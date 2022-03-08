@@ -1,0 +1,21 @@
+{
+  "replace": false,
+  "values": [
+    "domesticationinnovation:pet_bed_white",
+    "domesticationinnovation:pet_bed_orange",
+    "domesticationinnovation:pet_bed_magenta",
+    "domesticationinnovation:pet_bed_light_blue",
+    "domesticationinnovation:pet_bed_yellow",
+    "domesticationinnovation:pet_bed_lime",
+    "domesticationinnovation:pet_bed_pink",
+    "domesticationinnovation:pet_bed_gray",
+    "domesticationinnovation:pet_bed_light_gray",
+    "domesticationinnovation:pet_bed_cyan",
+    "domesticationinnovation:pet_bed_purple",
+    "domesticationinnovation:pet_bed_blue",
+    "domesticationinnovation:pet_bed_brown",
+    "domesticationinnovation:pet_bed_green",
+    "domesticationinnovation:pet_bed_red",
+    "domesticationinnovation:pet_bed_black"
+  ]
+}
