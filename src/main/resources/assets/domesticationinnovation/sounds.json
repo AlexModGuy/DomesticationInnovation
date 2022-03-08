@@ -1,0 +1,53 @@
+{
+  "magnet_loop": {
+    "category": "neutral",
+    "sounds": [
+      {
+        "name": "domesticationinnovation:magnet_loop"
+      }
+    ],
+    "subtitle": "domesticationinnovation.sound.subtitle.magnet_loop"
+  },
+  "chain_lightning": {
+    "category": "neutral",
+    "sounds": [
+      {
+        "name": "domesticationinnovation:chain_lightning_0"
+      },
+      {
+        "name": "domesticationinnovation:chain_lightning_1"
+      },
+      {
+        "name": "domesticationinnovation:chain_lightning_2"
+      }
+    ],
+    "subtitle": "domesticationinnovation.sound.subtitle.chain_lightning"
+  },
+  "giant_bubble_inflate": {
+    "category": "neutral",
+    "sounds": [
+      {
+        "name": "domesticationinnovation:giant_bubble_inflate_0"
+      },
+      {
+        "name": "domesticationinnovation:giant_bubble_inflate_1"
+      },
+      {
+        "name": "domesticationinnovation:giant_bubble_inflate_2"
+      }
+    ],
+    "subtitle": "domesticationinnovation.sound.subtitle.giant_bubble_inflate"
+  },
+  "giant_bubble_pop": {
+    "category": "neutral",
+    "sounds": [
+      {
+        "name": "domesticationinnovation:giant_bubble_pop_0"
+      },
+      {
+        "name": "domesticationinnovation:giant_bubble_pop_1"
+      }
+    ],
+    "subtitle": "domesticationinnovation.sound.subtitle.giant_bubble_pop"
+  }
+}

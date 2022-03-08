@@ -1,0 +1,76 @@
+{
+	"parent": "block/block",
+	"textures": {
+		"0": "domesticationinnovation:block/pet_bed_front",
+		"1": "domesticationinnovation:block/pet_bed_bottom",
+		"2": "domesticationinnovation:block/pet_bed_inside",
+		"particle": "domesticationinnovation:block/pet_bed_front"
+	},
+	"elements": [
+		{
+			"name": "bottom",
+			"from": [0, 0, 0],
+			"to": [16, 5, 16],
+			"faces": {
+				"north": {"uv": [0, 11, 16, 16], "texture": "#0"},
+				"east": {"uv": [0, 11, 16, 16], "texture": "#1"},
+				"south": {"uv": [0, 11, 16, 16], "texture": "#1"},
+				"west": {"uv": [0, 11, 16, 16], "texture": "#1"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#1"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#1"}
+			}
+		},
+		{
+			"name": "wall_left",
+			"from": [0, 5, 0],
+			"to": [4, 8, 16],
+			"faces": {
+				"north": {"uv": [12, 8, 16, 11], "texture": "#0"},
+				"east": {"uv": [16, 12, 0, 16], "texture": "#2"},
+				"south": {"uv": [0, 8, 4, 11], "texture": "#0"},
+				"west": {"uv": [0, 7, 16, 11], "texture": "#1"},
+				"up": {"uv": [0, 8, 16, 12], "rotation": 90, "texture": "#2"},
+				"down": {"uv": [0, 0, 4, 16], "texture": "#bed"}
+			}
+		},
+		{
+			"name": "wall_right",
+			"from": [12, 5, 0],
+			"to": [16, 8, 16],
+			"faces": {
+				"north": {"uv": [0, 8, 4, 11], "texture": "#0"},
+				"east": {"uv": [0, 7, 16, 11], "texture": "#1"},
+				"south": {"uv": [16, 8, 12, 11], "texture": "#0"},
+				"west": {"uv": [0, 12, 16, 16], "texture": "#2"},
+				"up": {"uv": [0, 12, 16, 8], "rotation": 90, "texture": "#2"},
+				"down": {"uv": [0, 0, 4, 16], "texture": "#bed"}
+			}
+		},
+		{
+			"name": "wall_back",
+			"from": [4, 5, 12],
+			"to": [12, 8, 16],
+			"faces": {
+				"north": {"uv": [4, 13, 12, 16], "texture": "#2"},
+				"east": {"uv": [0, 0, 4, 3], "texture": "#bed"},
+				"south": {"uv": [4, 4, 12, 7], "texture": "#1"},
+				"west": {"uv": [0, 0, 4, 3], "texture": "#1"},
+				"up": {"uv": [4, 8, 12, 4], "texture": "#2"},
+				"down": {"uv": [0, 0, 8, 4], "texture": "#bed"}
+			}
+		},
+		{
+			"name": "cushion",
+			"from": [4, 5, 2],
+			"to": [12, 7, 12],
+			"faces": {
+				"north": {"uv": [8, 0, 16, 2], "texture": "#bed"},
+				"east": {"uv": [0, 14, 10, 16], "texture": "#bed"},
+				"south": {"uv": [8, 0, 16, 2], "texture": "#bed"},
+				"west": {"uv": [0, 14, 10, 16], "texture": "#bed"},
+				"up": {"uv": [0, 0, 8, 10], "texture": "#bed"},
+				"down": {"uv": [0, 0, 8, 10], "texture": "#bed"}
+			}
+		}
+	]
+}

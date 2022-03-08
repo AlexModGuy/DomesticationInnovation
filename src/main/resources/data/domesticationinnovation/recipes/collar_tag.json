@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "I",
+    "C"
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:chain"
+    },
+    "C": {
+      "item": "minecraft:copper_ingot"
+    }
+  },
+  "result": {
+    "item": "domesticationinnovation:collar_tag",
+    "count": 1
+  }
+}

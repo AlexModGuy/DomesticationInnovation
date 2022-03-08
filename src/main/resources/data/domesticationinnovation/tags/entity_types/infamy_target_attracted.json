@@ -1,0 +1,23 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:drowned",
+    "minecraft:husk",
+    "minecraft:zombie_villager",
+    "minecraft:zombie",
+    "minecraft:vex",
+    "minecraft:spider",
+    "minecraft:slime",
+    "minecraft:ghast",
+    "minecraft:cave_spider",
+    "minecraft:silverfish",
+    "minecraft:blaze",
+    "minecraft:magma_cube",
+    "minecraft:wither",
+    "minecraft:endermite",
+    "minecraft:shulker",
+    "minecraft:phantom",
+    "#minecraft:raiders",
+    "#minecraft:skeletons"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "R ",
+    " F"
+  ],
+  "key": {
+    "R": {
+      "item": "minecraft:fishing_rod"
+    },
+    "F": {
+      "tag": "forge:feathers"
+    }
+  },
+  "result": {
+    "item": "domesticationinnovation:feather_on_a_stick",
+    "count": 1
+  }
+}

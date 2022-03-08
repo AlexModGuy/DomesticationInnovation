@@ -1,0 +1,6 @@
+{
+    "parent": "domesticationinnovation:block/pet_bed",
+    "textures": {
+        "bed": "domesticationinnovation:block/pet_bed_seat_blue"
+    }
+}

@@ -1,0 +1,30 @@
+modLoader="javafml" #mandatory
+loaderVersion="[36,)" #mandatory This is typically bumped every Minecraft version by Forge. See our download page for lists of versions.
+license="GNU LESSER GENERAL PUBLIC LICENSE"
+issueTrackerURL="https://github.com/Alex-the-666/DomesticationInnovation/issues" #optional
+[[mods]] #mandatory
+modId="domesticationinnovation" #mandatory
+version="1.0.0" #mandatory
+displayName="Domestication Innovation" #mandatory
+displayURL="https://www.curseforge.com/minecraft/mc-mods/dommestication-innovation" #optional
+authors="Alexthe668, FallenReaper, Yosh" #optional
+description='''Vastly improves upon and compliments tameable mobs, both from vanilla and other mods.'''
+logoFile="domesticationinnovation.png" #optional
+
+[[dependencies.domesticationinnovation]] #optional
+    # the modid of the dependency
+    modId="citadel" #mandatory
+    # Does this dependency have to exist - if not, ordering below must be specified
+    mandatory=true #mandatory
+    # The version range of the dependency
+    versionRange="[1.10.10,)" #mandatory
+    # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
+    ordering="AFTER"
+    # Side this dependency is applied on - BOTH, CLIENT or SERVER
+    side="BOTH"
+[[dependencies.domesticationinnovation]]
+    modId="forge"
+    mandatory=true
+    versionRange="[36.0.42,)"
+    ordering="NONE"
+    side="BOTH"
