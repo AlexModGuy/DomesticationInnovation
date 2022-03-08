@@ -343,6 +343,7 @@ public class CommonProxy {
     @SubscribeEvent
     public void onLivingDie(LivingDeathEvent event) {
         if (TameableUtils.isTamed(event.getEntityLiving()) && !TameableUtils.isZombiePet(event.getEntityLiving())) {
+
             BlockPos bedPos = TameableUtils.getPetBedPos(event.getEntityLiving());
             if (bedPos != null) {
                 CompoundTag data = new CompoundTag();
@@ -352,6 +353,12 @@ public class CommonProxy {
                 DIWorldData worldData = DIWorldData.get(event.getEntityLiving().level);
                 if (worldData != null) {
                     worldData.addRespawnRequest(request);
+                }
+            }
+            if(!(event.getEntityLiving() instanceof TamableAnimal)){
+                Entity owner = TameableUtils.getOwnerOf(event.getEntityLiving());
+                if (!event.getEntityLiving().level.isClientSide && event.getEntityLiving().level.getGameRules().getBoolean(GameRules.RULE_SHOWDEATHMESSAGES) && owner instanceof ServerPlayer) {
+                    owner.sendMessage(event.getEntityLiving().getCombatTracker().getDeathMessage(), Util.NIL_UUID);
                 }
             }
             if (event.getEntityLiving() instanceof Mob mob && event.getEntityLiving().level.getDifficulty() != Difficulty.PEACEFUL && TameableUtils.hasEnchant(mob, DIEnchantmentRegistry.UNDEAD_CURSE)) {
@@ -380,11 +387,6 @@ public class CommonProxy {
                 mob.level.addFreshEntity(zombieCopy);
                 zombieCopy.setHealth(zombieCopy.getMaxHealth());
                 TameableUtils.setZombiePet(zombieCopy, true);
-            }
-        }else if(TameableUtils.isTamed(event.getEntityLiving()) && !(event.getEntityLiving() instanceof TamableAnimal)){
-            Entity owner = TameableUtils.getOwnerOf(event.getEntityLiving());
-            if (!event.getEntityLiving().level.isClientSide && event.getEntityLiving().level.getGameRules().getBoolean(GameRules.RULE_SHOWDEATHMESSAGES) && owner instanceof ServerPlayer) {
-                owner.sendMessage(event.getEntityLiving().getCombatTracker().getDeathMessage(), Util.NIL_UUID);
             }
         }
     }

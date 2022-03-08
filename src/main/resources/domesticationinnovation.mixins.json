@@ -15,6 +15,7 @@
     "FishingHookMixin",
     "FloatGoalMixin",
     "FollowOwnerGoalMixin",
+    "FollowParentGoalMixin",
     "FoxMixin",
     "LivingEntityMixin",
     "MobMixin",
