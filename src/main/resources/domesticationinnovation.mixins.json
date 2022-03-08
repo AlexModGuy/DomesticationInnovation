@@ -19,6 +19,7 @@
     "FoxMixin",
     "LivingEntityMixin",
     "MobMixin",
+    "PanicGoalMixin",
     "ParrotMixin",
     "PlayerMixin",
     "RabbitMixin",

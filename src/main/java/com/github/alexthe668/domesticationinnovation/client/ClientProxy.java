@@ -81,7 +81,6 @@ public class ClientProxy extends CommonProxy {
     @Override
     @OnlyIn(Dist.CLIENT)
     public void clientInit() {
-        Minecraft.getInstance().renderBuffers().fixedBuffers.put(DIRenderTypes.IFRAME_GLINT, new BufferBuilder(DIRenderTypes.IFRAME_GLINT.bufferSize()));
         EntityRenderers.register(DIEntityRegistry.CHAIN_LIGHTNING.get(), ChainLightningRender::new);
         EntityRenderers.register(DIEntityRegistry.RECALL_BALL.get(), RecallBallRender::new);
         EntityRenderers.register(DIEntityRegistry.FEATHER.get(), RenderFeather::new);

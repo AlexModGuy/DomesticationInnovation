@@ -160,7 +160,7 @@ public class CommonProxy {
                     }
                     mob.setDeltaMovement(mob.getDeltaMovement().multiply(0.88D, 1.0D, 0.88D));
                     Vec3 move = new Vec3(mob.getX() - sucking.getX(), mob.getY() - (double) sucking.getEyeHeight() / 2.0D - sucking.getY(), mob.getZ() - sucking.getZ());
-                    sucking.setDeltaMovement(sucking.getDeltaMovement().add(move.normalize().scale(0.15D)));
+                    sucking.setDeltaMovement(sucking.getDeltaMovement().add(move.normalize().scale(mob.isOnGround() ? 0.15D : 0.05D)));
                 }
             }
             if (TameableUtils.hasEnchant(event.getEntityLiving(), DIEnchantmentRegistry.LINKED_INVENTORY) && event.getEntityLiving() instanceof Mob mob) {
