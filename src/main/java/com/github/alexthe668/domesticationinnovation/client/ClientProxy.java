@@ -43,6 +43,8 @@ import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RenderNameplateEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -69,8 +71,8 @@ public class ClientProxy extends CommonProxy {
         }));
     }
 
-    public static double getNametagOffset(int size) {
-        return (-10 * size) + 16;
+    public static float getNametagOffset() {
+        return ModList.get().isLoaded("neat") ? 0.5F : 0;
     }
 
     @Override
@@ -159,13 +161,13 @@ public class ClientProxy extends CommonProxy {
                 float f = entity.getBbHeight() + 0.5F;
                 int i = -10 * list.size();
                 pose.pushPose();
-                pose.translate(0.0D, f, 0.0D);
+                pose.translate(0.0D, f + getNametagOffset(), 0.0D);
                 pose.mulPose(Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation());
                 pose.scale(-0.025F, -0.025F, 0.025F);
 
                 float f3 = !list.isEmpty() ? (float) (-font.width(list.get(0)) / 2) : (float) (-font.width(nameTag) / 2);
                 pose.pushPose();
-                pose.translate(f3 + 12, ClientProxy.getNametagOffset(list.size()), 0);
+                pose.translate(f3 + 12, (-10 * list.size()) + 16, 0);
                 pose.mulPose(Vector3f.XP.rotationDegrees(180.0F));
                 pose.scale(22F, 22F, 22F);
                 Minecraft.getInstance().getItemRenderer().renderStatic(new ItemStack(DIItemRegistry.COLLAR_TAG.get()), ItemTransforms.TransformType.GROUND, lightIn, OverlayTexture.NO_OVERLAY, pose, buffer, entity.getId());
