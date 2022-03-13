@@ -10,6 +10,8 @@ import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.tags.EntityTypeTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
@@ -25,12 +27,26 @@ import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElementTy
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 import net.minecraft.world.level.levelgen.structure.templatesystem.*;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.registries.ForgeRegistries;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 public class PetshopStructurePoolElement extends LegacySinglePoolElement {
 
     public static final ResourceLocation CHEST = new ResourceLocation(DomesticationMod.MODID, "chests/petshop_chest");
+    public static final ResourceLocation FISHTANK_MOBS = new ResourceLocation(DomesticationMod.MODID, "petstore_fishtank");
+    public static final ResourceLocation CAGE_0_MOBS = new ResourceLocation(DomesticationMod.MODID, "petstore_cage_0");
+    public static final ResourceLocation CAGE_1_MOBS = new ResourceLocation(DomesticationMod.MODID, "petstore_cage_1");
+    public static final ResourceLocation CAGE_2_MOBS = new ResourceLocation(DomesticationMod.MODID, "petstore_cage_2");
+    public static final ResourceLocation CAGE_3_MOBS = new ResourceLocation(DomesticationMod.MODID, "petstore_cage_3");
+    private static boolean initializedMobLists = false;
+    private static EntityType[] fishtankMobs = null;
+    private static EntityType[] cage0Mobs = null;
+    private static EntityType[] cage1Mobs = null;
+    private static EntityType[] cage2Mobs = null;
+    private static EntityType[] cage3Mobs = null;
 
     public static final Codec<PetshopStructurePoolElement> CODEC = RecordCodecBuilder.create((p_210357_) -> {
         return p_210357_.group(templateCodec(), processorsCodec(), projectionCodec()).apply(p_210357_, PetshopStructurePoolElement::new);
@@ -47,8 +63,14 @@ public class PetshopStructurePoolElement extends LegacySinglePoolElement {
     @Override
     public void handleDataMarker(LevelAccessor levelAccessor, StructureTemplate.StructureBlockInfo structureBlockInfo, BlockPos pos, Rotation rotation, Random random, BoundingBox box) {
         String contents = structureBlockInfo.nbt.getString("metadata");
-        // System.out.println(structureBlockInfo.pos);
-        System.out.println(contents);
+        if(!initializedMobLists){
+            fishtankMobs = getAllMatchingEntities(DIEntityTags.PETSTORE_FISHTANK).toArray(new EntityType[0]);
+            cage0Mobs = getAllMatchingEntities(DIEntityTags.PETSTORE_CAGE_0).toArray(new EntityType[0]);
+            cage1Mobs = getAllMatchingEntities(DIEntityTags.PETSTORE_CAGE_1).toArray(new EntityType[0]);
+            cage2Mobs = getAllMatchingEntities(DIEntityTags.PETSTORE_CAGE_2).toArray(new EntityType[0]);
+            cage3Mobs = getAllMatchingEntities(DIEntityTags.PETSTORE_CAGE_3).toArray(new EntityType[0]);
+            initializedMobLists = true;
+        }
         switch (contents) {
             case "petshop_water":
                 BlockState state = Blocks.WATER.defaultBlockState();
@@ -76,7 +98,7 @@ public class PetshopStructurePoolElement extends LegacySinglePoolElement {
                     }
                     state = coralBlock.defaultBlockState().setValue(BaseCoralPlantTypeBlock.WATERLOGGED, true);
                 }
-                spawnAnimalsAt(levelAccessor, structureBlockInfo.pos, 2,  random, EntityType.TROPICAL_FISH);
+                spawnAnimalsAt(levelAccessor, structureBlockInfo.pos, 2,  random, fishtankMobs);
                 levelAccessor.setBlock(structureBlockInfo.pos, state, 2);
                 break;
             case "petshop_chest":
@@ -84,22 +106,26 @@ public class PetshopStructurePoolElement extends LegacySinglePoolElement {
                 RandomizableContainerBlockEntity.setLootTable(levelAccessor, random, structureBlockInfo.pos.below(), CHEST);
                 break;
             case "petshop_cage_0"://wolf, rabbit or cat
-                spawnAnimalsAt(levelAccessor, structureBlockInfo.pos, 1 + random.nextInt(1), random, EntityType.WOLF, EntityType.CAT, EntityType.RABBIT);
+                spawnAnimalsAt(levelAccessor, structureBlockInfo.pos, 1 + random.nextInt(2), random, cage0Mobs);
                 levelAccessor.setBlock(structureBlockInfo.pos, Blocks.AIR.defaultBlockState(), 4);
                 break;
             case "petshop_cage_1"://desert terrarium
-                spawnAnimalsAt(levelAccessor, structureBlockInfo.pos, 1 + random.nextInt(2), random, EntityType.RABBIT);
+                spawnAnimalsAt(levelAccessor, structureBlockInfo.pos, 2 + random.nextInt(2), random, cage1Mobs);
                 levelAccessor.setBlock(structureBlockInfo.pos, Blocks.AIR.defaultBlockState(), 2);
                 break;
             case "petshop_cage_2"://ice terrarium
-                spawnAnimalsAt(levelAccessor, structureBlockInfo.pos, 1 + random.nextInt(1), random, EntityType.FOX);
+                spawnAnimalsAt(levelAccessor, structureBlockInfo.pos, 1 + random.nextInt(2), random, cage2Mobs);
                 levelAccessor.setBlock(structureBlockInfo.pos, Blocks.AIR.defaultBlockState(), 2);
                 break;
             case "petshop_cage_3"://parrot
-                spawnAnimalsAt(levelAccessor, structureBlockInfo.pos, 1, random, EntityType.PARROT);
+                spawnAnimalsAt(levelAccessor, structureBlockInfo.pos, 1, random, cage3Mobs);
                 levelAccessor.setBlock(structureBlockInfo.pos, Blocks.AIR.defaultBlockState(), 2);
                 break;
         }
+    }
+
+    private List<EntityType<?>> getAllMatchingEntities(TagKey<EntityType<?>> tag) {
+       return ForgeRegistries.ENTITIES.getValues().stream().filter((type -> type.is(tag))).toList();
     }
 
     public void spawnAnimalsAt(LevelAccessor accessor, BlockPos at, int count, Random random, EntityType... types) {
