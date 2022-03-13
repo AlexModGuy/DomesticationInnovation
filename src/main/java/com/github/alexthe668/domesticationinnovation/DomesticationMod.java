@@ -67,4 +67,9 @@ public class DomesticationMod {
     private void setupParticleEvent(ParticleFactoryRegisterEvent event) {
         PROXY.setupParticles();
     }
+
+    @SubscribeEvent
+    public void serverAboutToStartEvent(ServerAboutToStartEvent event) {
+        DIVillagerRegistry.registerHouses(event.getServer());
+    }
 }

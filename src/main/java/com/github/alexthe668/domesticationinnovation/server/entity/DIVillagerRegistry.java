@@ -15,14 +15,12 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.entity.npc.VillagerProfession;
-import net.minecraft.world.level.levelgen.structure.pools.LegacySinglePoolElement;
-import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement;
-import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElementType;
-import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
+import net.minecraft.world.level.levelgen.feature.structures.StructurePoolElement;
+import net.minecraft.world.level.levelgen.feature.structures.StructurePoolElementType;
+import net.minecraft.world.level.levelgen.feature.structures.StructureTemplatePool;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -42,41 +40,31 @@ public class DIVillagerRegistry {
 
     @SubscribeEvent
     public static void registerVillagers(final RegistryEvent.Register<VillagerProfession> event) {
-        if(DomesticationMod.CONFIG.animalTamerVillager.get()){
+        if (DomesticationMod.CONFIG.animalTamerVillager.get()) {
             event.getRegistry().register(ANIMAL_TAMER);
         }
     }
 
-   /*  public static void registerHouses(MinecraftServer server) {
-       RegistryAccess.Frozen manager = server.registryAccess();
+    public static void registerHouses(MinecraftServer server) {
+        RegistryAccess manager = server.registryAccess();
         Registry<StructureTemplatePool> registry = manager.registryOrThrow(Registry.TEMPLATE_POOL_REGISTRY);
-        registerJigsawPiece(registry, new ResourceLocation("minecraft:village/plains/houses"), new ResourceLocation(DomesticationMod.MODID, "plains_petshop"), 20);
-        registerJigsawPiece(registry, new ResourceLocation("minecraft:village/desert/houses"), new ResourceLocation(DomesticationMod.MODID, "desert_petshop"), 20);
-        registerJigsawPiece(registry, new ResourceLocation("minecraft:village/savanna/houses"), new ResourceLocation(DomesticationMod.MODID, "savanna_petshop"), 20);
-        registerJigsawPiece(registry, new ResourceLocation("minecraft:village/snowy/houses"), new ResourceLocation(DomesticationMod.MODID, "snowy_petshop"), 20);
-        registerJigsawPiece(registry, new ResourceLocation("minecraft:village/taiga/houses"), new ResourceLocation(DomesticationMod.MODID, "taiga_petshop"), 20);
+        registerJigsawPiece(registry, new ResourceLocation("minecraft:village/plains/houses"), new ResourceLocation(DomesticationMod.MODID, "plains_petshop"));
+        registerJigsawPiece(registry, new ResourceLocation("minecraft:village/desert/houses"), new ResourceLocation(DomesticationMod.MODID, "desert_petshop"));
+        registerJigsawPiece(registry, new ResourceLocation("minecraft:village/savanna/houses"), new ResourceLocation(DomesticationMod.MODID, "savanna_petshop"));
+        registerJigsawPiece(registry, new ResourceLocation("minecraft:village/snowy/houses"), new ResourceLocation(DomesticationMod.MODID, "snowy_petshop"));
+        registerJigsawPiece(registry, new ResourceLocation("minecraft:village/taiga/houses"), new ResourceLocation(DomesticationMod.MODID, "taiga_petshop"));
 
     }
 
-    private static void registerJigsawPiece(Registry<StructureTemplatePool> registry, ResourceLocation poolLocation, ResourceLocation nbtLocation, int weight) {
+    private static void registerJigsawPiece(Registry<StructureTemplatePool> registry, ResourceLocation poolLocation, ResourceLocation nbtLocation) {
         StructureTemplatePool pool = registry.get(poolLocation);
-        StructurePoolElement element = new PetshopStructurePoolElement(nbtLocation, ProcessorLists.EMPTY);
-        if (pool != null) {
-            List<StructurePoolElement> templates = new ArrayList<>(pool.templates);
-            for (int i = 0; i < weight; i++) {
-                templates.add(element);
-            }
-            List<Pair<StructurePoolElement, Integer>> rawTemplates = new ArrayList(pool.rawTemplates);
-            rawTemplates.add(new Pair<>(element, weight));
-            pool.templates = templates;
-            pool.rawTemplates = rawTemplates;
-        }
-    }*/
+        addToPool(pool, nbtLocation);
+    }
 
     public static StructureTemplatePool addToPool(StructureTemplatePool pool, ResourceLocation resourceLocation) {
         int weight = DomesticationMod.CONFIG.petstoreVillageWeight.get();
-        if(weight > 0){
-            StructurePoolElement element = new PetshopStructurePoolElement(resourceLocation, ProcessorLists.EMPTY);
+        if (weight > 0) {
+            StructurePoolElement element = new PetshopStructurePoolElement(resourceLocation, () -> ProcessorLists.EMPTY);
             if (pool != null) {
                 List<StructurePoolElement> templates = new ArrayList<>(pool.templates);
                 for (int i = 0; i < weight; i++) {

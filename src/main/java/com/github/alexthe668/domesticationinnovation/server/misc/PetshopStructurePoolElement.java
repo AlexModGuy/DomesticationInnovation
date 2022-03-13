@@ -6,12 +6,9 @@ import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.tags.EntityTypeTags;
-import net.minecraft.tags.TagKey;
+import net.minecraft.tags.Tag;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
@@ -21,10 +18,10 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.feature.structures.LegacySinglePoolElement;
+import net.minecraft.world.level.levelgen.feature.structures.StructurePoolElementType;
+import net.minecraft.world.level.levelgen.feature.structures.StructureTemplatePool;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
-import net.minecraft.world.level.levelgen.structure.pools.LegacySinglePoolElement;
-import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElementType;
-import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 import net.minecraft.world.level.levelgen.structure.templatesystem.*;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -32,6 +29,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Supplier;
 
 public class PetshopStructurePoolElement extends LegacySinglePoolElement {
 
@@ -52,11 +50,11 @@ public class PetshopStructurePoolElement extends LegacySinglePoolElement {
         return p_210357_.group(templateCodec(), processorsCodec(), projectionCodec()).apply(p_210357_, PetshopStructurePoolElement::new);
     });
 
-    protected PetshopStructurePoolElement(Either<ResourceLocation, StructureTemplate> either, Holder<StructureProcessorList> p_210349_, StructureTemplatePool.Projection p_210350_) {
+    protected PetshopStructurePoolElement(Either<ResourceLocation, StructureTemplate> either, Supplier<StructureProcessorList> p_210349_, StructureTemplatePool.Projection p_210350_) {
         super(either, p_210349_, p_210350_);
     }
 
-    public PetshopStructurePoolElement(ResourceLocation resourceLocation, Holder<StructureProcessorList> processors) {
+    public PetshopStructurePoolElement(ResourceLocation resourceLocation, Supplier<StructureProcessorList> processors) {
         super(Either.left(resourceLocation), processors, StructureTemplatePool.Projection.RIGID);
     }
 
@@ -64,11 +62,11 @@ public class PetshopStructurePoolElement extends LegacySinglePoolElement {
     public void handleDataMarker(LevelAccessor levelAccessor, StructureTemplate.StructureBlockInfo structureBlockInfo, BlockPos pos, Rotation rotation, Random random, BoundingBox box) {
         String contents = structureBlockInfo.nbt.getString("metadata");
         if(!initializedMobLists){
-            fishtankMobs = getAllMatchingEntities(DIEntityTags.PETSTORE_FISHTANK).toArray(new EntityType[0]);
-            cage0Mobs = getAllMatchingEntities(DIEntityTags.PETSTORE_CAGE_0).toArray(new EntityType[0]);
-            cage1Mobs = getAllMatchingEntities(DIEntityTags.PETSTORE_CAGE_1).toArray(new EntityType[0]);
-            cage2Mobs = getAllMatchingEntities(DIEntityTags.PETSTORE_CAGE_2).toArray(new EntityType[0]);
-            cage3Mobs = getAllMatchingEntities(DIEntityTags.PETSTORE_CAGE_3).toArray(new EntityType[0]);
+            fishtankMobs = getAllMatchingEntities(FISHTANK_MOBS).toArray(new EntityType[0]);
+            cage0Mobs = getAllMatchingEntities(CAGE_0_MOBS).toArray(new EntityType[0]);
+            cage1Mobs = getAllMatchingEntities(CAGE_1_MOBS).toArray(new EntityType[0]);
+            cage2Mobs = getAllMatchingEntities(CAGE_2_MOBS).toArray(new EntityType[0]);
+            cage3Mobs = getAllMatchingEntities(CAGE_3_MOBS).toArray(new EntityType[0]);
             initializedMobLists = true;
         }
         switch (contents) {
@@ -124,7 +122,8 @@ public class PetshopStructurePoolElement extends LegacySinglePoolElement {
         }
     }
 
-    private List<EntityType<?>> getAllMatchingEntities(TagKey<EntityType<?>> tag) {
+    private List<EntityType<?>> getAllMatchingEntities(ResourceLocation resourceLocation) {
+        Tag<EntityType<?>> tag = EntityTypeTags.getAllTags().getTag(resourceLocation);
        return ForgeRegistries.ENTITIES.getValues().stream().filter((type -> type.is(tag))).toList();
     }
 
@@ -170,7 +169,7 @@ public class PetshopStructurePoolElement extends LegacySinglePoolElement {
         if (!p_210423_) {
             structureplacesettings.addProcessor(JigsawReplacementProcessor.INSTANCE);
         }
-        this.processors.value().list().forEach(structureplacesettings::addProcessor);
+        this.processors.get().list().forEach(structureplacesettings::addProcessor);
         this.getProjection().getProcessors().forEach(structureplacesettings::addProcessor);
         return structureplacesettings;
     }

@@ -22,7 +22,6 @@
     "PanicGoalMixin",
     "ParrotMixin",
     "PlayerMixin",
-    "PoolsMixin",
     "RabbitMixin",
     "TameableAnimalMixin",
     "VillagerMixin",
