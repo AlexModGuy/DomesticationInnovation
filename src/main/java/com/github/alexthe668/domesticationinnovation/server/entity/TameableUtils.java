@@ -128,6 +128,15 @@ public class TameableUtils {
         return null;
     }
 
+    public static void setOwnerUUIDOf(Entity entity, UUID uuid) {
+        if (entity instanceof ModifedToBeTameable) {
+            ((ModifedToBeTameable) entity).setTameOwnerUUID(uuid);
+        }
+        if (entity instanceof TamableAnimal) {
+            ((TamableAnimal) entity).setOwnerUUID(uuid);
+        }
+    }
+
     private static void setEnchantmentTag(LivingEntity enchanted, ListTag enchants) {
         CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
         tag.put(ENCHANTMENT_TAG, enchants);

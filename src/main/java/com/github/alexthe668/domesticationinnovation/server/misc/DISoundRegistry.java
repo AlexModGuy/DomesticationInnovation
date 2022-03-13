@@ -12,10 +12,12 @@ import java.lang.reflect.Field;
 @Mod.EventBusSubscriber(modid = DomesticationMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DISoundRegistry {
 
+    public static final SoundEvent COLLAR_TAG = createSoundEvent("collar_tag");
     public static final SoundEvent MAGNET_LOOP = createSoundEvent("magnet_loop");
     public static final SoundEvent CHAIN_LIGHTNING = createSoundEvent("chain_lightning");
     public static final SoundEvent GIANT_BUBBLE_INFLATE = createSoundEvent("giant_bubble_inflate");
     public static final SoundEvent GIANT_BUBBLE_POP = createSoundEvent("giant_bubble_pop");
+    public static final SoundEvent PET_BED_USE = createSoundEvent("pet_bed_use");
 
     private static SoundEvent createSoundEvent(final String soundName) {
         final ResourceLocation soundID = new ResourceLocation(DomesticationMod.MODID, soundName);

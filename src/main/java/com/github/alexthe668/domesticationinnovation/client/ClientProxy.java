@@ -8,6 +8,7 @@ import com.github.alexthe668.domesticationinnovation.server.entity.DIEntityRegis
 import com.github.alexthe668.domesticationinnovation.server.entity.FeatherEntity;
 import com.github.alexthe668.domesticationinnovation.server.entity.TameableUtils;
 import com.github.alexthe668.domesticationinnovation.server.item.DIItemRegistry;
+import com.github.alexthe668.domesticationinnovation.server.item.DeedOfOwnershipItem;
 import com.github.alexthe668.domesticationinnovation.server.item.FeatherOnAStickItem;
 import com.github.alexthe668.domesticationinnovation.server.misc.DIParticleRegistry;
 import com.google.common.collect.ImmutableList;
@@ -94,8 +95,11 @@ public class ClientProxy extends CommonProxy {
                 if (holder.getMainHandItem().getItem() instanceof FeatherOnAStickItem) {
                     flag1 = false;
                 }
-                return (flag || flag1) && holder instanceof Player && ((Player)holder).fishing instanceof FeatherEntity ? 1.0F : 0.0F;
+                return (flag || flag1) && holder instanceof Player && ((Player) holder).fishing instanceof FeatherEntity ? 1.0F : 0.0F;
             }
+        });
+        ItemProperties.register(DIItemRegistry.DEED_OF_OWNERSHIP.get(), new ResourceLocation("bound"), (stack, lvl, holder, i) -> {
+            return DeedOfOwnershipItem.isBound(stack) ? 1 : 0;
         });
     }
 
@@ -111,8 +115,8 @@ public class ClientProxy extends CommonProxy {
     }
 
     @SubscribeEvent
-    public void renderNametagEvent(RenderNameplateEvent event){
-        if(TameableUtils.isTamed(event.getEntity()) && TameableUtils.isPetOf(Minecraft.getInstance().player, event.getEntity()) && TameableUtils.hasAnyEnchants((LivingEntity)event.getEntity()) && Minecraft.getInstance().player.isShiftKeyDown()){
+    public void renderNametagEvent(RenderNameplateEvent event) {
+        if (TameableUtils.isTamed(event.getEntity()) && TameableUtils.isPetOf(Minecraft.getInstance().player, event.getEntity()) && TameableUtils.hasAnyEnchants((LivingEntity) event.getEntity()) && Minecraft.getInstance().player.isShiftKeyDown()) {
             event.setResult(Event.Result.DENY);
             renderNameTagStuffFor(event.getEntity(), event.getContent(), event.getPoseStack(), event.getMultiBufferSource(), event.getPackedLight());
         }
@@ -140,26 +144,26 @@ public class ClientProxy extends CommonProxy {
     }
 
     private void renderNameTagStuffFor(Entity entity, Component nameTag, PoseStack pose, MultiBufferSource buffer, int lightIn) {
-        if(Minecraft.getInstance().player.isShiftKeyDown() && TameableUtils.isTamed(entity) && TameableUtils.hasAnyEnchants((LivingEntity)entity)) {
-            LivingEntity living = (LivingEntity)entity;
+        if (Minecraft.getInstance().player.isShiftKeyDown() && TameableUtils.isTamed(entity) && TameableUtils.hasAnyEnchants((LivingEntity) entity)) {
+            LivingEntity living = (LivingEntity) entity;
             List<Component> list = TameableUtils.getEnchantDescriptions(living);
             double d0 = Minecraft.getInstance().getEntityRenderDispatcher().distanceToSqr(entity);
             if (net.minecraftforge.client.ForgeHooksClient.isNameplateInRenderDistance(entity, d0)) {
-                if(nameTag instanceof MutableComponent){
-                    int health = (int)Math.round(living.getHealth());
-                    int maxHealth = (int)Math.round(living.getMaxHealth());
-                    nameTag = ((MutableComponent)nameTag).append(" (" + health + "/" + maxHealth + ")");
+                if (nameTag instanceof MutableComponent) {
+                    int health = Math.round(living.getHealth());
+                    int maxHealth = Math.round(living.getMaxHealth());
+                    nameTag = ((MutableComponent) nameTag).append(" (" + health + "/" + maxHealth + ")");
                 }
                 Font font = Minecraft.getInstance().font;
                 boolean flag = !entity.isDiscrete();
                 float f = entity.getBbHeight() + 0.5F;
                 int i = -10 * list.size();
                 pose.pushPose();
-                pose.translate(0.0D, (double)f, 0.0D);
+                pose.translate(0.0D, f, 0.0D);
                 pose.mulPose(Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation());
                 pose.scale(-0.025F, -0.025F, 0.025F);
 
-                float f3 = !list.isEmpty() ? (float)(-font.width(list.get(0)) / 2) : (float)(-font.width(nameTag) / 2);
+                float f3 = !list.isEmpty() ? (float) (-font.width(list.get(0)) / 2) : (float) (-font.width(nameTag) / 2);
                 pose.pushPose();
                 pose.translate(f3 + 12, ClientProxy.getNametagOffset(list.size()), 0);
                 pose.mulPose(Vector3f.XP.rotationDegrees(180.0F));
@@ -169,17 +173,17 @@ public class ClientProxy extends CommonProxy {
 
                 Matrix4f matrix4f = pose.last().pose();
                 float f1 = Minecraft.getInstance().options.getBackgroundOpacity(0.25F);
-                int j = (int)(f1 * 255.0F) << 24;
-                float f2 = (float)(-font.width(nameTag) / 2);
-                font.drawInBatch(nameTag, f2, (float)i - 0.25F, 553648127, false, matrix4f, buffer, flag, j, lightIn);
+                int j = (int) (f1 * 255.0F) << 24;
+                float f2 = (float) (-font.width(nameTag) / 2);
+                font.drawInBatch(nameTag, f2, (float) i - 0.25F, 553648127, false, matrix4f, buffer, flag, j, lightIn);
                 if (flag) {
-                    font.drawInBatch(nameTag, f2, (float)i - 0.25F, -1, false, matrix4f, buffer, false, 0, lightIn);
+                    font.drawInBatch(nameTag, f2, (float) i - 0.25F, -1, false, matrix4f, buffer, false, 0, lightIn);
                 }
                 pose.pushPose();
                 pose.scale(0.8F, 0.8F, 0.8F);
                 matrix4f = pose.last().pose();
-                for(int k = 0; k < list.size(); k++){
-                    float f4 = (float)(-font.width(list.get(k)) / 2);
+                for (int k = 0; k < list.size(); k++) {
+                    float f4 = (float) (-font.width(list.get(k)) / 2);
                     font.drawInBatch(list.get(k), f4, i * 1.25F + k * 10 + 12, 553648127, false, matrix4f, buffer, flag, j, lightIn);
                     if (flag) {
                         font.drawInBatch(list.get(k), f4, i * 1.25F + k * 10 + 12, -1, false, matrix4f, buffer, false, 0, lightIn);

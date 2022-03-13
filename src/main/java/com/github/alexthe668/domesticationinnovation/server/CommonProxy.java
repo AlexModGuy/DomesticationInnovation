@@ -1,17 +1,21 @@
 package com.github.alexthe668.domesticationinnovation.server;
 
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
+import com.github.alexthe668.domesticationinnovation.server.block.DIBlockRegistry;
 import com.github.alexthe668.domesticationinnovation.server.block.PetBedBlock;
 import com.github.alexthe668.domesticationinnovation.server.block.PetBedBlockEntity;
 import com.github.alexthe668.domesticationinnovation.server.enchantment.DIEnchantmentRegistry;
 import com.github.alexthe668.domesticationinnovation.server.entity.*;
 import com.github.alexthe668.domesticationinnovation.server.item.DIItemRegistry;
 import com.github.alexthe668.domesticationinnovation.server.misc.*;
+import com.github.alexthe668.domesticationinnovation.server.misc.trades.*;
+import com.google.common.collect.ImmutableSet;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -30,6 +34,7 @@ import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.animal.Rabbit;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Ravager;
+import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -55,13 +60,12 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.village.VillagerTradesEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 @Mod.EventBusSubscriber(modid = DomesticationMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class CommonProxy {
@@ -155,7 +159,7 @@ public class CommonProxy {
                     }
                 }
                 if (sucking != null) {
-                    if(mob.tickCount % 15 == 0){
+                    if (mob.tickCount % 15 == 0) {
                         mob.playSound(DISoundRegistry.MAGNET_LOOP, 1F, 1F);
                     }
                     mob.setDeltaMovement(mob.getDeltaMovement().multiply(0.88D, 1.0D, 0.88D));
@@ -180,7 +184,7 @@ public class CommonProxy {
                 boolean shouldMoveToOwnerXZ = owner != null && Math.abs(owner.getY() - event.getEntityLiving().getY()) < 1;
                 double targetX = shouldMoveToOwnerXZ ? owner.getX() : event.getEntityLiving().getX();
                 double targetY = Math.max(event.getEntityLiving().level.getMinBuildHeight() + 0.5F, owner == null ? 64F : owner.getY() < event.getEntityLiving().getY() ? owner.getY() + 0.6F : owner.getY(1.0F) + event.getEntityLiving().getBbHeight());
-                if(owner != null && owner.getRootVehicle() == event.getEntityLiving()){
+                if (owner != null && owner.getRootVehicle() == event.getEntityLiving()) {
                     targetY = Math.min(event.getEntityLiving().level.getMinBuildHeight() + 0.5F, event.getEntityLiving().getY() - 0.5F);
                 }
                 double targetZ = shouldMoveToOwnerXZ ? owner.getZ() : event.getEntityLiving().getZ();
@@ -197,7 +201,7 @@ public class CommonProxy {
                 }
             }
             if (TameableUtils.isZombiePet(event.getEntityLiving()) && !event.getEntityLiving().level.isClientSide && event.getEntityLiving() instanceof Mob mob) {
-                if(mob.getTarget() instanceof Player && ((Player) mob.getTarget()).isCreative()){
+                if (mob.getTarget() instanceof Player && ((Player) mob.getTarget()).isCreative()) {
                     mob.setTarget(null);
                 }
                 if (mob.getTarget() == null || !mob.getTarget().isAlive()) {
@@ -276,6 +280,7 @@ public class CommonProxy {
                     recallBall.copyPosition(event.getEntityLiving());
                     recallBall.setYRot(event.getEntityLiving().getYRot());
                     recallBall.setInvulnerable(true);
+                    event.getEntityLiving().stopRiding();
                     if (event.getEntityLiving().level.addFreshEntity(recallBall)) {
                         event.getEntityLiving().discard();
                     }
@@ -355,7 +360,7 @@ public class CommonProxy {
                     worldData.addRespawnRequest(request);
                 }
             }
-            if(!(event.getEntityLiving() instanceof TamableAnimal)){
+            if (!(event.getEntityLiving() instanceof TamableAnimal)) {
                 Entity owner = TameableUtils.getOwnerOf(event.getEntityLiving());
                 if (!event.getEntityLiving().level.isClientSide && event.getEntityLiving().level.getGameRules().getBoolean(GameRules.RULE_SHOWDEATHMESSAGES) && owner instanceof ServerPlayer) {
                     owner.sendMessage(event.getEntityLiving().getCombatTracker().getDeathMessage(), Util.NIL_UUID);
@@ -379,7 +384,7 @@ public class CommonProxy {
                     tameable.setTame(false);
                     tameable.setTameOwnerUUID(null);
                 }
-                if(zombieCopy instanceof CommandableMob commandableMob){
+                if (zombieCopy instanceof CommandableMob commandableMob) {
                     commandableMob.setCommand(0);
                 }
                 zombieCopy.copyPosition(mob);
@@ -401,43 +406,43 @@ public class CommonProxy {
 
     @SubscribeEvent
     public void onInteractWithEntity(PlayerInteractEvent.EntityInteract event) {
-        if(TameableUtils.couldBeTamed(event.getTarget()) && TameableUtils.isZombiePet((LivingEntity) event.getTarget())){
+        if (TameableUtils.couldBeTamed(event.getTarget()) && TameableUtils.isZombiePet((LivingEntity) event.getTarget())) {
             event.setCanceled(true);
             event.setCancellationResult(InteractionResult.SUCCESS);
             return;
         }
-        if(event.getTarget() instanceof Rabbit rabbit && DomesticationMod.CONFIG.tameableRabbit.get()){
+        if (event.getTarget() instanceof Rabbit rabbit && DomesticationMod.CONFIG.tameableRabbit.get()) {
             ItemStack stack = event.getItemStack();
-            if(stack.getItem() == Items.CARROT || stack.getItem() == Items.GOLDEN_CARROT){
+            if (stack.getItem() == Items.CARROT || stack.getItem() == Items.GOLDEN_CARROT) {
                 if (TameableUtils.isTamed(rabbit) && rabbit.getHealth() < rabbit.getMaxHealth()) {
                     rabbit.heal(3);
-                    if(!event.getPlayer().isCreative()){
+                    if (!event.getPlayer().isCreative()) {
                         stack.shrink(1);
                     }
                     event.setCanceled(true);
                     event.setCancellationResult(InteractionResult.SUCCESS);
                     return;
                 }
-                if(!TameableUtils.isTamed(rabbit) && !rabbit.level.isClientSide){
-                    if(!event.getPlayer().isCreative()){
+                if (!TameableUtils.isTamed(rabbit) && !rabbit.level.isClientSide) {
+                    if (!event.getPlayer().isCreative()) {
                         stack.shrink(1);
                     }
-                    if(rabbit.getRandom().nextInt(4) == 0){
-                        for(int i = 0; i < 3; ++i) {
+                    if (rabbit.getRandom().nextInt(4) == 0) {
+                        for (int i = 0; i < 3; ++i) {
                             double d0 = rabbit.getRandom().nextGaussian() * 0.02D;
                             double d1 = rabbit.getRandom().nextGaussian() * 0.02D;
                             double d2 = rabbit.getRandom().nextGaussian() * 0.02D;
-                            ((ServerLevel)rabbit.getLevel()).sendParticles(ParticleTypes.HEART, rabbit.getRandomX(1.0D), rabbit.getRandomY() + 0.5D, rabbit.getRandomZ(1.0D), 3, d0, d1, d2, 0.02F);
+                            ((ServerLevel) rabbit.getLevel()).sendParticles(ParticleTypes.HEART, rabbit.getRandomX(1.0D), rabbit.getRandomY() + 0.5D, rabbit.getRandomZ(1.0D), 3, d0, d1, d2, 0.02F);
                         }
-                        ((ModifedToBeTameable)rabbit).setTame(true);
-                        ((ModifedToBeTameable)rabbit).setTameOwnerUUID(event.getPlayer().getUUID());
-                        ((CommandableMob)rabbit).setCommand(1);
-                    }else{
-                        for(int i = 0; i < 3; ++i) {
+                        ((ModifedToBeTameable) rabbit).setTame(true);
+                        ((ModifedToBeTameable) rabbit).setTameOwnerUUID(event.getPlayer().getUUID());
+                        ((CommandableMob) rabbit).setCommand(1);
+                    } else {
+                        for (int i = 0; i < 3; ++i) {
                             double d0 = rabbit.getRandom().nextGaussian() * 0.02D;
                             double d1 = rabbit.getRandom().nextGaussian() * 0.02D;
                             double d2 = rabbit.getRandom().nextGaussian() * 0.02D;
-                            ((ServerLevel)rabbit.getLevel()).sendParticles(ParticleTypes.SMOKE, rabbit.getRandomX(1.0D), rabbit.getRandomY() + 0.5D, rabbit.getRandomZ(1.0D), 3, d0, d1, d2, 0.02F);
+                            ((ServerLevel) rabbit.getLevel()).sendParticles(ParticleTypes.SMOKE, rabbit.getRandomX(1.0D), rabbit.getRandomY() + 0.5D, rabbit.getRandomZ(1.0D), 3, d0, d1, d2, 0.02F);
                         }
                     }
                     event.setCanceled(true);
@@ -445,63 +450,100 @@ public class CommonProxy {
                     return;
                 }
             }
-            if (TameableUtils.isTamed(rabbit) && TameableUtils.isPetOf(event.getPlayer(), rabbit)){
-                ((CommandableMob)rabbit).playerSetCommand(event.getPlayer(), rabbit);
+            if (TameableUtils.isTamed(rabbit) && TameableUtils.isPetOf(event.getPlayer(), rabbit)) {
+                ((CommandableMob) rabbit).playerSetCommand(event.getPlayer(), rabbit);
             }
         }
-        if (event.getTarget() instanceof LivingEntity entity && TameableUtils.isPetOf(event.getPlayer(), entity) && event.getItemStack().is(DIItemRegistry.COLLAR_TAG.get()) && DomesticationMod.CONFIG.collarTag.get()) {
+        if (event.getTarget() instanceof LivingEntity entity && TameableUtils.isPetOf(event.getPlayer(), entity)) {
             ItemStack stack = event.getItemStack();
-            if (!event.getPlayer().level.isClientSide && entity.isAlive()) {
-                Map<Enchantment, Integer> itemEnchantments = EnchantmentHelper.deserializeEnchantments(stack.getEnchantmentTags());
-                Map<ResourceLocation, Integer> entityEnchantments = TameableUtils.getEnchants(entity);
-                if(stack.hasCustomHoverName() && entity.hasCustomName() && stack.getHoverName().equals(entity.getCustomName())){
-                    boolean hasSameEnchants = itemEnchantments.isEmpty();
-                    if(entityEnchantments != null){
-                        hasSameEnchants = true;
-                        for(Map.Entry<Enchantment, Integer> itemEntry : itemEnchantments.entrySet()){
-                            ResourceLocation name = itemEntry.getKey().getRegistryName();
-                            if(entityEnchantments.get(name) == null || !entityEnchantments.get(name).equals(itemEntry.getValue())){
-                                hasSameEnchants = false;
+            Player player = event.getPlayer();
+            if(event.getItemStack().is(DIItemRegistry.COLLAR_TAG.get()) && DomesticationMod.CONFIG.collarTag.get()) {
+                if (!event.getPlayer().level.isClientSide && entity.isAlive()) {
+                    Map<Enchantment, Integer> itemEnchantments = EnchantmentHelper.deserializeEnchantments(stack.getEnchantmentTags());
+                    Map<ResourceLocation, Integer> entityEnchantments = TameableUtils.getEnchants(entity);
+                    if (stack.hasCustomHoverName() && entity.hasCustomName() && stack.getHoverName().equals(entity.getCustomName())) {
+                        boolean hasSameEnchants = itemEnchantments.isEmpty();
+                        if (entityEnchantments != null) {
+                            hasSameEnchants = true;
+                            for (Map.Entry<Enchantment, Integer> itemEntry : itemEnchantments.entrySet()) {
+                                ResourceLocation name = itemEntry.getKey().getRegistryName();
+                                if (entityEnchantments.get(name) == null || !entityEnchantments.get(name).equals(itemEntry.getValue())) {
+                                    hasSameEnchants = false;
+                                }
                             }
                         }
-                    }
-                    if(hasSameEnchants){
-                        event.setCanceled(true);
-                        event.setCancellationResult(InteractionResult.FAIL);
-                        return;
-                    }
-                }
-                if(stack.hasCustomHoverName()){
-                    entity.setCustomName(stack.getHoverName());
-                }
-                if(!event.getPlayer().isCreative()){
-                    stack.shrink(1);
-                }
-                if(TameableUtils.hasCollar(entity)){
-                    ItemStack collarFrom = new ItemStack(DIItemRegistry.COLLAR_TAG.get());
-                    if(entityEnchantments != null){
-                        collarFrom.getOrCreateTag();
-                        if (!collarFrom.getTag().contains("Enchantments", 9)) {
-                            collarFrom.getTag().put("Enchantments", new ListTag());
+                        if (hasSameEnchants) {
+                            event.setCanceled(true);
+                            event.setCancellationResult(InteractionResult.FAIL);
+                            return;
                         }
+                    }
+                    if (stack.hasCustomHoverName()) {
+                        entity.setCustomName(stack.getHoverName());
+                    }
+                    if (!event.getPlayer().isCreative()) {
+                        stack.shrink(1);
+                    }
+                    if (TameableUtils.hasCollar(entity)) {
+                        ItemStack collarFrom = new ItemStack(DIItemRegistry.COLLAR_TAG.get());
+                        if (entityEnchantments != null) {
+                            collarFrom.getOrCreateTag();
+                            if (!collarFrom.getTag().contains("Enchantments", 9)) {
+                                collarFrom.getTag().put("Enchantments", new ListTag());
+                            }
 
-                        ListTag listtag = collarFrom.getTag().getList("Enchantments", 10);
-                        for(Map.Entry<ResourceLocation, Integer> entry : entityEnchantments.entrySet()){
-                            listtag.add(EnchantmentHelper.storeEnchantment(entry.getKey(), entry.getValue()));
+                            ListTag listtag = collarFrom.getTag().getList("Enchantments", 10);
+                            for (Map.Entry<ResourceLocation, Integer> entry : entityEnchantments.entrySet()) {
+                                listtag.add(EnchantmentHelper.storeEnchantment(entry.getKey(), entry.getValue()));
+                            }
+                        } else {
+                            collarFrom.setTag(null);
                         }
-                    }else{
-                        collarFrom.setTag(null);
+                        entity.spawnAtLocation(collarFrom);
                     }
-                    entity.spawnAtLocation(collarFrom);
+                    entity.playSound(DISoundRegistry.COLLAR_TAG, 1, 1);
+                    TameableUtils.clearEnchants(entity);
+                    for (Map.Entry<Enchantment, Integer> entry : itemEnchantments.entrySet()) {
+                        TameableUtils.addEnchant(entity, new EnchantmentInstance(entry.getKey(), entry.getValue()));
+                    }
+                    TameableUtils.setHasCollar(entity, true);
                 }
-                TameableUtils.clearEnchants(entity);
-                for (Map.Entry<Enchantment, Integer> entry : itemEnchantments.entrySet()){
-                    TameableUtils.addEnchant(entity, new EnchantmentInstance(entry.getKey(), entry.getValue()));
-                }
-                TameableUtils.setHasCollar(entity, true);
+                event.setCanceled(true);
+                event.setCancellationResult(InteractionResult.SUCCESS);
             }
-            event.setCanceled(true);
-            event.setCancellationResult(InteractionResult.SUCCESS);
+            if(event.getItemStack().is(DIItemRegistry.DEED_OF_OWNERSHIP.get())) {
+                CompoundTag tag = stack.getTag();
+                boolean unbound = tag == null || !tag.getBoolean("HasBoundEntity");
+                Entity currentOwner = TameableUtils.getOwnerOf(entity);
+                if (TameableUtils.isTamed(entity) && currentOwner != null && currentOwner.equals(player) && unbound) {
+                    CompoundTag newTag = new CompoundTag();
+                    newTag.putBoolean("HasBoundEntity", true);
+                    newTag.putUUID("BoundEntity", entity.getUUID());
+                    newTag.putString("BoundEntityName", entity.getName().getString());
+                    stack.setTag(newTag);
+                    event.setCanceled(true);
+                    event.setCancellationResult(InteractionResult.SUCCESS);
+                    return;
+                }
+                if (TameableUtils.isTamed(entity) && tag != null && tag.getBoolean("HasBoundEntity") && tag.getUUID("BoundEntity") != null) {
+                    UUID fromItem = tag.getUUID("BoundEntity");
+                    if(entity.getUUID().equals(fromItem)){
+                        player.getCooldowns().addCooldown(stack.getItem(), 5);
+                        TameableUtils.setOwnerUUIDOf(entity, player.getUUID());
+                        player.displayClientMessage(new TranslatableComponent("message.domesticationinnovation.set_owner", player.getName(), entity.getName()), true);
+                        if(currentOwner instanceof Player && !currentOwner.equals(player)){
+                            ((Player)currentOwner).displayClientMessage(new TranslatableComponent("message.domesticationinnovation.set_owner", player.getName(), entity.getName()), true);
+                        }
+                        stack.setTag(new CompoundTag());
+                        if(!player.isCreative()){
+                            stack.shrink(1);
+                        }
+                        event.setCanceled(true);
+                        event.setCancellationResult(InteractionResult.SUCCESS);
+                    }
+                }
+
+            }
         }
     }
 
@@ -531,9 +573,9 @@ public class CommonProxy {
     }
 
     @SubscribeEvent
-    public void onBlockBreak(BlockEvent.BreakEvent event){
-        if(event.getState().getBlock() instanceof PetBedBlock){
-            if(event.getWorld().getBlockEntity(event.getPos()) instanceof PetBedBlockEntity entity1){
+    public void onBlockBreak(BlockEvent.BreakEvent event) {
+        if (event.getState().getBlock() instanceof PetBedBlock) {
+            if (event.getWorld().getBlockEntity(event.getPos()) instanceof PetBedBlockEntity entity1) {
                 entity1.removeAllRequestsFor(event.getPlayer());
                 entity1.resetBedsForNearbyPets();
             }
@@ -547,8 +589,50 @@ public class CommonProxy {
                 Ravager ravager = (Ravager) event.getEntity();
                 ravager.goalSelector.addGoal(4, new AvoidEntityGoal(ravager, Rabbit.class, 13.0F, 1.5D, 2.0D, EntitySelector.NO_SPECTATORS));
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             DomesticationMod.LOGGER.warn("could not add ai tasks to ravager");
+        }
+    }
+
+    @SubscribeEvent
+    public void onVillagerTrades(VillagerTradesEvent event) {
+        if (event.getType() == DIVillagerRegistry.ANIMAL_TAMER) {
+            List<VillagerTrades.ItemListing> level1 = new ArrayList<>();
+            List<VillagerTrades.ItemListing> level2 = new ArrayList<>();
+            List<VillagerTrades.ItemListing> level3 = new ArrayList<>();
+            List<VillagerTrades.ItemListing> level4 = new ArrayList<>();
+            List<VillagerTrades.ItemListing> level5 = new ArrayList<>();
+            level1.add(new BuyingItemTrade(Items.TROPICAL_FISH, 10, 2, 10, 2));
+            level1.add(new SellingItemTrade(Items.BONE, 3, 10, 6, 4));
+            level1.add(new BuyingItemTrade(Items.HAY_BLOCK, 7, 1, 9, 1));
+            level1.add(new SellingItemTrade(Items.COD, 2, 7, 6, 3));
+            level1.add(new SellingItemTrade(Items.EGG, 4, 2, 9, 3));
+            level1.add(new SellingItemTrade(DIItemRegistry.FEATHER_ON_A_STICK.get(), 3, 1, 2, 3));
+            level2.add(new SellingItemTrade(Items.TROPICAL_FISH_BUCKET, 2, 1, 6, 7));
+            level2.add(new BuyingItemTrade(DIItemRegistry.COLLAR_TAG.get(), 5, 1, 12, 7));
+            level2.add(new SellingItemTrade(Items.APPLE, 4, 12, 3, 7));
+            level2.add(new SellingOneOfTheseItemsTrade(ImmutableSet.of(
+                    DIBlockRegistry.WHITE_PET_BED.get(), DIBlockRegistry.ORANGE_PET_BED.get(), DIBlockRegistry.MAGENTA_PET_BED.get(), DIBlockRegistry.LIGHT_BLUE_PET_BED.get(), DIBlockRegistry.YELLOW_PET_BED.get(), DIBlockRegistry.LIME_PET_BED.get(), DIBlockRegistry.PINK_PET_BED.get(), DIBlockRegistry.GRAY_PET_BED.get(), DIBlockRegistry.LIGHT_GRAY_PET_BED.get(), DIBlockRegistry.CYAN_PET_BED.get(), DIBlockRegistry.PURPLE_PET_BED.get(), DIBlockRegistry.BLUE_PET_BED.get(), DIBlockRegistry.BROWN_PET_BED.get(), DIBlockRegistry.GREEN_PET_BED.get(), DIBlockRegistry.RED_PET_BED.get(), DIBlockRegistry.BLACK_PET_BED.get()
+            ), 2, 1, 6, 7));
+            level2.add(new SellingItemTrade(DIItemRegistry.DEED_OF_OWNERSHIP.get(), 3, 1, 2, 7));
+            level3.add(new SellingItemTrade(DIItemRegistry.ROTTEN_APPLE.get(), 4, 1, 1, 10));
+            level3.add(new SellingItemTrade(Items.CARROT_ON_A_STICK, 3, 1, 2, 10));
+            level3.add(new SellingItemTrade(Items.LEAD, 3, 2, 5, 10));
+            level3.add(new SellingItemTrade(Items.LEATHER_HORSE_ARMOR, 4, 1, 3, 11));
+            level3.add(new EnchantItemTrade(DIItemRegistry.COLLAR_TAG.get(), 20, 2, 8, 3, 10));
+            level4.add(new SellingItemTrade(Items.IRON_HORSE_ARMOR, 8, 1, 2, 15));
+            level4.add(new SellingItemTrade(Items.AXOLOTL_BUCKET, 11, 1, 2, 15));
+            level4.add(new SellingItemTrade(Items.TURTLE_EGG, 26, 1, 2, 15));
+            level4.add(new EnchantItemTrade(DIItemRegistry.COLLAR_TAG.get(), 40, 3, 18, 3, 15));
+            level5.add(new SellingItemTrade(Items.GOLDEN_HORSE_ARMOR, 13, 1, 1, 18));
+            level5.add(new SellingItemTrade(Items.SCUTE, 21, 1, 3, 18));
+            level5.add(new EnchantItemTrade(DIItemRegistry.COLLAR_TAG.get(), 50, 4, 38, 3, 20));
+            level5.add(new SellingEnchantedBook(DIEnchantmentRegistry.CHARISMA, 3, 12, 1, 18, 0.02F));
+            event.getTrades().put(1, level1);
+            event.getTrades().put(2, level2);
+            event.getTrades().put(3, level3);
+            event.getTrades().put(4, level4);
+            event.getTrades().put(5, level5);
         }
     }
 }

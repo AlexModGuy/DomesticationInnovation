@@ -1,4 +1,19 @@
 {
+  "collar_tag": {
+    "category": "neutral",
+    "sounds": [
+      {
+        "name": "domesticationinnovation:collar_tag_0"
+      },
+      {
+        "name": "domesticationinnovation:collar_tag_1"
+      },
+      {
+        "name": "domesticationinnovation:collar_tag_2"
+      }
+    ],
+    "subtitle": "domesticationinnovation.sound.subtitle.collar_tag"
+  },
   "magnet_loop": {
     "category": "neutral",
     "sounds": [
@@ -49,5 +64,20 @@
       }
     ],
     "subtitle": "domesticationinnovation.sound.subtitle.giant_bubble_pop"
+  },
+  "pet_bed_use": {
+    "category": "neutral",
+    "sounds": [
+      {
+        "name": "domesticationinnovation:pet_bed_use_0"
+      },
+      {
+        "name": "domesticationinnovation:pet_bed_use_1"
+      },
+      {
+        "name": "domesticationinnovation:pet_bed_use_2"
+      }
+    ],
+    "subtitle": "domesticationinnovation.sound.subtitle.pet_bed_use"
   }
 }

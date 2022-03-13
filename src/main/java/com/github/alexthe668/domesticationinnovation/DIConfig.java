@@ -21,6 +21,8 @@ public class DIConfig {
     public final ForgeConfigSpec.BooleanValue petBedRespawns;
     public final ForgeConfigSpec.BooleanValue collarTag;
     public final ForgeConfigSpec.BooleanValue rabbitsScareRavagers;
+    public final ForgeConfigSpec.BooleanValue animalTamerVillager;
+    public final ForgeConfigSpec.IntValue petstoreVillageWeight;
     public final ForgeConfigSpec.DoubleValue sinisterCarrotLootChance;
     public final ForgeConfigSpec.DoubleValue bubblingLootChance;
     public final ForgeConfigSpec.DoubleValue vampirismLootChance;
@@ -40,6 +42,8 @@ public class DIConfig {
         petBedRespawns = builder.comment("true if mobs can respawn in pet beds the next morning after they die").translation("pet_bed_respawns").define("pet_bed_respawns", true);
         collarTag = builder.comment("true if collar tag functionality are enabled. If this is disabled, there is no way to enchant mobs!").translation("collar_tags").define("collar_tags", true);
         rabbitsScareRavagers = builder.comment("true if rabbits scare ravagers like they used to do").translation("rabbits_scare_ravagers").define("rabbits_scare_ravagers", true);
+        animalTamerVillager = builder.comment("true if animal tamer villagers are enabled. Their work station is a pet bed").translation("animal_tamer_villager").define("animal_tamer_villager", true);
+        petstoreVillageWeight = builder.comment("the spawn weight of the pet store in villages, set to 0 to disable it entirely").translation("petstore_village_weight").defineInRange("petstore_village_weight", 17, 0, 1000);
         builder.pop();
         builder.push("loot");
         sinisterCarrotLootChance = builder.comment("percent chance of woodland mansion loot table containing sinister carrot:").translation("sinister_carrot_loot_chance").defineInRange("sinister_carrot_loot_chance", 0.11D, 0.0, 1.0D);

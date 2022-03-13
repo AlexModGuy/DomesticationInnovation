@@ -16,10 +16,6 @@ public class PetEnchantmentCurse extends PetEnchantment {
         return 1;
     }
 
-    public boolean isTreasureOnly() {
-        return DomesticationMod.CONFIG.isEnchantEnabled(this);
-    }
-
     public boolean isCurse() {
         return true;
     }

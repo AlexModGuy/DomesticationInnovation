@@ -14,7 +14,6 @@ import net.minecraftforge.registries.RegistryObject;
 
 import java.lang.reflect.Field;
 
-@Mod.EventBusSubscriber(modid = DomesticationMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DIEntityRegistry {
 
     public static final DeferredRegister<EntityType<?>> DEF_REG = DeferredRegister.create(ForgeRegistries.ENTITIES, DomesticationMod.MODID);

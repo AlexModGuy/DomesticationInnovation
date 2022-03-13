@@ -5,12 +5,16 @@ import com.github.alexthe668.domesticationinnovation.server.CommonProxy;
 import com.github.alexthe668.domesticationinnovation.server.block.DIBlockRegistry;
 import com.github.alexthe668.domesticationinnovation.server.block.DITileEntityRegistry;
 import com.github.alexthe668.domesticationinnovation.server.entity.DIEntityRegistry;
+import com.github.alexthe668.domesticationinnovation.server.entity.DIVillagerRegistry;
 import com.github.alexthe668.domesticationinnovation.server.item.DIItemRegistry;
 import com.github.alexthe668.domesticationinnovation.server.misc.DICreativeModeTab;
+import com.github.alexthe668.domesticationinnovation.server.misc.DIPOIRegistry;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.server.ServerAboutToStartEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -32,11 +36,9 @@ public class DomesticationMod {
     private static final ForgeConfigSpec CONFIG_SPEC;
 
     static {
-        {
-            final Pair<DIConfig, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(DIConfig::new);
-            CONFIG = specPair.getLeft();
-            CONFIG_SPEC = specPair.getRight();
-        }
+        final Pair<DIConfig, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(DIConfig::new);
+        CONFIG = specPair.getLeft();
+        CONFIG_SPEC = specPair.getRight();
     }
 
     public DomesticationMod() {
@@ -49,6 +51,7 @@ public class DomesticationMod {
         DIItemRegistry.DEF_REG.register(FMLJavaModLoadingContext.get().getModEventBus());
         DITileEntityRegistry.DEF_REG.register(FMLJavaModLoadingContext.get().getModEventBus());
         DIEntityRegistry.DEF_REG.register(FMLJavaModLoadingContext.get().getModEventBus());
+        DIPOIRegistry.DEF_REG.register(FMLJavaModLoadingContext.get().getModEventBus());
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(PROXY);
     }

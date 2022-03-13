@@ -1,0 +1,14 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "domesticationinnovation:item/deed_of_ownership"
+    },
+    "overrides": [
+        {
+            "predicate": {
+                "bound": 1
+            },
+            "model": "domesticationinnovation:item/deed_of_ownership_bound"
+        }
+    ]
+}
