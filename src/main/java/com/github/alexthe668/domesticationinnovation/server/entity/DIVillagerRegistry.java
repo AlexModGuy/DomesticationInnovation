@@ -18,9 +18,11 @@ import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.level.levelgen.feature.structures.StructurePoolElement;
 import net.minecraft.world.level.levelgen.feature.structures.StructurePoolElementType;
 import net.minecraft.world.level.levelgen.feature.structures.StructureTemplatePool;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorList;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,37 +48,32 @@ public class DIVillagerRegistry {
     }
 
     public static void registerHouses(MinecraftServer server) {
+        registerJigsawPiece(server, new ResourceLocation("minecraft:village/plains/houses"), new ResourceLocation(DomesticationMod.MODID, "plains_petshop"));
+        registerJigsawPiece(server, new ResourceLocation("minecraft:village/desert/houses"), new ResourceLocation(DomesticationMod.MODID, "desert_petshop"));
+        registerJigsawPiece(server, new ResourceLocation("minecraft:village/savanna/houses"), new ResourceLocation(DomesticationMod.MODID, "savanna_petshop"));
+        registerJigsawPiece(server, new ResourceLocation("minecraft:village/snowy/houses"), new ResourceLocation(DomesticationMod.MODID, "snowy_petshop"));
+        registerJigsawPiece(server, new ResourceLocation("minecraft:village/taiga/houses"), new ResourceLocation(DomesticationMod.MODID, "taiga_petshop"));
+
+    }
+
+    private static void registerJigsawPiece(MinecraftServer server, ResourceLocation poolLocation, ResourceLocation resourceLocation) {
         RegistryAccess manager = server.registryAccess();
         Registry<StructureTemplatePool> registry = manager.registryOrThrow(Registry.TEMPLATE_POOL_REGISTRY);
-        registerJigsawPiece(registry, new ResourceLocation("minecraft:village/plains/houses"), new ResourceLocation(DomesticationMod.MODID, "plains_petshop"));
-        registerJigsawPiece(registry, new ResourceLocation("minecraft:village/desert/houses"), new ResourceLocation(DomesticationMod.MODID, "desert_petshop"));
-        registerJigsawPiece(registry, new ResourceLocation("minecraft:village/savanna/houses"), new ResourceLocation(DomesticationMod.MODID, "savanna_petshop"));
-        registerJigsawPiece(registry, new ResourceLocation("minecraft:village/snowy/houses"), new ResourceLocation(DomesticationMod.MODID, "snowy_petshop"));
-        registerJigsawPiece(registry, new ResourceLocation("minecraft:village/taiga/houses"), new ResourceLocation(DomesticationMod.MODID, "taiga_petshop"));
-
-    }
-
-    private static void registerJigsawPiece(Registry<StructureTemplatePool> registry, ResourceLocation poolLocation, ResourceLocation nbtLocation) {
         StructureTemplatePool pool = registry.get(poolLocation);
-        addToPool(pool, nbtLocation);
-    }
-
-    public static StructureTemplatePool addToPool(StructureTemplatePool pool, ResourceLocation resourceLocation) {
         int weight = DomesticationMod.CONFIG.petstoreVillageWeight.get();
         if (weight > 0) {
-            StructurePoolElement element = new PetshopStructurePoolElement(resourceLocation, () -> ProcessorLists.EMPTY);
+            StructureProcessorList processorList = manager.registryOrThrow(Registry.PROCESSOR_LIST_REGISTRY).getOptional(poolLocation).orElse(ProcessorLists.EMPTY);            StructurePoolElement element = new PetshopStructurePoolElement(resourceLocation, () -> processorList);
             if (pool != null) {
-                List<StructurePoolElement> templates = new ArrayList<>(pool.templates);
+                List<StructurePoolElement> templates = pool.templates;
                 for (int i = 0; i < weight; i++) {
                     templates.add(element);
                 }
                 List<Pair<StructurePoolElement, Integer>> rawTemplates = new ArrayList(pool.rawTemplates);
-                rawTemplates.add(new Pair<>(element, weight));
+                rawTemplates.addAll(pool.rawTemplates);
                 pool.templates = templates;
                 pool.rawTemplates = rawTemplates;
             }
         }
-        return pool;
     }
 
     private static class AnimalTamerProfession extends VillagerProfession {
