@@ -56,8 +56,8 @@ public class DIWorldData extends SavedData {
                 tag.putString("DimensionIn", request.getDimension());
                 tag.put("EntityData", request.getEntityData());
                 tag.putInt("X", request.getBedPosition().getX());
-                tag.putInt("Y", request.getBedPosition().getX());
-                tag.putInt("Z", request.getBedPosition().getX());
+                tag.putInt("Y", request.getBedPosition().getY());
+                tag.putInt("Z", request.getBedPosition().getZ());
                 tag.putLong("Timestamp", request.getTimestamp());
                 tag.putString("EntityNametag", request.getNametag());
                 listTag.add(tag);
