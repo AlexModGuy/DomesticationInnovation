@@ -34,9 +34,8 @@ public class PoolsMixin {
             cancellable = true
     )
     private static void di_register(StructureTemplatePool poolIn, CallbackInfoReturnable<Holder<StructureTemplatePool>> cir) {
-        if(DIVillagerRegistry.REPLACE_POOLS.containsKey(poolIn.getName().toString())){
-            DomesticationMod.LOGGER.info("replacing structure template pool for " + poolIn.getName());
-            cir.setReturnValue(BuiltinRegistries.register(BuiltinRegistries.TEMPLATE_POOL, poolIn.getName(), DIVillagerRegistry.addToPool(poolIn, DIVillagerRegistry.REPLACE_POOLS.get(poolIn.getName().toString()))));
+        if (!DIVillagerRegistry.registeredHouses) {
+            DIVillagerRegistry.registerHouses();
         }
     }
 }

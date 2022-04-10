@@ -4,7 +4,7 @@ license="GNU LESSER GENERAL PUBLIC LICENSE"
 issueTrackerURL="https://github.com/Alex-the-666/DomesticationInnovation/issues" #optional
 [[mods]] #mandatory
 modId="domesticationinnovation" #mandatory
-version="1.1.0" #mandatory
+version="1.2.0" #mandatory
 displayName="Domestication Innovation" #mandatory
 displayURL="https://www.curseforge.com/minecraft/mc-mods/dommestication-innovation" #optional
 authors="Alexthe668, FallenReaper, Yosh" #optional

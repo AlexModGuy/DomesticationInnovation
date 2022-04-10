@@ -1,5 +1,6 @@
 package com.github.alexthe668.domesticationinnovation.server.entity;
 
+import com.github.alexthe666.citadel.server.generation.VillageHouseManager;
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
 import com.github.alexthe668.domesticationinnovation.server.misc.DIPOIRegistry;
 import com.github.alexthe668.domesticationinnovation.server.misc.DISoundRegistry;
@@ -30,15 +31,9 @@ import java.util.Map;
 @Mod.EventBusSubscriber(modid = DomesticationMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DIVillagerRegistry {
 
-    public static final Map<String, ResourceLocation> REPLACE_POOLS = ImmutableMap.<String, ResourceLocation>builder()
-            .put("minecraft:village/plains/houses", new ResourceLocation(DomesticationMod.MODID, "plains_petshop"))
-            .put("minecraft:village/desert/houses", new ResourceLocation(DomesticationMod.MODID, "desert_petshop"))
-            .put("minecraft:village/savanna/houses", new ResourceLocation(DomesticationMod.MODID, "savanna_petshop"))
-            .put("minecraft:village/snowy/houses", new ResourceLocation(DomesticationMod.MODID, "snowy_petshop"))
-            .put("minecraft:village/taiga/houses", new ResourceLocation(DomesticationMod.MODID, "taiga_petshop"))
-            .build();
     public static final StructurePoolElementType<PetshopStructurePoolElement> PETSHOP_TYPE = Registry.register(Registry.STRUCTURE_POOL_ELEMENT, new ResourceLocation(DomesticationMod.MODID, "petshop"), () -> PetshopStructurePoolElement.CODEC);
     public static final VillagerProfession ANIMAL_TAMER = new AnimalTamerProfession().setRegistryName(DomesticationMod.MODID, "animal_tamer");
+    public static boolean registeredHouses = false;
 
     @SubscribeEvent
     public static void registerVillagers(final RegistryEvent.Register<VillagerProfession> event) {
@@ -47,48 +42,19 @@ public class DIVillagerRegistry {
         }
     }
 
-   /*  public static void registerHouses(MinecraftServer server) {
-       RegistryAccess.Frozen manager = server.registryAccess();
-        Registry<StructureTemplatePool> registry = manager.registryOrThrow(Registry.TEMPLATE_POOL_REGISTRY);
-        registerJigsawPiece(registry, new ResourceLocation("minecraft:village/plains/houses"), new ResourceLocation(DomesticationMod.MODID, "plains_petshop"), 20);
-        registerJigsawPiece(registry, new ResourceLocation("minecraft:village/desert/houses"), new ResourceLocation(DomesticationMod.MODID, "desert_petshop"), 20);
-        registerJigsawPiece(registry, new ResourceLocation("minecraft:village/savanna/houses"), new ResourceLocation(DomesticationMod.MODID, "savanna_petshop"), 20);
-        registerJigsawPiece(registry, new ResourceLocation("minecraft:village/snowy/houses"), new ResourceLocation(DomesticationMod.MODID, "snowy_petshop"), 20);
-        registerJigsawPiece(registry, new ResourceLocation("minecraft:village/taiga/houses"), new ResourceLocation(DomesticationMod.MODID, "taiga_petshop"), 20);
-
-    }
-
-    private static void registerJigsawPiece(Registry<StructureTemplatePool> registry, ResourceLocation poolLocation, ResourceLocation nbtLocation, int weight) {
-        StructureTemplatePool pool = registry.get(poolLocation);
-        StructurePoolElement element = new PetshopStructurePoolElement(nbtLocation, ProcessorLists.EMPTY);
-        if (pool != null) {
-            List<StructurePoolElement> templates = new ArrayList<>(pool.templates);
-            for (int i = 0; i < weight; i++) {
-                templates.add(element);
-            }
-            List<Pair<StructurePoolElement, Integer>> rawTemplates = new ArrayList(pool.rawTemplates);
-            rawTemplates.add(new Pair<>(element, weight));
-            pool.templates = templates;
-            pool.rawTemplates = rawTemplates;
-        }
-    }*/
-
-    public static StructureTemplatePool addToPool(StructureTemplatePool pool, ResourceLocation resourceLocation) {
+    public static void registerHouses() {
+        registeredHouses = true;
         int weight = DomesticationMod.CONFIG.petstoreVillageWeight.get();
-        if(weight > 0){
-            StructurePoolElement element = new PetshopStructurePoolElement(resourceLocation, ProcessorLists.EMPTY);
-            if (pool != null) {
-                List<StructurePoolElement> templates = new ArrayList<>(pool.templates);
-                for (int i = 0; i < weight; i++) {
-                    templates.add(element);
-                }
-                List<Pair<StructurePoolElement, Integer>> rawTemplates = new ArrayList(pool.rawTemplates);
-                rawTemplates.add(new Pair<>(element, weight));
-                pool.templates = templates;
-                pool.rawTemplates = rawTemplates;
-            }
-        }
-        return pool;
+        StructurePoolElement plains = new PetshopStructurePoolElement(new ResourceLocation(DomesticationMod.MODID, "plains_petshop"), ProcessorLists.EMPTY);
+        VillageHouseManager.register("minecraft:village/plains/houses", (pool) -> VillageHouseManager.addToPool(pool, plains, weight));
+        StructurePoolElement desert = new PetshopStructurePoolElement(new ResourceLocation(DomesticationMod.MODID, "desert_petshop"), ProcessorLists.EMPTY);
+        VillageHouseManager.register("minecraft:village/desert/houses", (pool) -> VillageHouseManager.addToPool(pool, desert, weight));
+        StructurePoolElement savanna = new PetshopStructurePoolElement(new ResourceLocation(DomesticationMod.MODID, "savanna_petshop"), ProcessorLists.EMPTY);
+        VillageHouseManager.register("minecraft:village/savanna/houses", (pool) -> VillageHouseManager.addToPool(pool, savanna, weight));
+        StructurePoolElement snowy = new PetshopStructurePoolElement(new ResourceLocation(DomesticationMod.MODID, "snowy_petshop"), ProcessorLists.EMPTY);
+        VillageHouseManager.register("minecraft:village/snowy/houses", (pool) -> VillageHouseManager.addToPool(pool, snowy, weight));
+        StructurePoolElement taiga = new PetshopStructurePoolElement(new ResourceLocation(DomesticationMod.MODID, "taiga_petshop"), ProcessorLists.EMPTY);
+        VillageHouseManager.register("minecraft:village/taiga/houses", (pool) -> VillageHouseManager.addToPool(pool, taiga, weight));
     }
 
     private static class AnimalTamerProfession extends VillagerProfession {
