@@ -290,7 +290,7 @@ public class CommonProxy {
             }
             int oreLvl = TameableUtils.getEnchantLevel(event.getEntityLiving(), DIEnchantmentRegistry.ORE_SCENTING);
             if (oreLvl > 0) {
-                int interval = 100 + Math.min(150, 550 - oreLvl * 100);
+                int interval = 100 + Math.max(150, 550 - oreLvl * 100);
                 TameableUtils.detectRandomOres(event.getEntityLiving(), interval, 5 + oreLvl * 2, oreLvl * 50, oreLvl * 3);
             }
             if (TameableUtils.isZombiePet(event.getEntityLiving()) && !event.getEntityLiving().level.isClientSide && event.getEntityLiving() instanceof Mob mob) {
@@ -728,6 +728,7 @@ public class CommonProxy {
             level3.add(new SellingItemTrade(Items.CARROT_ON_A_STICK, 3, 1, 2, 10));
             level3.add(new SellingItemTrade(Items.LEAD, 3, 2, 5, 10));
             level3.add(new SellingItemTrade(Items.LEATHER_HORSE_ARMOR, 4, 1, 3, 11));
+            level3.add(new SellingItemTrade(DIBlockRegistry.DRUM.get(), 2, 3, 7, 11));
             level3.add(new EnchantItemTrade(DIItemRegistry.COLLAR_TAG.get(), 20, 2, 8, 3, 10));
             level4.add(new SellingItemTrade(Items.IRON_HORSE_ARMOR, 8, 1, 2, 15));
             level4.add(new SellingItemTrade(Items.AXOLOTL_BUCKET, 11, 1, 2, 15));
