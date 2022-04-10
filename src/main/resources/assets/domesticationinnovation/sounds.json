@@ -79,5 +79,23 @@
       }
     ],
     "subtitle": "domesticationinnovation.sound.subtitle.pet_bed_use"
+  },
+  "drum": {
+    "category": "neutral",
+    "sounds": [
+      {
+        "name": "domesticationinnovation:drum_0"
+      },
+      {
+        "name": "domesticationinnovation:drum_1"
+      },
+      {
+        "name": "domesticationinnovation:drum_2"
+      },
+      {
+        "name": "domesticationinnovation:drum_3"
+      }
+    ],
+    "subtitle": "domesticationinnovation.sound.subtitle.drum"
   }
 }

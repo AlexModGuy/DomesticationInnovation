@@ -24,7 +24,6 @@ public class ChainLightningEntity extends Entity {
 
     private static final EntityDataAccessor<Integer> CREATOR_ID = SynchedEntityData.defineId(ChainLightningEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> FROM_ID = SynchedEntityData.defineId(ChainLightningEntity.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Integer> NEXT_ID = SynchedEntityData.defineId(ChainLightningEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> TARGET_COUNT = SynchedEntityData.defineId(ChainLightningEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> CURRENT_TARGET_ID = SynchedEntityData.defineId(ChainLightningEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DIES_IN = SynchedEntityData.defineId(ChainLightningEntity.class, EntityDataSerializers.INT);

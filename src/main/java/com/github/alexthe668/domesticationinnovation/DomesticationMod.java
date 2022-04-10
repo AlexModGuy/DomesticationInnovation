@@ -67,4 +67,5 @@ public class DomesticationMod {
     private void setupParticleEvent(ParticleFactoryRegisterEvent event) {
         PROXY.setupParticles();
     }
+
 }

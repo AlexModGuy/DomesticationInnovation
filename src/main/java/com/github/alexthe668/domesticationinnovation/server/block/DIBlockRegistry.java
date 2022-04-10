@@ -31,4 +31,6 @@ public class DIBlockRegistry {
     public static final RegistryObject<Block> RED_PET_BED = DEF_REG.register("pet_bed_red", () -> new PetBedBlock("red", DyeColor.RED));
     public static final RegistryObject<Block> BLACK_PET_BED = DEF_REG.register("pet_bed_black", () -> new PetBedBlock("black", DyeColor.BLACK));
 
+    public static final RegistryObject<Block> DRUM = DEF_REG.register("drum", () -> new DrumBlock());
+
 }

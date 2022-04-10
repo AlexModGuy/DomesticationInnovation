@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "command=0": {
+      "model": "domesticationinnovation:block/drum_wander"
+    },
+    "command=1": {
+      "model": "domesticationinnovation:block/drum_stay"
+    },
+    "command=2": {
+      "model": "domesticationinnovation:block/drum_follow"
+    }
+  }
+}

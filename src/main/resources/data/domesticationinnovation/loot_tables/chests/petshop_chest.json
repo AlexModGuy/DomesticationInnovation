@@ -129,6 +129,11 @@
               }
             }
           ]
+        },
+        {
+          "type": "item",
+          "name": "domesticationinnovation:drum",
+          "weight": 4
         }
       ]
     }
