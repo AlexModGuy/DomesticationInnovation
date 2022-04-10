@@ -1,12 +1,12 @@
 package com.github.alexthe668.domesticationinnovation.client;
 
+import com.github.alexthe666.citadel.Citadel;
+import com.github.alexthe666.citadel.client.event.EventGetOutlineColor;
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
 import com.github.alexthe668.domesticationinnovation.client.particle.*;
 import com.github.alexthe668.domesticationinnovation.client.render.*;
 import com.github.alexthe668.domesticationinnovation.server.CommonProxy;
-import com.github.alexthe668.domesticationinnovation.server.entity.DIEntityRegistry;
-import com.github.alexthe668.domesticationinnovation.server.entity.FeatherEntity;
-import com.github.alexthe668.domesticationinnovation.server.entity.TameableUtils;
+import com.github.alexthe668.domesticationinnovation.server.entity.*;
 import com.github.alexthe668.domesticationinnovation.server.item.DIItemRegistry;
 import com.github.alexthe668.domesticationinnovation.server.item.DeedOfOwnershipItem;
 import com.github.alexthe668.domesticationinnovation.server.item.FeatherOnAStickItem;
@@ -26,6 +26,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -50,12 +51,17 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @OnlyIn(Dist.CLIENT)
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientProxy extends CommonProxy {
+
+    public static final Map<Integer, DiscJockeySound> DISC_JOCKEY_SOUND_MAP = new HashMap<>();
+    public static Map<Entity, int[]> shadowPunchRenderData = new HashMap<>();
 
     @SubscribeEvent
     @OnlyIn(Dist.CLIENT)
@@ -88,6 +94,8 @@ public class ClientProxy extends CommonProxy {
         EntityRenderers.register(DIEntityRegistry.RECALL_BALL.get(), RecallBallRender::new);
         EntityRenderers.register(DIEntityRegistry.FEATHER.get(), RenderFeather::new);
         EntityRenderers.register(DIEntityRegistry.GIANT_BUBBLE.get(), RenderGiantBubble::new);
+        EntityRenderers.register(DIEntityRegistry.FOLLOWING_JUKEBOX.get(), RenderJukeboxFollower::new);
+        EntityRenderers.register(DIEntityRegistry.HIGHLIGHTED_BLOCK.get(), RenderHighlightedBlock::new);
         ItemProperties.register(DIItemRegistry.FEATHER_ON_A_STICK.get(), new ResourceLocation("cast"), (stack, lvl, holder, i) -> {
             if (holder == null) {
                 return 0.0F;
@@ -114,6 +122,15 @@ public class ClientProxy extends CommonProxy {
         Minecraft.getInstance().particleEngine.register(DIParticleRegistry.GIANT_POP, ParticleGiantPop.Factory::new);
         Minecraft.getInstance().particleEngine.register(DIParticleRegistry.SIMPLE_BUBBLE, ParticleSimpleBubble.Factory::new);
         Minecraft.getInstance().particleEngine.register(DIParticleRegistry.VAMPIRE, ParticleVampire.Factory::new);
+        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.SNIFF, ParticleSniff.Factory::new);
+    }
+
+    @SubscribeEvent
+    public void onOutlineColor(EventGetOutlineColor event) {
+        if(event.getEntityIn() instanceof HighlightedBlockEntity){
+            event.setColor(OreColorRegistry.getBlockColor(((HighlightedBlockEntity) event.getEntityIn()).getBlockState()));
+            event.setResult(Event.Result.ALLOW);
+        }
     }
 
     @SubscribeEvent
@@ -193,6 +210,36 @@ public class ClientProxy extends CommonProxy {
                 }
                 pose.popPose();
                 pose.popPose();
+            }
+        }
+    }
+
+    public void updateVisualDataForMob(Entity entity, int[] arr) {
+        shadowPunchRenderData.put(entity, arr);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public void updateEntityStatus(Entity entity, byte updateKind) {
+        if (entity instanceof FollowingJukeboxEntity) {
+            SoundEvent record = ((FollowingJukeboxEntity) entity).getRecordSound();
+            if (entity.isAlive() && updateKind == 66) {
+                DiscJockeySound sound;
+                if (record != null && (DISC_JOCKEY_SOUND_MAP.get(entity.getId()) == null || DISC_JOCKEY_SOUND_MAP.get(entity.getId()).getRecordSound() != record)) {
+                    sound = new DiscJockeySound(record, (FollowingJukeboxEntity) entity);
+                    DISC_JOCKEY_SOUND_MAP.put(entity.getId(), sound);
+                } else {
+                    sound = DISC_JOCKEY_SOUND_MAP.get(entity.getId());
+                }
+                if (sound != null && !Minecraft.getInstance().getSoundManager().isActive(sound) && sound.canPlaySound() && sound.isNearest()) {
+                    Minecraft.getInstance().getSoundManager().play(sound);
+                }
+            }
+            if (updateKind == 67 || record == null) {
+                if (DISC_JOCKEY_SOUND_MAP.containsKey(entity.getId())) {
+                    DiscJockeySound sound = DISC_JOCKEY_SOUND_MAP.get(entity.getId());
+                    DISC_JOCKEY_SOUND_MAP.remove(entity.getId());
+                    Minecraft.getInstance().getSoundManager().stop(sound);
+                }
             }
         }
     }

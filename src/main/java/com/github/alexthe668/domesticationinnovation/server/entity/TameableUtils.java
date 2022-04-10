@@ -5,9 +5,10 @@ import com.github.alexthe666.citadel.server.entity.CitadelEntityData;
 import com.github.alexthe666.citadel.server.message.PropertiesMessage;
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
 import com.github.alexthe668.domesticationinnovation.server.enchantment.DIEnchantmentRegistry;
+import com.github.alexthe668.domesticationinnovation.server.misc.DIParticleRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
@@ -18,15 +19,20 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.Fox;
 import net.minecraft.world.entity.animal.Rabbit;
 import net.minecraft.world.entity.animal.axolotl.Axolotl;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.Tags;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -38,7 +44,13 @@ public class TameableUtils {
     private static final String COLLAR_TAG = "HasPetCollar";
     private static final String IMMUNITY_TIME_TAG = "PetImmunityTimer";
     private static final String FROZEN_TIME_TAG = "PetFrozenTime";
-    private static final String MAGNET_SUCTION_ENTITY = "PetMagnetSuctionEntity";
+    private static final String ATTACK_TARGET_ENTITY = "PetAttackTarget";
+    private static final String SHADOW_PUNCH_TIMES = "PetShadowPunchTimes";
+    private static final String SHADOW_PUNCH_TIMES_PREV = "PetPrevShadowPunchTimes";
+    private static final String SHADOW_PUNCH_COOLDOWN = "PetShadowPunchCooldown";
+    private static final String SHADOW_PUNCH_STRIKING = "PetShadowPunchStriking";
+    private static final String JUKEBOX_FOLLOWER_UUID = "PetJukeboxFollowerUUID";
+    private static final String JUKEBOX_FOLLOWER_DISC = "PetJukeboxFollowerDisc";
     private static final String HAS_PET_BED = "HasPetBed";
     private static final String PET_BED_X = "PetBedX";
     private static final String PET_BED_Y = "PetBedY";
@@ -137,12 +149,7 @@ public class TameableUtils {
     private static void setEnchantmentTag(LivingEntity enchanted, ListTag enchants) {
         CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
         tag.put(ENCHANTMENT_TAG, enchants);
-        CitadelEntityData.setCitadelTag(enchanted, tag);
-        if (!enchanted.level.isClientSide) {
-            Citadel.sendMSGToAll(new PropertiesMessage("CitadelTagUpdate", tag, enchanted.getId()));
-        } else {
-            Citadel.sendMSGToServer(new PropertiesMessage("CitadelTagUpdate", tag, enchanted.getId()));
-        }
+        sync(enchanted, tag);
         onUpdateEnchants(enchanted);
     }
 
@@ -272,12 +279,7 @@ public class TameableUtils {
     public static void setHasCollar(LivingEntity enchanted, boolean collar) {
         CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
         tag.putBoolean(COLLAR_TAG, collar);
-        CitadelEntityData.setCitadelTag(enchanted, tag);
-        if (!enchanted.level.isClientSide) {
-            Citadel.sendMSGToAll(new PropertiesMessage("CitadelTagUpdate", tag, enchanted.getId()));
-        } else {
-            Citadel.sendMSGToServer(new PropertiesMessage("CitadelTagUpdate", tag, enchanted.getId()));
-        }
+        sync(enchanted, tag);
     }
 
     public static boolean hasCollar(LivingEntity enchanted) {
@@ -297,12 +299,7 @@ public class TameableUtils {
         if (hasEnchant(enchanted, DIEnchantmentRegistry.IMMUNITY_FRAME)) {
             CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
             tag.putInt(IMMUNITY_TIME_TAG, time);
-            CitadelEntityData.setCitadelTag(enchanted, tag);
-            if (!enchanted.level.isClientSide) {
-                Citadel.sendMSGToAll(new PropertiesMessage("CitadelTagUpdate", tag, enchanted.getId()));
-            } else {
-                Citadel.sendMSGToServer(new PropertiesMessage("CitadelTagUpdate", tag, enchanted.getId()));
-            }
+            sync(enchanted, tag);
         }
     }
 
@@ -314,28 +311,82 @@ public class TameableUtils {
     public static void setFrozenTimeTag(LivingEntity enchanted, int time) {
         CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
         tag.putInt(FROZEN_TIME_TAG, time);
-        CitadelEntityData.setCitadelTag(enchanted, tag);
-        if (!enchanted.level.isClientSide) {
-            Citadel.sendMSGToAll(new PropertiesMessage("CitadelTagUpdate", tag, enchanted.getId()));
-        } else {
-            Citadel.sendMSGToServer(new PropertiesMessage("CitadelTagUpdate", tag, enchanted.getId()));
-        }
+        sync(enchanted, tag);
     }
 
-    public static int getMagnetSuctionEntityID(LivingEntity enchanted) {
+    public static int getPetAttackTargetID(LivingEntity enchanted) {
         CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
-        return !tag.contains(MAGNET_SUCTION_ENTITY) ? -1 : tag.getInt(MAGNET_SUCTION_ENTITY);
+        return !tag.contains(ATTACK_TARGET_ENTITY) ? -1 : tag.getInt(ATTACK_TARGET_ENTITY);
     }
 
     @Nullable
-    public static Entity getMagnetSuctionEntity(LivingEntity enchanted) {
-        int i = getMagnetSuctionEntityID(enchanted);
+    public static Entity getPetAttackTarget(LivingEntity enchanted) {
+        int i = getPetAttackTargetID(enchanted);
         return i == -1 ? null : enchanted.level.getEntity(i);
     }
 
-    public static void setMagnetSuctionEntityID(LivingEntity enchanted, int id) {
+    public static void setPetAttackTarget(LivingEntity enchanted, int id) {
         CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
-        tag.putInt(MAGNET_SUCTION_ENTITY, id);
+        tag.putInt(ATTACK_TARGET_ENTITY, id);
+        sync(enchanted, tag);
+    }
+
+    public static int getShadowPunchCooldown(LivingEntity enchanted) {
+        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
+        return tag.getInt(SHADOW_PUNCH_COOLDOWN);
+    }
+
+    public static void setShadowPunchCooldown(LivingEntity enchanted, int time) {
+        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
+        tag.putInt(SHADOW_PUNCH_COOLDOWN, time);
+        sync(enchanted, tag);
+    }
+
+    public static int[] getShadowPunchTimes(LivingEntity enchanted) {
+        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
+        return tag.getIntArray(SHADOW_PUNCH_TIMES);
+    }
+
+    public static void setShadowPunchTimes(LivingEntity enchanted, int[] times) {
+        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
+        tag.putIntArray(SHADOW_PUNCH_TIMES, times);
+        sync(enchanted, tag);
+    }
+
+    public static void setShadowPunchStriking(LivingEntity enchanted, int[] times) {
+        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
+        tag.putIntArray(SHADOW_PUNCH_STRIKING, times);
+        sync(enchanted, tag);
+    }
+
+    public static int[] getShadowPunchStriking(LivingEntity enchanted) {
+        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
+        return tag.getIntArray(SHADOW_PUNCH_STRIKING);
+    }
+
+    public static void setPetJukeboxUUID(LivingEntity enchanted, UUID id) {
+        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
+        tag.putUUID(JUKEBOX_FOLLOWER_UUID, id);
+        sync(enchanted, tag);
+    }
+
+    public static UUID getPetJukeboxUUID(LivingEntity enchanted) {
+        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
+        return tag.contains(JUKEBOX_FOLLOWER_UUID) ? tag.getUUID(JUKEBOX_FOLLOWER_UUID) : null;
+    }
+
+    public static void setPetJukeboxDisc(LivingEntity enchanted, ItemStack stack) {
+        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
+        tag.put(JUKEBOX_FOLLOWER_DISC, stack.save(new CompoundTag()));
+        sync(enchanted, tag);
+    }
+
+    public static ItemStack getPetJukeboxDisc(LivingEntity enchanted) {
+        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
+        return tag.contains(JUKEBOX_FOLLOWER_DISC) ? ItemStack.of(tag.getCompound(JUKEBOX_FOLLOWER_DISC)) : ItemStack.EMPTY;
+    }
+
+    private static void sync(LivingEntity enchanted, CompoundTag tag) {
         CitadelEntityData.setCitadelTag(enchanted, tag);
         if (!enchanted.level.isClientSide) {
             Citadel.sendMSGToAll(new PropertiesMessage("CitadelTagUpdate", tag, enchanted.getId()));
@@ -359,23 +410,13 @@ public class TameableUtils {
         tag.putInt(PET_BED_X, petBed.getX());
         tag.putInt(PET_BED_Y, petBed.getY());
         tag.putInt(PET_BED_Z, petBed.getZ());
-        CitadelEntityData.setCitadelTag(enchanted, tag);
-        if (!enchanted.level.isClientSide) {
-            Citadel.sendMSGToAll(new PropertiesMessage("CitadelTagUpdate", tag, enchanted.getId()));
-        } else {
-            Citadel.sendMSGToServer(new PropertiesMessage("CitadelTagUpdate", tag, enchanted.getId()));
-        }
+        sync(enchanted, tag);
     }
 
     public static void removePetBedPos(LivingEntity enchanted) {
         CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
         tag.putBoolean(HAS_PET_BED, false);
-        CitadelEntityData.setCitadelTag(enchanted, tag);
-        if (!enchanted.level.isClientSide) {
-            Citadel.sendMSGToAll(new PropertiesMessage("CitadelTagUpdate", tag, enchanted.getId()));
-        } else {
-            Citadel.sendMSGToServer(new PropertiesMessage("CitadelTagUpdate", tag, enchanted.getId()));
-        }
+        sync(enchanted, tag);
     }
 
     public static String getPetBedDimension(LivingEntity enchanted) {
@@ -386,12 +427,7 @@ public class TameableUtils {
     public static void setPetBedDimension(LivingEntity enchanted, String dimension) {
         CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
         tag.putString(PET_BED_DIMENSION, dimension);
-        CitadelEntityData.setCitadelTag(enchanted, tag);
-        if (!enchanted.level.isClientSide) {
-            Citadel.sendMSGToAll(new PropertiesMessage("CitadelTagUpdate", tag, enchanted.getId()));
-        } else {
-            Citadel.sendMSGToServer(new PropertiesMessage("CitadelTagUpdate", tag, enchanted.getId()));
-        }
+        sync(enchanted, tag);
     }
 
     public static void attractAnimals(LivingEntity attractor, int max) {
@@ -421,6 +457,50 @@ public class TameableUtils {
         }
     }
 
+    public static void detectRandomOres(LivingEntity attractor, int interval, int range, int effectLength, int maxOres) {
+        int tick = (attractor.tickCount + attractor.getId()) % interval;
+        if(tick <= 30){
+            attractor.xRotO = attractor.getXRot();
+            attractor.setXRot((float)Math.sin(tick * 0.6F) * 30F);
+            Vec3 look = attractor.getEyePosition().add(attractor.getViewVector(1.0F).scale(attractor.getBbWidth()));
+            Random rand = attractor.getRandom();
+            for(int i = 0; i < 3; i++){
+                double x = attractor.getRandomX(2.0F);
+                double y = attractor.position().y;
+                double z = attractor.getRandomZ(2.0F);
+                attractor.getLevel().addParticle(DIParticleRegistry.SNIFF, x, y, z, look.x, look.y, look.z);
+            }
+        }
+        if (tick == 30) {
+            List<BlockPos> ores = new ArrayList<>();
+            BlockPos blockpos = attractor.blockPosition();
+            int half = range / 2;
+            for(int i = 0; i <= half && i >= -half; i = (i <= 0 ? 1 : 0) - i) {
+                for(int j = 0; j <= range && j >= -range; j = (j <= 0 ? 1 : 0) - j) {
+                    for(int k = 0; k <= range && k >= -range; k = (k <= 0 ? 1 : 0) - k) {
+                        BlockPos offset = blockpos.offset(j, i, k);
+                        BlockState state = attractor.getLevel().getBlockState(offset);
+                        if (state.is(Tags.Blocks.ORES)) {
+                            if (ores.size() < maxOres) {
+                                ores.add(offset);
+                            }else{
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            for(BlockPos ore : ores){
+                HighlightedBlockEntity highlight = DIEntityRegistry.HIGHLIGHTED_BLOCK.get().create(attractor.level);
+                highlight.setPos(Vec3.atBottomCenterOf(ore));
+                highlight.setLifespan(effectLength);
+                highlight.setXRot(0);
+                highlight.setYRot(0);
+                attractor.getLevel().addFreshEntity(highlight);
+            }
+        }
+    }
+
     public static float getFallDistance(LivingEntity enchanted) {
         CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
         return tag.getFloat(FALL_DISTANCE_SYNC);
@@ -429,24 +509,16 @@ public class TameableUtils {
     public static void setFallDistance(LivingEntity enchanted, float dist) {
         CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
         tag.putFloat(FALL_DISTANCE_SYNC, dist);
-        CitadelEntityData.setCitadelTag(enchanted, tag);
-        if (!enchanted.level.isClientSide) {
-            Citadel.sendMSGToAll(new PropertiesMessage("CitadelTagUpdate", tag, enchanted.getId()));
-        } else {
-            Citadel.sendMSGToServer(new PropertiesMessage("CitadelTagUpdate", tag, enchanted.getId()));
-        }
+        sync(enchanted, tag);
+
     }
 
 
     public static void setZombiePet(LivingEntity enchanted, boolean zombiefied) {
         CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
         tag.putBoolean(ZOMBIE_PET, zombiefied);
-        CitadelEntityData.setCitadelTag(enchanted, tag);
-        if (!enchanted.level.isClientSide) {
-            Citadel.sendMSGToAll(new PropertiesMessage("CitadelTagUpdate", tag, enchanted.getId()));
-        } else {
-            Citadel.sendMSGToServer(new PropertiesMessage("CitadelTagUpdate", tag, enchanted.getId()));
-        }
+        sync(enchanted, tag);
+
     }
 
     public static boolean isZombiePet(LivingEntity enchanted) {

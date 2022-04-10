@@ -32,6 +32,11 @@ public class DIEnchantmentRegistry {
     public static final PetEnchantment VAMPIRE = new PetEnchantmentLootOnly("vampire", Enchantment.Rarity.VERY_RARE, 2, 20);
     public static final PetEnchantment VOID_CLOUD = new PetEnchantmentLootOnly("void_cloud", Enchantment.Rarity.VERY_RARE, 1, 14);
     public static final PetEnchantment CHARISMA = new PetEnchantmentTradeOnly("charisma", Enchantment.Rarity.VERY_RARE, 3, 9);
+    public static final PetEnchantment SHADOW_HANDS = new PetEnchantment("shadow_hands", Enchantment.Rarity.VERY_RARE, 4, 10);
+    public static final PetEnchantment DISK_JOCKEY = new PetEnchantment("disc_jockey", Enchantment.Rarity.RARE, 1, 8);
+    public static final PetEnchantment DEFUSAL = new PetEnchantment("defusal", Enchantment.Rarity.UNCOMMON, 3, 14);
+    public static final PetEnchantment WARPING_BITE = new PetEnchantment("warping_bite", Enchantment.Rarity.RARE, 1, 17);
+    public static final PetEnchantment ORE_SCENTING = new PetEnchantmentLootOnly("ore_scenting", Enchantment.Rarity.VERY_RARE, 3, 13);
     public static final PetEnchantment UNDEAD_CURSE = new PetEnchantmentCurse("undead_curse", Enchantment.Rarity.VERY_RARE);
     public static final PetEnchantment INFAMY_CURSE = new PetEnchantmentCurse("infamy_curse", Enchantment.Rarity.VERY_RARE);
 
@@ -60,19 +65,19 @@ public class DIEnchantmentRegistry {
             return e2 != DEFLECTION;
         }
         if(e1 == DEFLECTION){
-            return e2 != IMMUNITY_FRAME;
+            return e2 != IMMUNITY_FRAME && e2 != DEFUSAL;
         }
         if(e1 == POISON_RESISTANCE){
             return e2 != FIREPROOF;
         }
         if(e1 == CHAIN_LIGHTNING){
-            return e2 != FROST_FANG && e2 != MAGNETIC && e2 != BUBBLING;
+            return e2 != FROST_FANG && e2 != MAGNETIC && e2 != BUBBLING && e2 != SHADOW_HANDS;
         }
         if(e1 == FROST_FANG){
-            return e2 != CHAIN_LIGHTNING && e2 != FIREPROOF && e2 != BUBBLING;
+            return e2 != CHAIN_LIGHTNING && e2 != FIREPROOF && e2 != BUBBLING && e2 != WARPING_BITE;
         }
         if(e1 == MAGNETIC){
-            return e2 != CHAIN_LIGHTNING && e2 != SHEPHERD && e2 != VAMPIRE;
+            return e2 != CHAIN_LIGHTNING && e2 != SHEPHERD && e2 != VAMPIRE && e2 != SHADOW_HANDS;
         }
         if(e1 == TOTAL_RECALL){
             return e2 != UNDEAD_CURSE;
@@ -81,10 +86,10 @@ public class DIEnchantmentRegistry {
             return e2 != HEALTH_BOOST && e2 != VAMPIRE;
         }
         if(e1 == BUBBLING){
-            return e2 != CHAIN_LIGHTNING && e2 != FROST_FANG;
+            return e2 != CHAIN_LIGHTNING && e2 != FROST_FANG && e2 != SHADOW_HANDS && e2 != WARPING_BITE;
         }
         if(e1 == SHEPHERD){
-            return e2 != MAGNETIC;
+            return e2 != MAGNETIC && e2 != ORE_SCENTING;
         }
         if(e1 == AMPHIBIOUS){
             return e2 != FIREPROOF;
@@ -94,6 +99,21 @@ public class DIEnchantmentRegistry {
         }
         if(e1 == UNDEAD_CURSE){
             return e2 != TOTAL_RECALL;
+        }
+        if(e1 == SHADOW_HANDS){
+            return e2 != CHAIN_LIGHTNING && e2 != MAGNETIC && e2 != BUBBLING && e2 != DISK_JOCKEY;
+        }
+        if(e1 == DISK_JOCKEY){
+            return e2 != SHADOW_HANDS;
+        }
+        if(e1 == DEFUSAL){
+            return e2 != DEFLECTION;
+        }
+        if(e1 == WARPING_BITE){
+            return e2 != FROST_FANG && e2 != BUBBLING;
+        }
+        if(e1 == ORE_SCENTING){
+            return e2 != SHEPHERD;
         }
         return true;
     }

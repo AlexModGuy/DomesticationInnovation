@@ -27,6 +27,7 @@ public class DIConfig {
     public final ForgeConfigSpec.DoubleValue bubblingLootChance;
     public final ForgeConfigSpec.DoubleValue vampirismLootChance;
     public final ForgeConfigSpec.DoubleValue voidCloudLootChance;
+    public final ForgeConfigSpec.DoubleValue oreScentingLootChance;
 
     private final Map<ResourceLocation, ForgeConfigSpec.BooleanValue> enabledEnchantments = new HashMap<>();
 
@@ -50,7 +51,7 @@ public class DIConfig {
         bubblingLootChance = builder.comment("percent chance of burried treasure loot table containing Bubbling book:").translation("bubbling_loot_chance").defineInRange("bubbling_loot_chance", 0.65D, 0.0, 1.0D);
         vampirismLootChance = builder.comment("percent chance of woodland mansion loot table containing Vampire book:").translation("vampirism_loot_chance").defineInRange("vampirism_loot_chance", 0.13D, 0.0, 1.0D);
         voidCloudLootChance = builder.comment("percent chance of end city loot table containing Void Cloud book:").translation("void_cloud_loot_chance").defineInRange("void_cloud_loot_chance", 0.13D, 0.0, 1.0D);
-
+        oreScentingLootChance = builder.comment("percent chance of mineshaft loot table containing Ore Scenting book:").translation("ore_scenting_loot_chance").defineInRange("ore_scenting_loot_chance", 0.1D, 0.0, 1.0D);
         builder.pop();
         builder.push("enchantments");
         try {

@@ -18,6 +18,7 @@ public class DISoundRegistry {
     public static final SoundEvent GIANT_BUBBLE_INFLATE = createSoundEvent("giant_bubble_inflate");
     public static final SoundEvent GIANT_BUBBLE_POP = createSoundEvent("giant_bubble_pop");
     public static final SoundEvent PET_BED_USE = createSoundEvent("pet_bed_use");
+    public static final SoundEvent DRUM = createSoundEvent("drum");
 
     private static SoundEvent createSoundEvent(final String soundName) {
         final ResourceLocation soundID = new ResourceLocation(DomesticationMod.MODID, soundName);

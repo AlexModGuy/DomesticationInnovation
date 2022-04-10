@@ -18,6 +18,7 @@ public class DIParticleRegistry {
     public static final SimpleParticleType GIANT_POP = (SimpleParticleType) new SimpleParticleType(false).setRegistryName(DomesticationMod.MODID + ":giant_pop");
     public static final SimpleParticleType SIMPLE_BUBBLE = (SimpleParticleType) new SimpleParticleType(false).setRegistryName(DomesticationMod.MODID + ":simple_bubble");
     public static final SimpleParticleType VAMPIRE = (SimpleParticleType) new SimpleParticleType(false).setRegistryName(DomesticationMod.MODID + ":vampire");
+    public static final SimpleParticleType SNIFF = (SimpleParticleType) new SimpleParticleType(false).setRegistryName(DomesticationMod.MODID + ":sniff");
 
     @SubscribeEvent
     public static void registerParticles(RegistryEvent.Register<ParticleType<?>> event) {
