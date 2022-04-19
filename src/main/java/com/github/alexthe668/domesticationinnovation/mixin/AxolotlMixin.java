@@ -199,6 +199,17 @@ public abstract class AxolotlMixin extends Animal implements ModifedToBeTameable
         }
     }
 
+    @Inject(
+            at = {@At("HEAD")},
+            remap = true,
+            method = {"Lnet/minecraft/world/entity/animal/axolotl/Axolotl;removeWhenFarAway(D)Z"},
+            cancellable = true)
+    private void di_removeWhenFarAway(double dist, CallbackInfoReturnable<Boolean> cir) {
+        if(this.isTame()){
+            cir.setReturnValue(false);
+        }
+    }
+
     private void spawnTamingParticles(boolean smoke){
         if(!level.isClientSide){
             ParticleOptions particleoptions = smoke ? ParticleTypes.SMOKE : ParticleTypes.HEART;
