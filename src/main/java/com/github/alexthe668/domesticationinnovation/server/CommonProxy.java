@@ -12,6 +12,7 @@ import com.github.alexthe668.domesticationinnovation.server.misc.trades.*;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -267,6 +268,12 @@ public class CommonProxy {
             if (TameableUtils.hasEnchant(event.getEntityLiving(), DIEnchantmentRegistry.INFAMY_CURSE)) {
                 TameableUtils.aggroRandomMonsters(event.getEntityLiving());
             }
+            if (TameableUtils.hasEnchant(event.getEntityLiving(), DIEnchantmentRegistry.INTIMIDATION)) {
+                TameableUtils.scareRandomMonsters(event.getEntityLiving(), TameableUtils.getEnchantLevel(event.getEntityLiving(), DIEnchantmentRegistry.INTIMIDATION));
+            }
+            if (TameableUtils.hasEnchant(event.getEntityLiving(), DIEnchantmentRegistry.BLIGHT_CURSE)) {
+                TameableUtils.destroyRandomPlants(event.getEntityLiving());
+            }
             if (TameableUtils.hasEnchant(event.getEntityLiving(), DIEnchantmentRegistry.VOID_CLOUD) && !event.getEntityLiving().isInWaterOrBubble() && event.getEntityLiving().fallDistance > 3.0F && !event.getEntityLiving().isOnGround()) {
                 Entity owner = TameableUtils.getOwnerOf(event.getEntityLiving());
                 boolean shouldMoveToOwnerXZ = owner != null && Math.abs(owner.getY() - event.getEntityLiving().getY()) < 1;
@@ -304,9 +311,50 @@ public class CommonProxy {
                 } else if (mob.getNavigation().isDone()) {
                     mob.getNavigation().moveTo(mob.getTarget(), 1.0D);
                 }
-
+            }
+            int psychicWallLevel = TameableUtils.getEnchantLevel(event.getEntityLiving(), DIEnchantmentRegistry.PSYCHIC_WALL);
+            if (psychicWallLevel > 0 && event.getEntityLiving() instanceof Mob mob) {
+                int cooldown = TameableUtils.getPsychicWallCooldown(mob);
+                if(cooldown  > 0){
+                    TameableUtils.setPsychicWallCooldown(mob, cooldown - 1);
+                }else{
+                    Entity blocking = null;
+                    Entity blockingFrom = null;
+                    if (mob.getTarget() != null) {
+                        blocking = mob.getTarget();
+                        blockingFrom = mob;
+                    }else if(TameableUtils.getOwnerOf(mob) instanceof LivingEntity owner){
+                        if(owner.getLastHurtByMob() != null && owner.getLastHurtByMob().isAlive()){
+                            blocking = owner.getLastHurtByMob();
+                            blockingFrom = owner;
+                        }
+                        if(owner.getLastHurtMob() != null && owner.getLastHurtMob().isAlive()){
+                            blocking = owner.getLastHurtMob();
+                            blockingFrom = owner;
+                        }
+                    }
+                    if(blocking != null){
+                        int width = psychicWallLevel + 1;
+                        float yAdditional = blocking.getBbHeight() * 0.5F + width * 0.5F;
+                        Vec3 vec3 = blockingFrom.position().add(0, yAdditional, 0);
+                        Vec3 vec32 = blocking.position().add(0, yAdditional, 0);
+                        Vec3 vec33 = vec3.add(vec32);
+                        Vec3 avg = new Vec3(vec33.x / 2F, Math.floor(vec33.y / 2F), vec33.z / 2F);
+                        Vec3 rotationFrom = avg.subtract(vec3);
+                        Direction dir = Direction.getNearest(rotationFrom.x, rotationFrom.y, rotationFrom.z);
+                        PsychicWallEntity wall = DIEntityRegistry.PSYCHIC_WALL.get().create(mob.level);
+                        wall.setPos(avg.x, avg.y, avg.z);
+                        wall.setBlockWidth(width);
+                        wall.setCreatorId(mob.getUUID());
+                        wall.setLifespan(psychicWallLevel * 100);
+                        wall.setWallDirection(dir);
+                        mob.level.addFreshEntity(wall);
+                        TameableUtils.setPsychicWallCooldown(mob, psychicWallLevel * 200 + 40);
+                    }
+                }
             }
         }
+
         if (frozenTime > 0) {
             TameableUtils.setFrozenTimeTag(event.getEntityLiving(), frozenTime - 1);
             AttributeInstance instance = event.getEntityLiving().getAttribute(Attributes.MOVEMENT_SPEED);
@@ -515,6 +563,18 @@ public class CommonProxy {
             event.setCanceled(true);
             event.setCancellationResult(InteractionResult.SUCCESS);
             return;
+        }
+        if (event.getTarget() instanceof LivingEntity entity && TameableUtils.isTamed(entity) && TameableUtils.hasEnchant(entity, DIEnchantmentRegistry.GLUTTONOUS)) {
+            ItemStack stack = event.getItemStack();
+            if (stack.getItem().isEdible() && entity.getHealth() < entity.getMaxHealth() && stack.getItem().getFoodProperties() != null) {
+                entity.heal((float) Math.floor(stack.getItem().getFoodProperties().getNutrition() * 1.5F));
+                if (!event.getPlayer().isCreative()) {
+                    stack.shrink(1);
+                }
+                entity.playSound(entity.getRandom().nextBoolean() ? SoundEvents.PLAYER_BURP : SoundEvents.GENERIC_EAT, 1F, entity.getVoicePitch());
+                event.setCanceled(true);
+                event.setCancellationResult(InteractionResult.SUCCESS);
+            }
         }
         if (event.getTarget() instanceof Rabbit rabbit && DomesticationMod.CONFIG.tameableRabbit.get()) {
             ItemStack stack = event.getItemStack();

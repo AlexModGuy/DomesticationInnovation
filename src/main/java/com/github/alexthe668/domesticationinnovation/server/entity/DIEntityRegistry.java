@@ -23,6 +23,7 @@ public class DIEntityRegistry {
     public static final RegistryObject<EntityType<GiantBubbleEntity>> GIANT_BUBBLE = DEF_REG.register("giant_bubble", () -> build(EntityType.Builder.of(GiantBubbleEntity::new, MobCategory.MISC).sized(1.2F, 1.8F).setCustomClientFactory(GiantBubbleEntity::new).fireImmune(), "giant_bubble"));
     public static final RegistryObject<EntityType<FollowingJukeboxEntity>> FOLLOWING_JUKEBOX = DEF_REG.register("following_jukebox", () -> build(EntityType.Builder.of(FollowingJukeboxEntity::new, MobCategory.MISC).sized(0.65F, 0.65F).setCustomClientFactory(FollowingJukeboxEntity::new).fireImmune(), "following_jukebox"));
     public static final RegistryObject<EntityType<HighlightedBlockEntity>> HIGHLIGHTED_BLOCK = DEF_REG.register("highlighted_block", () -> build(EntityType.Builder.of(HighlightedBlockEntity::new, MobCategory.MISC).sized(1.0F, 1.0F).setCustomClientFactory(HighlightedBlockEntity::new).fireImmune(), "highlighted_block"));
+    public static final RegistryObject<EntityType<PsychicWallEntity>> PSYCHIC_WALL = DEF_REG.register("psychic_wall", () -> build(EntityType.Builder.of(PsychicWallEntity::new, MobCategory.MISC).sized(1F, 1F).setCustomClientFactory(PsychicWallEntity::new).fireImmune(), "psychic_wall"));
 
     private static final EntityType build(EntityType.Builder builder, String entityName) {
         ResourceLocation nameLoc = new ResourceLocation(DomesticationMod.MODID, entityName);

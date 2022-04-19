@@ -19,6 +19,9 @@ public class DIParticleRegistry {
     public static final SimpleParticleType SIMPLE_BUBBLE = (SimpleParticleType) new SimpleParticleType(false).setRegistryName(DomesticationMod.MODID + ":simple_bubble");
     public static final SimpleParticleType VAMPIRE = (SimpleParticleType) new SimpleParticleType(false).setRegistryName(DomesticationMod.MODID + ":vampire");
     public static final SimpleParticleType SNIFF = (SimpleParticleType) new SimpleParticleType(false).setRegistryName(DomesticationMod.MODID + ":sniff");
+    public static final SimpleParticleType PSYCHIC_WALL = (SimpleParticleType) new SimpleParticleType(false).setRegistryName(DomesticationMod.MODID + ":psychic_wall");
+    public static final SimpleParticleType INTIMIDATION = (SimpleParticleType) new SimpleParticleType(false).setRegistryName(DomesticationMod.MODID + ":intimidation");
+    public static final SimpleParticleType BLIGHT = (SimpleParticleType) new SimpleParticleType(false).setRegistryName(DomesticationMod.MODID + ":blight");
 
     @SubscribeEvent
     public static void registerParticles(RegistryEvent.Register<ParticleType<?>> event) {

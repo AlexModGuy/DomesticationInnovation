@@ -19,6 +19,8 @@ public class DISoundRegistry {
     public static final SoundEvent GIANT_BUBBLE_POP = createSoundEvent("giant_bubble_pop");
     public static final SoundEvent PET_BED_USE = createSoundEvent("pet_bed_use");
     public static final SoundEvent DRUM = createSoundEvent("drum");
+    public static final SoundEvent PSYCHIC_WALL = createSoundEvent("psychic_wall");
+    public static final SoundEvent PSYCHIC_WALL_DEFLECT = createSoundEvent("psychic_wall_deflect");
 
     private static SoundEvent createSoundEvent(final String soundName) {
         final ResourceLocation soundID = new ResourceLocation(DomesticationMod.MODID, soundName);

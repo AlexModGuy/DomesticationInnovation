@@ -96,6 +96,7 @@ public class ClientProxy extends CommonProxy {
         EntityRenderers.register(DIEntityRegistry.GIANT_BUBBLE.get(), RenderGiantBubble::new);
         EntityRenderers.register(DIEntityRegistry.FOLLOWING_JUKEBOX.get(), RenderJukeboxFollower::new);
         EntityRenderers.register(DIEntityRegistry.HIGHLIGHTED_BLOCK.get(), RenderHighlightedBlock::new);
+        EntityRenderers.register(DIEntityRegistry.PSYCHIC_WALL.get(), RenderPsychicWall::new);
         ItemProperties.register(DIItemRegistry.FEATHER_ON_A_STICK.get(), new ResourceLocation("cast"), (stack, lvl, holder, i) -> {
             if (holder == null) {
                 return 0.0F;
@@ -123,6 +124,9 @@ public class ClientProxy extends CommonProxy {
         Minecraft.getInstance().particleEngine.register(DIParticleRegistry.SIMPLE_BUBBLE, ParticleSimpleBubble.Factory::new);
         Minecraft.getInstance().particleEngine.register(DIParticleRegistry.VAMPIRE, ParticleVampire.Factory::new);
         Minecraft.getInstance().particleEngine.register(DIParticleRegistry.SNIFF, ParticleSniff.Factory::new);
+        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.PSYCHIC_WALL, ParticlePsychicWall.Factory::new);
+        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.INTIMIDATION, new ParticleIntimidation.Factory());
+        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.BLIGHT, ParticleBlight.Factory::new);
     }
 
     @SubscribeEvent
