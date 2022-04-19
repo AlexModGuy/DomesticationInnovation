@@ -91,11 +91,21 @@
   "enchantment.domesticationinnovation.warping_bite.desc": "Pet will randomly teleport targeted mobs away from it",
   "enchantment.domesticationinnovation.ore_scenting": "Ore Scenting",
   "enchantment.domesticationinnovation.ore_scenting.desc": "Pet can sniff out ore blocks and alert its owner, level determines distance, amount and frequency of ore detection",
+  "enchantment.domesticationinnovation.gluttonous": "Gluttonous",
+  "enchantment.domesticationinnovation.gluttonous.desc": "Pet can eat any food item, regardless of dietary restrictions",
+  "enchantment.domesticationinnovation.psychic_wall": "Psychic Wall",
+  "enchantment.domesticationinnovation.psychic_wall.desc": "Pet summons a wall of psychic energy during combat to provide cover, level determines size of wall and length of the effect",
+  "enchantment.domesticationinnovation.intimidation": "Intimidation",
+  "enchantment.domesticationinnovation.intimidation.desc": "Pet can scare away hostile mobs with its fearsome appearance, level determines range and frequency of effect",
+  "enchantment.domesticationinnovation.blight_curse": "Curse of Blight",
+  "enchantment.domesticationinnovation.blight_curse.desc": "Plants will wither and die around the pet.",
   "domesticationinnovation.sound.subtitle.collar_tag": "equipped Collar Tag",
   "domesticationinnovation.sound.subtitle.magnet_loop": "Magnet buzzes",
   "domesticationinnovation.sound.subtitle.chain_lightning": "Lightning zaps",
   "domesticationinnovation.sound.subtitle.giant_bubble_inflate": "Giant Bubble inflates",
   "domesticationinnovation.sound.subtitle.giant_bubble_pop": "Giant Bubble pops",
   "domesticationinnovation.sound.subtitle.pet_bed_uses": "Pet Bed adjusted",
-  "domesticationinnovation.sound.subtitle.drum": "Command Drum beats"
+  "domesticationinnovation.sound.subtitle.drum": "Command Drum beats",
+  "domesticationinnovation.sound.subtitle.psychic_wall": "Psychic Wall hums",
+  "domesticationinnovation.sound.subtitle.psychic_wall_deflect": "Psychic Wall deflects"
 }

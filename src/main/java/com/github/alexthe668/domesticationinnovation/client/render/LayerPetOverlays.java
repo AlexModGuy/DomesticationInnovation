@@ -170,9 +170,9 @@ public class LayerPetOverlays extends RenderLayer {
             }
             if (TameableUtils.hasEnchant(living, DIEnchantmentRegistry.VOID_CLOUD) && !living.isInWaterOrBubble() && !living.isOnGround() && TameableUtils.getFallDistance(living) >= 3.0F) {
                 matrixStackIn.pushPose();
+                matrixStackIn.translate(0.4F, 1.25F + entity.getBbHeight(), 0.2F);
                 matrixStackIn.mulPose(Vector3f.YN.rotationDegrees(f));
                 matrixStackIn.mulPose(Vector3f.XN.rotationDegrees(180));
-
                 for (int i = 0; i < CLOUD_COUNT; i++) {
                     float xSin = (float) Math.sin(realAge * 0.05F + i * 2F) * 0.1F;
                     float ySin = (float) Math.cos(realAge * 0.05F + i * 2F) * 0.1F;

@@ -97,5 +97,38 @@
       }
     ],
     "subtitle": "domesticationinnovation.sound.subtitle.drum"
+  },
+  "psychic_wall": {
+    "category": "neutral",
+    "sounds": [
+      {
+        "name": "domesticationinnovation:psychic_wall_0"
+      },
+      {
+        "name": "domesticationinnovation:psychic_wall_1"
+      },
+      {
+        "name": "domesticationinnovation:psychic_wall_2"
+      },
+      {
+        "name": "domesticationinnovation:psychic_wall_3"
+      }
+    ],
+    "subtitle": "domesticationinnovation.sound.subtitle.psychic_wall"
+  },
+  "psychic_wall_deflect": {
+    "category": "neutral",
+    "sounds": [
+      {
+        "name": "domesticationinnovation:psychic_wall_deflect_0"
+      },
+      {
+        "name": "domesticationinnovation:psychic_wall_deflect_1"
+      },
+      {
+        "name": "domesticationinnovation:psychic_wall_deflect_2"
+      }
+    ],
+    "subtitle": "domesticationinnovation.sound.subtitle.psychic_wall_deflect"
   }
 }

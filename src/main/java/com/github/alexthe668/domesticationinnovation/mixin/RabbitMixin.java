@@ -15,6 +15,9 @@ import net.minecraft.server.players.OldUsersConverter;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.AvoidEntityGoal;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.animal.Animal;
@@ -30,6 +33,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.annotation.Nullable;
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -49,7 +53,7 @@ public abstract class RabbitMixin extends Animal implements ModifedToBeTameable,
     }
 
     @Inject(
-            at = {@At("HEAD")},
+            at = {@At("TAIL")},
             remap = true,
             method = {"Lnet/minecraft/world/entity/animal/Rabbit;registerGoals()V"}
     )
@@ -58,6 +62,9 @@ public abstract class RabbitMixin extends Animal implements ModifedToBeTameable,
         this.goalSelector.addGoal(2, new FollowOwner2Goal(this, 2.0D, 10.0F, 3.0F, false));
         this.targetSelector.addGoal(2, new OwnerHurtTarget2Goal(this));
         this.targetSelector.addGoal(3, new OwnerHurtByTarget2Goal(this));
+        if(isTame()){
+            removeUntamedGoals();
+        }
     }
 
     @Inject(
@@ -124,6 +131,9 @@ public abstract class RabbitMixin extends Animal implements ModifedToBeTameable,
 
     public void setTame(boolean b){
         this.entityData.set(TAMED, b);
+        if(b){
+            removeUntamedGoals();
+        }
     }
 
     @Nullable
@@ -157,6 +167,18 @@ public abstract class RabbitMixin extends Animal implements ModifedToBeTameable,
         return this.getRabbitType() == 99;
     }
 
+    public void removeUntamedGoals(){
+        try {
+            this.goalSelector.getAvailableGoals().stream().filter((wrapped) -> {
+                return wrapped.getGoal() instanceof AvoidEntityGoal;
+            }).filter(WrappedGoal::isRunning).forEach(WrappedGoal::stop);
+            this.goalSelector.getAvailableGoals().removeIf((wrapped) -> {
+                return wrapped.getGoal() instanceof AvoidEntityGoal;
+            });
+        } catch (Exception e){
+            DomesticationMod.LOGGER.warn("encountered error modifying rabbit AI");
+        }
+    }
 
     @Inject(
             at = {@At("HEAD")},

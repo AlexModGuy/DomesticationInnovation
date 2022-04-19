@@ -7,6 +7,7 @@ import com.github.alexthe668.domesticationinnovation.DomesticationMod;
 import com.github.alexthe668.domesticationinnovation.server.enchantment.DIEnchantmentRegistry;
 import com.github.alexthe668.domesticationinnovation.server.misc.DIParticleRegistry;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -16,10 +17,12 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.util.LandRandomPos;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.Fox;
@@ -31,6 +34,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.Tags;
@@ -47,8 +51,9 @@ public class TameableUtils {
     private static final String FROZEN_TIME_TAG = "PetFrozenTime";
     private static final String ATTACK_TARGET_ENTITY = "PetAttackTarget";
     private static final String SHADOW_PUNCH_TIMES = "PetShadowPunchTimes";
-    private static final String SHADOW_PUNCH_TIMES_PREV = "PetPrevShadowPunchTimes";
     private static final String SHADOW_PUNCH_COOLDOWN = "PetShadowPunchCooldown";
+    private static final String PSYCHIC_WALL_COOLDOWN = "PetPsychicWallCooldown";
+    private static final String INTIMIDATION_COOLDOWN = "PetIntimidationCooldown";
     private static final String SHADOW_PUNCH_STRIKING = "PetShadowPunchStriking";
     private static final String JUKEBOX_FOLLOWER_UUID = "PetJukeboxFollowerUUID";
     private static final String JUKEBOX_FOLLOWER_DISC = "PetJukeboxFollowerDisc";
@@ -387,6 +392,28 @@ public class TameableUtils {
         return tag.contains(JUKEBOX_FOLLOWER_DISC) ? ItemStack.of(tag.getCompound(JUKEBOX_FOLLOWER_DISC)) : ItemStack.EMPTY;
     }
 
+    public static int getPsychicWallCooldown(LivingEntity enchanted) {
+        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
+        return tag.getInt(PSYCHIC_WALL_COOLDOWN);
+    }
+
+    public static void setPsychicWallCooldown(LivingEntity enchanted, int time) {
+        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
+        tag.putInt(PSYCHIC_WALL_COOLDOWN, time);
+        sync(enchanted, tag);
+    }
+
+    public static int getIntimidationCooldown(LivingEntity enchanted) {
+        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
+        return tag.getInt(INTIMIDATION_COOLDOWN);
+    }
+
+    public static void setIntimidationCooldown(LivingEntity enchanted, int time) {
+        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
+        tag.putInt(INTIMIDATION_COOLDOWN, time);
+        sync(enchanted, tag);
+    }
+
     private static void sync(LivingEntity enchanted, CompoundTag tag) {
         CitadelEntityData.setCitadelTag(enchanted, tag);
         if (!enchanted.level.isClientSide) {
@@ -448,12 +475,41 @@ public class TameableUtils {
 
     public static void aggroRandomMonsters(LivingEntity attractor) {
         if ((attractor.tickCount + attractor.getId()) % 400 == 0) {
-            //Tag<EntityType<?>> tag = EntityTypeTags.getAllTags().getTag(INFAMY_ENCHANT_ATTRACTS);
             Predicate<Entity> notOnTeamAndMonster = (animal) -> animal instanceof Monster && !hasSameOwnerAs((LivingEntity) animal, attractor) && animal.distanceTo(attractor) > 3 + attractor.getBbWidth() * 1.6F;
             List<Mob> list = attractor.level.getEntitiesOfClass(Mob.class, attractor.getBoundingBox().inflate(20, 8, 20), EntitySelector.NO_SPECTATORS.and(notOnTeamAndMonster));
             list.sort(Comparator.comparingDouble(attractor::distanceToSqr));
             if (!list.isEmpty()) {
                 list.get(0).setTarget(attractor);
+            }
+        }
+    }
+
+    public static void scareRandomMonsters(LivingEntity scary, int level) {
+        boolean interval = (scary.tickCount + scary.getId()) % Math.max(140, 600 - level * 200) == 0;
+        if (interval || scary.hurtTime == 4 || getIntimidationCooldown(scary) > 0) {
+            Predicate<Entity> notOnTeamAndMonster = (animal) -> animal instanceof Monster && !hasSameOwnerAs((LivingEntity) animal, scary) && animal.distanceTo(scary) > 3 + scary.getBbWidth() * 1.6F;
+            List<PathfinderMob> list = scary.level.getEntitiesOfClass(PathfinderMob.class, scary.getBoundingBox().inflate(10 * level, 8 * level, 10 * level), EntitySelector.NO_SPECTATORS.and(notOnTeamAndMonster));
+            list.sort(Comparator.comparingDouble(scary::distanceToSqr));
+            if(!list.isEmpty()){
+                if(getIntimidationCooldown(scary) > 0 && !interval){
+                    setIntimidationCooldown(scary, getIntimidationCooldown(scary) - 1);
+                }else {
+                    Vec3 rots = list.get(0).getEyePosition().subtract(scary.getEyePosition()).normalize();
+                    float f = Mth.sqrt((float) (rots.x * rots.x + rots.z * rots.z));
+                    double yRot = Math.atan2(-rots.z, -rots.x) * (double)(180F / (float)Math.PI) + 90F;
+                    double xRot = Math.atan2(-rots.y, f) * (double)(180F / (float)Math.PI);
+                    scary.level.addParticle(DIParticleRegistry.INTIMIDATION, scary.getX(), scary.getY(), scary.getZ(), scary.getId(), xRot, yRot);
+                    setIntimidationCooldown(scary, 70 * level);
+                    if(scary instanceof Mob){
+                        ((Mob) scary).playAmbientSound();
+                    }
+                }
+                for(PathfinderMob monster : list){
+                    Vec3 vec = LandRandomPos.getPosAway(monster, 11 * level, 7, scary.position());
+                    if (vec != null) {
+                        monster.getNavigation().moveTo(vec.x, vec.y, vec.z, 1.5D);
+                    }
+                }
             }
         }
     }
@@ -502,6 +558,45 @@ public class TameableUtils {
         }
     }
 
+    public static void destroyRandomPlants(LivingEntity living) {
+        if ((living.tickCount + living.getId()) % 200 == 0) {
+            int range = 2;
+            List<BlockPos> plants = new ArrayList<>();
+            List<BlockPos> grasses = new ArrayList<>();
+            BlockPos blockpos = living.blockPosition();
+            int half = range / 2;
+            Random r = living.getRandom();
+            int maxPlants = 2 + r.nextInt(2);
+            for(int i = 0; i <= half && i >= -half; i = (i <= 0 ? 1 : 0) - i) {
+                for(int j = 0; j <= range && j >= -range; j = (j <= 0 ? 1 : 0) - j) {
+                    for(int k = 0; k <= range && k >= -range; k = (k <= 0 ? 1 : 0) - k) {
+                        BlockPos offset = blockpos.offset(j, i, k);
+                        BlockState state = living.getLevel().getBlockState(offset);
+                        if (!state.isAir() && r.nextInt(4) == 0) {
+                            if(state.is(BlockTags.FLOWERS) || state.is(BlockTags.REPLACEABLE_PLANTS)|| state.is(BlockTags.CROPS)){
+                                plants.add(offset);
+                            }else if(state.is(BlockTags.DIRT) && !state.is(Blocks.DIRT) && !state.is(Blocks.COARSE_DIRT) || state.is(Blocks.FARMLAND)){
+                                grasses.add(offset);
+                            }
+                        }
+                    }
+                }
+            }
+            for(BlockPos plant : plants){
+                living.getLevel().setBlockAndUpdate(plant, Blocks.AIR.defaultBlockState());
+                for(int i = 0; i < 1 + r.nextInt(2); i++){
+                    living.getLevel().addParticle(DIParticleRegistry.BLIGHT, plant.getX() + r.nextFloat(), plant.getY() + r.nextFloat(), plant.getZ() + r.nextFloat(), 0, 0.08F, 0);
+                }
+            }
+            for(BlockPos dirt : grasses){
+                living.getLevel().setBlockAndUpdate(dirt, r.nextBoolean() ? Blocks.COARSE_DIRT.defaultBlockState() : Blocks.DIRT.defaultBlockState());
+                for(int i = 0; i < 1 + r.nextInt(2); i++) {
+                    living.getLevel().addParticle(DIParticleRegistry.BLIGHT, dirt.getX() + r.nextFloat(), dirt.getY() + 1, dirt.getZ() + r.nextFloat(), 0, 0.08F, 0);
+                }
+            }
+        }
+    }
+
     public static float getFallDistance(LivingEntity enchanted) {
         CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
         return tag.getFloat(FALL_DISTANCE_SYNC);
@@ -536,4 +631,5 @@ public class TameableUtils {
         }
         return Math.min(charismas, 50);
     }
+
 }
