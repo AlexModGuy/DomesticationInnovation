@@ -73,32 +73,4 @@ public class EntityMixin {
             cir.setReturnValue(false);
         }
     }
-
-        @Redirect(
-            method = {"Lnet/minecraft/world/entity/Entity;collide(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;"},
-            remap = true,
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/level/Level;getEntityCollisions(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/AABB;)Ljava/util/List;"
-            )
-    )
-    protected List<VoxelShape> di_getEntityCollisions(Level level, Entity entity, AABB aabb) {
-        if (aabb.getSize() < 1.0E-7D) {
-            return List.of();
-        } else {
-            Predicate<Entity> predicate = entity == null ? EntitySelector.CAN_BE_COLLIDED_WITH : EntitySelector.NO_SPECTATORS.and(entity::canCollideWith);
-            List<Entity> list = level.getEntities(entity, aabb.inflate(1.0E-7D), predicate);
-            if (list.isEmpty()) {
-                return List.of();
-            } else {
-                ImmutableList.Builder<VoxelShape> builder = ImmutableList.builderWithExpectedSize(list.size());
-                for(Entity entity2 : list) {
-                    if(!(entity2 instanceof PsychicWallEntity) || !((PsychicWallEntity)entity2).isSameTeam(entity)){
-                        builder.add(Shapes.create(entity2.getBoundingBox()));
-                    }
-                }
-                return builder.build();
-            }
-        }
-    }
 }
