@@ -26,13 +26,13 @@ import java.util.*;
 
 public class PsychicWallEntity extends Entity {
 
+    protected static final EntityDataAccessor<Direction> DIRECTION = SynchedEntityData.defineId(PsychicWallEntity.class, EntityDataSerializers.DIRECTION);
     private static final EntityDataAccessor<Optional<UUID>> CREATOR_UUID = SynchedEntityData.defineId(PsychicWallEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Integer> CREATOR_ID = SynchedEntityData.defineId(PsychicWallEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> LIFESPAN = SynchedEntityData.defineId(PsychicWallEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> BLOCK_WIDTH = SynchedEntityData.defineId(PsychicWallEntity.class, EntityDataSerializers.INT);
-    protected static final EntityDataAccessor<Direction> DIRECTION = SynchedEntityData.defineId(PsychicWallEntity.class, EntityDataSerializers.DIRECTION);
-    private List<UUID> deflectedArrows = new ArrayList<>();
-    private Map<UUID, Integer> deflectedEntities = new HashMap<>();
+    private final List<UUID> deflectedArrows = new ArrayList<>();
+    private final Map<UUID, Integer> deflectedEntities = new HashMap<>();
     private int soundLoop = 0;
 
     public PsychicWallEntity(EntityType<?> type, Level level) {
@@ -45,19 +45,19 @@ public class PsychicWallEntity extends Entity {
 
     public void tick() {
         super.tick();
-        if(this.tickCount <= 10 || this.getLifespan() <= 10){
+        if (this.tickCount <= 10 || this.getLifespan() <= 10) {
             this.setBoundingBox(this.makeBoundingBox());
-        }else{
-            if(soundLoop % 15 == 0){
+        } else {
+            if (soundLoop % 15 == 0) {
                 this.playSound(DISoundRegistry.PSYCHIC_WALL, 1, random.nextFloat() * 0.3F + 0.9F);
             }
             soundLoop++;
         }
-        if(!this.level.isClientSide && this.getCreatorId() != null){
+        if (!this.level.isClientSide && this.getCreatorId() != null) {
             Entity creator = this.getCreator();
-            if(creator != null){
+            if (creator != null) {
                 this.entityData.set(CREATOR_ID, creator.getId());
-                if(!creator.isAlive() && this.getLifespan() > 20){
+                if (!creator.isAlive() && this.getLifespan() > 20) {
                     this.setLifespan(20);
                 }
             }
@@ -70,39 +70,42 @@ public class PsychicWallEntity extends Entity {
         List<Entity> colliders = level.getEntities(this, collisionAABB);
         float backISay = this.getWallDirection().getAxis() == Direction.Axis.Y ? -0.6F : -0.1F;
         for (Entity collider : colliders) {
-            if(!deflectedEntities.containsKey(collider.getUUID()) && !isSameTeam(collider)){
-                boolean flag = true;
-                if(collider instanceof Projectile){
-                    if (isFiredByAlly((Projectile) collider)) {
-                        flag = false;
-                    }else{
-                        collider.setDeltaMovement(collider.getDeltaMovement().scale(backISay));
-                        collider.setYRot(collider.getYRot() + 180);
-                        collider.setXRot(collider.getXRot() + 180);
-                    }
-                }
-                if(flag){
-                    deflectedEntities.put(collider.getUUID(), 15);
-                    if(level.isClientSide && collider.getBoundingBox().intersects(collisionAABB) && collider.getDeltaMovement().length() > 0.00001F){
-                        Vec3 vec3 = new Vec3(collider.getX(), collider.getY(0.5F), collider.getZ());
-                        Vec3 vec31 = collisionAABB.getCenter();
-                        Vec3 vec32;
-                        EntityHitResult entityhitresult = ProjectileUtil.getEntityHitResult(collider, vec3, vec31, collisionAABB, (entity) -> {
-                            return entity == this;
-                        }, collider.distanceTo(this));
-                        if(entityhitresult == null || entityhitresult.getType() == HitResult.Type.MISS){
-                            vec32 = vec3;
-                        }else{
-                            vec32 = entityhitresult.getLocation();
+            if (!isSameTeam(collider)) {
+                collider.push(getWallDirection().getStepX() * 0.25F, getWallDirection().getStepY() * 0.25F, getWallDirection().getStepZ() * 0.25F);
+                if (!deflectedEntities.containsKey(collider.getUUID())) {
+                    boolean flag = true;
+                    if (collider instanceof Projectile) {
+                        if (isFiredByAlly((Projectile) collider)) {
+                            flag = false;
+                        } else {
+                            collider.setDeltaMovement(collider.getDeltaMovement().scale(backISay));
+                            collider.setYRot(collider.getYRot() + 180);
+                            collider.setXRot(collider.getXRot() + 180);
                         }
-                        level.addParticle(DIParticleRegistry.PSYCHIC_WALL, vec32.x, vec32.y, vec32.z, this.getWallDirection().get3DDataValue(), 0, 0);
-                        this.playSound(DISoundRegistry.PSYCHIC_WALL_DEFLECT, 1, random.nextFloat() * 0.3F + 0.9F);
+                    }
+                    if (flag) {
+                        deflectedEntities.put(collider.getUUID(), 15);
+                        if (level.isClientSide && collider.getBoundingBox().intersects(collisionAABB)) {
+                            Vec3 vec3 = new Vec3(collider.getX(), collider.getY(0.5F), collider.getZ());
+                            Vec3 vec31 = collisionAABB.getCenter();
+                            Vec3 vec32;
+                            EntityHitResult entityhitresult = ProjectileUtil.getEntityHitResult(collider, vec3, vec31, collisionAABB, (entity) -> {
+                                return entity == this;
+                            }, collider.distanceTo(this));
+                            if (entityhitresult == null || entityhitresult.getType() == HitResult.Type.MISS) {
+                                vec32 = vec3;
+                            } else {
+                                vec32 = entityhitresult.getLocation();
+                            }
+                            level.addParticle(DIParticleRegistry.PSYCHIC_WALL, vec32.x, vec32.y, vec32.z, this.getWallDirection().get3DDataValue(), 0, 0);
+                            this.playSound(DISoundRegistry.PSYCHIC_WALL_DEFLECT, 1, random.nextFloat() * 0.3F + 0.9F);
+                        }
                     }
                 }
             }
         }
-        if(!deflectedEntities.isEmpty()){
-            for(UUID uuid : deflectedEntities.keySet()){
+        if (!deflectedEntities.isEmpty()) {
+            for (UUID uuid : deflectedEntities.keySet()) {
                 deflectedEntities.put(uuid, deflectedEntities.get(uuid) - 1);
             }
             deflectedEntities.entrySet().removeIf(e -> e.getValue() <= 0);
@@ -116,15 +119,15 @@ public class PsychicWallEntity extends Entity {
 
     private boolean isFiredByAlly(Projectile projectile) {
         Entity owner = this.getCreator();
-        if(owner instanceof LivingEntity && projectile.getOwner() != null){
+        if (owner instanceof LivingEntity && projectile.getOwner() != null) {
             return TameableUtils.hasSameOwnerAs((LivingEntity) owner, projectile.getOwner());
-        }else{
+        } else {
             return false;
         }
     }
 
     public boolean canBeCollidedWith() {
-        return true;
+        return false;
     }
 
     public boolean hurt(DamageSource source, float f) {
@@ -146,7 +149,7 @@ public class PsychicWallEntity extends Entity {
 
     @Override
     protected void readAdditionalSaveData(CompoundTag tag) {
-        if(tag.contains("Lifespan")){
+        if (tag.contains("Lifespan")) {
             this.setLifespan(tag.getInt("Lifespan"));
         }
         if (tag.hasUUID("CreatorUUID")) {
@@ -202,13 +205,13 @@ public class PsychicWallEntity extends Entity {
 
 
     public Entity getCreator() {
-        if(!level.isClientSide){
+        if (!level.isClientSide) {
             UUID id = getCreatorId();
             if (id != null) {
                 return ((ServerLevel) level).getEntity(id);
             }
             return null;
-        }else{
+        } else {
             int id = this.entityData.get(CREATOR_ID);
             return id < 0 ? null : level.getEntity(id);
         }
