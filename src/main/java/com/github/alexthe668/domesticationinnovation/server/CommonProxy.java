@@ -334,11 +334,11 @@ public class CommonProxy {
                         blocking = mob.getTarget();
                         blockingFrom = mob;
                     } else if (TameableUtils.getOwnerOf(mob) instanceof LivingEntity owner) {
-                        if (owner.getLastHurtByMob() != null && owner.getLastHurtByMob().isAlive()) {
+                        if (owner.getLastHurtByMob() != null && owner.getLastHurtByMob().isAlive() && !TameableUtils.hasSameOwnerAs(mob, owner.getLastHurtByMob())) {
                             blocking = owner.getLastHurtByMob();
                             blockingFrom = owner;
                         }
-                        if (owner.getLastHurtMob() != null && owner.getLastHurtMob().isAlive()) {
+                        if (owner.getLastHurtMob() != null && owner.getLastHurtMob().isAlive() && !TameableUtils.hasSameOwnerAs(mob, owner.getLastHurtMob())) {
                             blocking = owner.getLastHurtMob();
                             blockingFrom = owner;
                         }
@@ -859,7 +859,7 @@ public class CommonProxy {
             } else {
                 EntityDimensions dimensions = entity.getDimensions(entity.getPose());
                 AABB suffocationBox = new AABB(-dimensions.width / 2.0F, 0, -dimensions.width / 2.0F, dimensions.width / 2.0F, dimensions.height, dimensions.width / 2.0F);
-                while(!toLevel.noCollision(entity, suffocationBox.move(toPos.x, toPos.y, toPos.z)) && toPos.y < 300){
+                while (!toLevel.noCollision(entity, suffocationBox.move(toPos.x, toPos.y, toPos.z)) && toPos.y < 300) {
                     toPos = toPos.add(0, 1, 0);
                 }
                 entity.fallDistance = 0.0F;
@@ -878,8 +878,8 @@ public class CommonProxy {
 
     @SubscribeEvent
     public void onEntityTravelToDimension(EntityTravelToDimensionEvent event) {
-        if(!event.isCanceled()){
-            if(event.getEntity().level instanceof ServerLevel serverLevel){
+        if (!event.isCanceled()) {
+            if (event.getEntity().level instanceof ServerLevel serverLevel) {
                 MinecraftServer server = serverLevel.getServer();
                 Level toLevel = server.getLevel(event.getDimension());
                 teleportNearbyPets((Player) event.getEntity(), event.getEntity().position(), event.getEntity().position(), event.getEntity().level, toLevel);
