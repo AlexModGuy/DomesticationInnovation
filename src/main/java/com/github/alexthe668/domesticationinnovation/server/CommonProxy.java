@@ -219,7 +219,7 @@ public class CommonProxy {
                             } else {
                                 TameableUtils.setShadowPunchCooldown(mob, cooldown - 1);
                             }
-                            for (int i = 0; i < shadowHandsLevel; i++) {
+                            for (int i = 0; i < Math.min(shadowHandsLevel, Math.min(striking.length, punchProgress.length)); i++) {
                                 if (striking[i] != 0) {
                                     if (punchProgress[i] < 10) {
                                         punchProgress[i] = punchProgress[i] + 1;
