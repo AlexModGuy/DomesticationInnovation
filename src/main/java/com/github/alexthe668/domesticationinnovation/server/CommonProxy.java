@@ -105,7 +105,7 @@ public class CommonProxy {
 
     @SubscribeEvent
     public void onEntityJoinWorldEvent(EntityJoinWorldEvent event) {
-        if(event.getEntity() instanceof LivingEntity living && TameableUtils.couldBeTamed(living) && living instanceof Wolf){
+        if(event.getEntity() instanceof LivingEntity living && TameableUtils.couldBeTamed(living)){
             if(TameableUtils.hasEnchant(living, DIEnchantmentRegistry.HEALTH_BOOST)){
                 living.setHealth((float)Math.max(living.getHealth(), TameableUtils.getSafePetHealth(living)));
             }
@@ -114,7 +114,7 @@ public class CommonProxy {
 
     @SubscribeEvent
     public void onEntityLeaveWorld(EntityLeaveWorldEvent event) {
-        if(event.getEntity() instanceof LivingEntity living && TameableUtils.couldBeTamed(living) && living instanceof Wolf){
+        if(event.getEntity() instanceof LivingEntity living && TameableUtils.couldBeTamed(living)){
             if(TameableUtils.hasEnchant(living, DIEnchantmentRegistry.HEALTH_BOOST)){
                 TameableUtils.setSafePetHealth(living, living.getHealth());
             }
