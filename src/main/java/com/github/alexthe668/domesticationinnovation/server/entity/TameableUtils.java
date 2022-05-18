@@ -61,6 +61,7 @@ public class TameableUtils {
     private static final String PET_BED_DIMENSION = "PetBedDimension";
     private static final String FALL_DISTANCE_SYNC = "SyncedFallDistance";
     private static final String ZOMBIE_PET = "ZombiePet";
+    private static final String SAFE_PET_HEALTH = "SafePetHealth";
     private static final UUID HEALTH_BOOST_UUID = UUID.fromString("556E1665-8B10-40C8-8F9D-CF9B166EEEEE");
     private static final UUID SPEED_BOOST_UUID = UUID.fromString("ff465ded-9040-4eb5-93a1-7bbe97c31744");
     private static final ResourceLocation INFAMY_ENCHANT_ATTRACTS = new ResourceLocation(DomesticationMod.MODID + ":infamy_target_attracted");
@@ -458,6 +459,17 @@ public class TameableUtils {
     public static void setPetBedDimension(LivingEntity enchanted, String dimension) {
         CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
         tag.putString(PET_BED_DIMENSION, dimension);
+        sync(enchanted, tag);
+    }
+
+    public static double getSafePetHealth(LivingEntity enchanted) {
+        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
+        return tag.getDouble(SAFE_PET_HEALTH);
+    }
+
+    public static void setSafePetHealth(LivingEntity enchanted, double health) {
+        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
+        tag.putDouble(SAFE_PET_HEALTH, health);
         sync(enchanted, tag);
     }
 

@@ -39,6 +39,7 @@ import net.minecraft.world.entity.ai.goal.AvoidEntityGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.animal.Fox;
 import net.minecraft.world.entity.animal.Rabbit;
+import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Ravager;
@@ -64,10 +65,7 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.EntityMountEvent;
-import net.minecraftforge.event.entity.EntityTeleportEvent;
-import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
-import net.minecraftforge.event.entity.ProjectileImpactEvent;
+import net.minecraftforge.event.entity.*;
 import net.minecraftforge.event.entity.item.ItemExpireEvent;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -104,6 +102,25 @@ public class CommonProxy {
     public void updateEntityStatus(Entity entity, byte updateKind) {
 
     }
+
+    @SubscribeEvent
+    public void onEntityJoinWorldEvent(EntityJoinWorldEvent event) {
+        if(event.getEntity() instanceof LivingEntity living && TameableUtils.couldBeTamed(living) && living instanceof Wolf){
+            if(TameableUtils.hasEnchant(living, DIEnchantmentRegistry.HEALTH_BOOST)){
+                living.setHealth((float)Math.max(living.getHealth(), TameableUtils.getSafePetHealth(living)));
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onEntityLeaveWorld(EntityLeaveWorldEvent event) {
+        if(event.getEntity() instanceof LivingEntity living && TameableUtils.couldBeTamed(living) && living instanceof Wolf){
+            if(TameableUtils.hasEnchant(living, DIEnchantmentRegistry.HEALTH_BOOST)){
+                TameableUtils.setSafePetHealth(living, living.getHealth());
+            }
+        }
+    }
+
 
     @SubscribeEvent
     public void onProjectileImpactEvent(ProjectileImpactEvent event) {
