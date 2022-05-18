@@ -33,6 +33,10 @@ public class DeedOfOwnershipItem extends Item {
         return stack.getTag() != null && stack.getTag().getBoolean("HasBoundEntity");
     }
 
+    public boolean isFoil(ItemStack stack) {
+        return super.isFoil(stack) || isBound(stack);
+    }
+
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> list, TooltipFlag flags) {
         if(isBound(stack) && level != null && stack.getTag().getString("BoundEntityName") != null){
             list.add(new TranslatableComponent("item.domesticationinnovation.deed_of_ownership.desc", stack.getTag().getString("BoundEntityName")).withStyle(ChatFormatting.GRAY));
