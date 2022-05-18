@@ -8,6 +8,7 @@ import com.github.alexthe668.domesticationinnovation.server.enchantment.DIEnchan
 import com.github.alexthe668.domesticationinnovation.server.entity.*;
 import com.github.alexthe668.domesticationinnovation.server.event.ServerEvents;
 import com.github.alexthe668.domesticationinnovation.server.item.DIItemRegistry;
+import com.github.alexthe668.domesticationinnovation.server.item.DeedOfOwnershipItem;
 import com.github.alexthe668.domesticationinnovation.server.misc.*;
 import com.github.alexthe668.domesticationinnovation.server.misc.trades.*;
 import com.google.common.collect.ImmutableSet;
@@ -568,25 +569,61 @@ public class CommonProxy {
 
     @SubscribeEvent
     public void onInteractWithEntity(PlayerInteractEvent.EntityInteract event) {
+        Player player = event.getPlayer();
+        Entity entity = event.getTarget();
+        ItemStack stack = event.getItemStack();
+        if(TameableUtils.isTamed(event.getTarget())){
+            if (event.getItemStack().is(DIItemRegistry.DEED_OF_OWNERSHIP.get())) {
+                CompoundTag tag = stack.getTag();
+                boolean unbound = !DeedOfOwnershipItem.isBound(event.getItemStack());
+                Entity currentOwner = TameableUtils.getOwnerOf(entity);
+                if (TameableUtils.isTamed(entity) && currentOwner != null && currentOwner.equals(player) && unbound) {
+                    CompoundTag newTag = new CompoundTag();
+                    newTag.putBoolean("HasBoundEntity", true);
+                    newTag.putUUID("BoundEntity", entity.getUUID());
+                    newTag.putString("BoundEntityName", entity.getName().getString());
+                    stack.setTag(newTag);
+                    event.setCanceled(true);
+                    event.setCancellationResult(InteractionResult.SUCCESS);
+                    return;
+                }
+                if (TameableUtils.isTamed(entity) && tag != null && tag.getBoolean("HasBoundEntity") && tag.getUUID("BoundEntity") != null) {
+                    UUID fromItem = tag.getUUID("BoundEntity");
+                    if (entity.getUUID().equals(fromItem)) {
+                        player.getCooldowns().addCooldown(stack.getItem(), 5);
+                        TameableUtils.setOwnerUUIDOf(entity, player.getUUID());
+                        player.displayClientMessage(new TranslatableComponent("message.domesticationinnovation.set_owner", player.getName(), entity.getName()), true);
+                        if (currentOwner instanceof Player && !currentOwner.equals(player)) {
+                            ((Player) currentOwner).displayClientMessage(new TranslatableComponent("message.domesticationinnovation.set_owner", player.getName(), entity.getName()), true);
+                        }
+                        stack.setTag(new CompoundTag());
+                        if (!player.isCreative()) {
+                            stack.shrink(1);
+                        }
+                        event.setCanceled(true);
+                        event.setCancellationResult(InteractionResult.SUCCESS);
+                    }
+                }
+
+            }
+        }
         if (TameableUtils.couldBeTamed(event.getTarget()) && TameableUtils.isZombiePet((LivingEntity) event.getTarget())) {
             event.setCanceled(true);
             event.setCancellationResult(InteractionResult.SUCCESS);
             return;
         }
-        if (event.getTarget() instanceof LivingEntity entity && TameableUtils.isTamed(entity) && TameableUtils.hasEnchant(entity, DIEnchantmentRegistry.GLUTTONOUS)) {
-            ItemStack stack = event.getItemStack();
-            if (stack.getItem().isEdible() && entity.getHealth() < entity.getMaxHealth() && stack.getItem().getFoodProperties() != null) {
-                entity.heal((float) Math.floor(stack.getItem().getFoodProperties().getNutrition() * 1.5F));
+        if (event.getTarget() instanceof LivingEntity living && TameableUtils.isTamed(entity) && TameableUtils.hasEnchant(living, DIEnchantmentRegistry.GLUTTONOUS)) {
+            if (stack.getItem().isEdible() && living.getHealth() < living.getMaxHealth() && stack.getItem().getFoodProperties() != null) {
+                living.heal((float) Math.floor(stack.getItem().getFoodProperties().getNutrition() * 1.5F));
                 if (!event.getPlayer().isCreative()) {
                     stack.shrink(1);
                 }
-                entity.playSound(entity.getRandom().nextBoolean() ? SoundEvents.PLAYER_BURP : SoundEvents.GENERIC_EAT, 1F, entity.getVoicePitch());
+                living.playSound(living.getRandom().nextBoolean() ? SoundEvents.PLAYER_BURP : SoundEvents.GENERIC_EAT, 1F, living.getVoicePitch());
                 event.setCanceled(true);
                 event.setCancellationResult(InteractionResult.SUCCESS);
             }
         }
         if (event.getTarget() instanceof Rabbit rabbit && DomesticationMod.CONFIG.tameableRabbit.get()) {
-            ItemStack stack = event.getItemStack();
             if (stack.getItem() == Items.CARROT || stack.getItem() == Items.GOLDEN_CARROT) {
                 if (TameableUtils.isTamed(rabbit) && rabbit.getHealth() < rabbit.getMaxHealth()) {
                     rabbit.heal(3);
@@ -628,14 +665,12 @@ public class CommonProxy {
                 ((CommandableMob) rabbit).playerSetCommand(event.getPlayer(), rabbit);
             }
         }
-        if (event.getTarget() instanceof LivingEntity entity && TameableUtils.isPetOf(event.getPlayer(), entity)) {
-            ItemStack stack = event.getItemStack();
-            Player player = event.getPlayer();
+        if (event.getTarget() instanceof LivingEntity living && TameableUtils.isPetOf(event.getPlayer(), entity)) {
             if (event.getItemStack().is(DIItemRegistry.COLLAR_TAG.get()) && DomesticationMod.CONFIG.collarTag.get()) {
-                if (!event.getPlayer().level.isClientSide && entity.isAlive()) {
+                if (!event.getPlayer().level.isClientSide && living.isAlive()) {
                     Map<Enchantment, Integer> itemEnchantments = EnchantmentHelper.deserializeEnchantments(stack.getEnchantmentTags());
-                    Map<ResourceLocation, Integer> entityEnchantments = TameableUtils.getEnchants(entity);
-                    if (stack.hasCustomHoverName() && entity.hasCustomName() && stack.getHoverName().equals(entity.getCustomName())) {
+                    Map<ResourceLocation, Integer> entityEnchantments = TameableUtils.getEnchants(living);
+                    if (stack.hasCustomHoverName() && living.hasCustomName() && stack.getHoverName().equals(living.getCustomName())) {
                         boolean hasSameEnchants = itemEnchantments.isEmpty();
                         if (entityEnchantments != null) {
                             hasSameEnchants = true;
@@ -653,12 +688,12 @@ public class CommonProxy {
                         }
                     }
                     if (stack.hasCustomHoverName()) {
-                        entity.setCustomName(stack.getHoverName());
+                        living.setCustomName(stack.getHoverName());
                     }
                     if (!event.getPlayer().isCreative()) {
                         stack.shrink(1);
                     }
-                    if (TameableUtils.hasCollar(entity)) {
+                    if (TameableUtils.hasCollar(living)) {
                         ItemStack collarFrom = new ItemStack(DIItemRegistry.COLLAR_TAG.get());
                         if (entityEnchantments != null) {
                             collarFrom.getOrCreateTag();
@@ -673,50 +708,17 @@ public class CommonProxy {
                         } else {
                             collarFrom.setTag(null);
                         }
-                        entity.spawnAtLocation(collarFrom);
+                        living.spawnAtLocation(collarFrom);
                     }
-                    entity.playSound(DISoundRegistry.COLLAR_TAG, 1, 1);
-                    TameableUtils.clearEnchants(entity);
+                    living.playSound(DISoundRegistry.COLLAR_TAG, 1, 1);
+                    TameableUtils.clearEnchants(living);
                     for (Map.Entry<Enchantment, Integer> entry : itemEnchantments.entrySet()) {
-                        TameableUtils.addEnchant(entity, new EnchantmentInstance(entry.getKey(), entry.getValue()));
+                        TameableUtils.addEnchant(living, new EnchantmentInstance(entry.getKey(), entry.getValue()));
                     }
-                    TameableUtils.setHasCollar(entity, true);
+                    TameableUtils.setHasCollar(living, true);
                 }
                 event.setCanceled(true);
                 event.setCancellationResult(InteractionResult.SUCCESS);
-            }
-            if (event.getItemStack().is(DIItemRegistry.DEED_OF_OWNERSHIP.get())) {
-                CompoundTag tag = stack.getTag();
-                boolean unbound = tag == null || !tag.getBoolean("HasBoundEntity");
-                Entity currentOwner = TameableUtils.getOwnerOf(entity);
-                if (TameableUtils.isTamed(entity) && currentOwner != null && currentOwner.equals(player) && unbound) {
-                    CompoundTag newTag = new CompoundTag();
-                    newTag.putBoolean("HasBoundEntity", true);
-                    newTag.putUUID("BoundEntity", entity.getUUID());
-                    newTag.putString("BoundEntityName", entity.getName().getString());
-                    stack.setTag(newTag);
-                    event.setCanceled(true);
-                    event.setCancellationResult(InteractionResult.SUCCESS);
-                    return;
-                }
-                if (TameableUtils.isTamed(entity) && tag != null && tag.getBoolean("HasBoundEntity") && tag.getUUID("BoundEntity") != null) {
-                    UUID fromItem = tag.getUUID("BoundEntity");
-                    if (entity.getUUID().equals(fromItem)) {
-                        player.getCooldowns().addCooldown(stack.getItem(), 5);
-                        TameableUtils.setOwnerUUIDOf(entity, player.getUUID());
-                        player.displayClientMessage(new TranslatableComponent("message.domesticationinnovation.set_owner", player.getName(), entity.getName()), true);
-                        if (currentOwner instanceof Player && !currentOwner.equals(player)) {
-                            ((Player) currentOwner).displayClientMessage(new TranslatableComponent("message.domesticationinnovation.set_owner", player.getName(), entity.getName()), true);
-                        }
-                        stack.setTag(new CompoundTag());
-                        if (!player.isCreative()) {
-                            stack.shrink(1);
-                        }
-                        event.setCanceled(true);
-                        event.setCancellationResult(InteractionResult.SUCCESS);
-                    }
-                }
-
             }
         }
     }
