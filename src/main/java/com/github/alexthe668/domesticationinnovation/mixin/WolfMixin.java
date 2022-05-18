@@ -10,11 +10,13 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.NeutralMob;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -80,6 +82,18 @@ public abstract class WolfMixin extends TamableAnimal implements CommandableMob 
 
     public void setCommand(int i){
         this.entityData.set(COMMAND, i);
+    }
+
+    @Inject(
+            at = {@At("HEAD")},
+            remap = true,
+            method = {"Lnet/minecraft/world/entity/animal/Wolf;getTailAngle()F"},
+            cancellable = true)
+    private void di_getTailAngle(CallbackInfoReturnable<Float> cir) {
+        if(!((NeutralMob)this).isAngry() && this.isTame()){
+            float f = (this.getMaxHealth() - this.getHealth()) / this.getMaxHealth() * 20F;
+            cir.setReturnValue((0.55F - Math.max(f * 0.02F, 0F)) * (float)Math.PI);
+        }
     }
 
 
