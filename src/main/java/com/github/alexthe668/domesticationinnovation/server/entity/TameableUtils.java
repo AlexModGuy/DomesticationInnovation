@@ -6,11 +6,8 @@ import com.github.alexthe666.citadel.server.message.PropertiesMessage;
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
 import com.github.alexthe668.domesticationinnovation.server.enchantment.DIEnchantmentRegistry;
 import com.github.alexthe668.domesticationinnovation.server.misc.DIParticleRegistry;
-import com.mojang.brigadier.Command;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
@@ -24,7 +21,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.util.LandRandomPos;
-import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.Fox;
 import net.minecraft.world.entity.animal.Rabbit;
@@ -155,16 +151,22 @@ public class TameableUtils {
 
     private static void setEnchantmentTag(LivingEntity enchanted, ListTag enchants) {
         CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
+        Map<ResourceLocation, Integer> prevEnchants = getEnchants(enchanted);
         tag.put(ENCHANTMENT_TAG, enchants);
         sync(enchanted, tag);
-        onUpdateEnchants(enchanted);
+        onUpdateEnchants(prevEnchants, enchanted);
     }
 
-    private static void onUpdateEnchants(LivingEntity enchanted) {
+    private static void onUpdateEnchants(@Nullable Map<ResourceLocation, Integer> prevEnchants, LivingEntity enchanted) {
         int healthExtra = getEnchantLevel(enchanted, DIEnchantmentRegistry.HEALTH_BOOST);
         int speedExtra = getEnchantLevel(enchanted, DIEnchantmentRegistry.SPEEDSTER);
         AttributeInstance health = enchanted.getAttribute(Attributes.MAX_HEALTH);
         AttributeInstance speed = enchanted.getAttribute(Attributes.MOVEMENT_SPEED);
+        if(hasEnchant(enchanted, DIEnchantmentRegistry.IMMATURITY_CURSE) || prevEnchants != null && prevEnchants.keySet().contains(DIEnchantmentRegistry.IMMATURITY_CURSE.getRegistryName())){
+            //change pose to update client
+            enchanted.setPose(Pose.FALL_FLYING);
+            enchanted.refreshDimensions();
+        }
         if (health != null) {
             if (healthExtra > 0) {
                 AttributeModifier attributemodifier = new AttributeModifier(HEALTH_BOOST_UUID, "health boost pet upgrade", healthExtra * 10, AttributeModifier.Operation.ADDITION);

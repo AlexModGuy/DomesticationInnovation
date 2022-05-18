@@ -6,6 +6,7 @@
   "refmap": "domesticationinnovation.refmap.json",
   "mixins": [
     "AbstractHorseMixin",
+    "AgeableMobMixin",
     "AnimalMixin",
     "AxolotlAiMixin",
     "AxolotlAttackablesSensorMixin",

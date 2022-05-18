@@ -101,6 +101,8 @@
   "enchantment.domesticationinnovation.blight_curse.desc": "Plants will wither and die around the pet.",
   "enchantment.domesticationinnovation.tethered_teleport": "Tethered Teleport",
   "enchantment.domesticationinnovation.tethered_teleport.desc": "Pet will teleport with its owner, even across dimensions.",
+  "enchantment.domesticationinnovation.immaturity_curse": "Curse of Immaturity",
+  "enchantment.domesticationinnovation.immaturity_curse.desc": "Pet appears and behaves as a baby version of itself.",
   "domesticationinnovation.sound.subtitle.collar_tag": "equipped Collar Tag",
   "domesticationinnovation.sound.subtitle.magnet_loop": "Magnet buzzes",
   "domesticationinnovation.sound.subtitle.chain_lightning": "Lightning zaps",
