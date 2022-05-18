@@ -6,6 +6,7 @@ import com.github.alexthe668.domesticationinnovation.server.block.PetBedBlock;
 import com.github.alexthe668.domesticationinnovation.server.block.PetBedBlockEntity;
 import com.github.alexthe668.domesticationinnovation.server.enchantment.DIEnchantmentRegistry;
 import com.github.alexthe668.domesticationinnovation.server.entity.*;
+import com.github.alexthe668.domesticationinnovation.server.event.ServerEvents;
 import com.github.alexthe668.domesticationinnovation.server.item.DIItemRegistry;
 import com.github.alexthe668.domesticationinnovation.server.misc.*;
 import com.github.alexthe668.domesticationinnovation.server.misc.trades.*;
@@ -18,6 +19,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -37,15 +39,18 @@ import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.animal.Fox;
 import net.minecraft.world.entity.animal.Rabbit;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Ravager;
 import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
@@ -57,16 +62,21 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.LootTableLoadEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityMountEvent;
+import net.minecraftforge.event.entity.EntityTeleportEvent;
+import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
 import net.minecraftforge.event.entity.ProjectileImpactEvent;
 import net.minecraftforge.event.entity.item.ItemExpireEvent;
 import net.minecraftforge.event.entity.living.*;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.village.VillagerTradesEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.antlr.v4.runtime.misc.Triple;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -315,25 +325,25 @@ public class CommonProxy {
             int psychicWallLevel = TameableUtils.getEnchantLevel(event.getEntityLiving(), DIEnchantmentRegistry.PSYCHIC_WALL);
             if (psychicWallLevel > 0 && event.getEntityLiving() instanceof Mob mob) {
                 int cooldown = TameableUtils.getPsychicWallCooldown(mob);
-                if(cooldown  > 0){
+                if (cooldown > 0) {
                     TameableUtils.setPsychicWallCooldown(mob, cooldown - 1);
-                }else{
+                } else {
                     Entity blocking = null;
                     Entity blockingFrom = null;
                     if (mob.getTarget() != null) {
                         blocking = mob.getTarget();
                         blockingFrom = mob;
-                    }else if(TameableUtils.getOwnerOf(mob) instanceof LivingEntity owner){
-                        if(owner.getLastHurtByMob() != null && owner.getLastHurtByMob().isAlive()){
+                    } else if (TameableUtils.getOwnerOf(mob) instanceof LivingEntity owner) {
+                        if (owner.getLastHurtByMob() != null && owner.getLastHurtByMob().isAlive()) {
                             blocking = owner.getLastHurtByMob();
                             blockingFrom = owner;
                         }
-                        if(owner.getLastHurtMob() != null && owner.getLastHurtMob().isAlive()){
+                        if (owner.getLastHurtMob() != null && owner.getLastHurtMob().isAlive()) {
                             blocking = owner.getLastHurtMob();
                             blockingFrom = owner;
                         }
                     }
-                    if(blocking != null){
+                    if (blocking != null) {
                         int width = psychicWallLevel + 1;
                         float yAdditional = blocking.getBbHeight() * 0.5F + width * 0.5F;
                         Vec3 vec3 = blockingFrom.position().add(0, yAdditional, 0);
@@ -555,7 +565,6 @@ public class CommonProxy {
             event.setCanceled(true);
         }
     }
-
 
     @SubscribeEvent
     public void onInteractWithEntity(PlayerInteractEvent.EntityInteract event) {
@@ -836,6 +845,44 @@ public class CommonProxy {
                 for (int i = 0; i < 5; i++) {
                     serverLevel.sendParticles(ParticleTypes.CLOUD, center.x, center.y + 1.0F, center.z, 5, 0, 0F, 0, 0.2F);
                 }
+            }
+        }
+    }
+
+    private void teleportNearbyPets(Player owner, Vec3 fromPos, Vec3 toPos, Level fromLevel, Level toLevel) {
+        double dist = 20;
+        boolean removeAndReadd = fromLevel.dimension() != toLevel.dimension();
+        Predicate<Entity> enchantedPet = (animal) -> animal instanceof Mob && TameableUtils.isPetOf(owner, animal) && TameableUtils.isValidTeleporter(owner, (Mob) animal);
+        for (Mob entity : fromLevel.getEntitiesOfClass(Mob.class, new AABB(fromPos.x - dist, fromPos.y - dist, fromPos.z - dist, fromPos.x + dist, fromPos.y + dist, fromPos.z + dist), EntitySelector.NO_SPECTATORS.and(enchantedPet))) {
+            if (removeAndReadd) {
+                ServerEvents.teleportingPets.add(new Triple(entity, toLevel, owner.getUUID()));
+            } else {
+                EntityDimensions dimensions = entity.getDimensions(entity.getPose());
+                AABB suffocationBox = new AABB(-dimensions.width / 2.0F, 0, -dimensions.width / 2.0F, dimensions.width / 2.0F, dimensions.height, dimensions.width / 2.0F);
+                while(!toLevel.noCollision(entity, suffocationBox.move(toPos.x, toPos.y, toPos.z)) && toPos.y < 300){
+                    toPos = toPos.add(0, 1, 0);
+                }
+                entity.fallDistance = 0.0F;
+                entity.teleportToWithTicket(toPos.x, toPos.y, toPos.z);
+                entity.setPortalCooldown();
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onEntityTeleport(EntityTeleportEvent event) {
+        if (event.getEntity() instanceof Player) {
+            teleportNearbyPets((Player) event.getEntity(), event.getPrev(), event.getTarget(), event.getEntity().level, event.getEntity().level);
+        }
+    }
+
+    @SubscribeEvent
+    public void onEntityTravelToDimension(EntityTravelToDimensionEvent event) {
+        if(!event.isCanceled()){
+            if(event.getEntity().level instanceof ServerLevel serverLevel){
+                MinecraftServer server = serverLevel.getServer();
+                Level toLevel = server.getLevel(event.getDimension());
+                teleportNearbyPets((Player) event.getEntity(), event.getEntity().position(), event.getEntity().position(), event.getEntity().level, toLevel);
             }
         }
     }
