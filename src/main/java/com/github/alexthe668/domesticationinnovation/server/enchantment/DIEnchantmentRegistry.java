@@ -40,6 +40,7 @@ public class DIEnchantmentRegistry {
     public static final PetEnchantment GLUTTONOUS = new PetEnchantment("gluttonous", Enchantment.Rarity.COMMON, 1, 9);
     public static final PetEnchantment PSYCHIC_WALL = new PetEnchantment("psychic_wall", Enchantment.Rarity.VERY_RARE, 3, 12);
     public static final PetEnchantment INTIMIDATION = new PetEnchantment("intimidation", Enchantment.Rarity.UNCOMMON, 2, 12);
+    public static final PetEnchantment TETHERED_TELEPORT = new PetEnchantment("tethered_teleport", Enchantment.Rarity.COMMON, 1, 6);
     public static final PetEnchantment UNDEAD_CURSE = new PetEnchantmentCurse("undead_curse", Enchantment.Rarity.VERY_RARE);
     public static final PetEnchantment INFAMY_CURSE = new PetEnchantmentCurse("infamy_curse", Enchantment.Rarity.VERY_RARE);
     public static final PetEnchantment BLIGHT_CURSE = new PetEnchantmentCurse("blight_curse", Enchantment.Rarity.VERY_RARE);

@@ -6,6 +6,7 @@ import com.github.alexthe666.citadel.server.message.PropertiesMessage;
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
 import com.github.alexthe668.domesticationinnovation.server.enchantment.DIEnchantmentRegistry;
 import com.github.alexthe668.domesticationinnovation.server.misc.DIParticleRegistry;
+import com.mojang.brigadier.Command;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -632,4 +633,14 @@ public class TameableUtils {
         return Math.min(charismas, 50);
     }
 
+    public static boolean isValidTeleporter(LivingEntity owner, Mob animal) {
+        if (hasEnchant(animal, DIEnchantmentRegistry.TETHERED_TELEPORT)) {
+            if(animal instanceof CommandableMob commandableMob){
+                return commandableMob.getCommand() == 2;
+            }else if(animal instanceof TamableAnimal tame){
+                return !tame.isOrderedToSit() && animal.distanceTo(owner) < 10;
+            }
+        }
+        return false;
+    }
 }
