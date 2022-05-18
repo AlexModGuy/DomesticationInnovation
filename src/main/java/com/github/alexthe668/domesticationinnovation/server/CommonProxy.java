@@ -251,8 +251,19 @@ public class CommonProxy {
                                 TameableUtils.setPetAttackTarget(mob, -1);
                             }
                         }
-                        if (mob.getTarget() != null && mob.getTarget().isAlive()) {
-                            TameableUtils.setPetAttackTarget(mob, mob.getTarget().getId());
+                        Entity punchingTarget = null;
+                        if (mob.getTarget() != null) {
+                            punchingTarget = mob.getTarget();
+                        } else if (TameableUtils.getOwnerOf(mob) instanceof LivingEntity owner) {
+                            if (owner.getLastHurtByMob() != null && owner.getLastHurtByMob().isAlive() && !TameableUtils.hasSameOwnerAs(mob, owner.getLastHurtByMob())) {
+                                punchingTarget = owner.getLastHurtByMob();
+                            }
+                            if (owner.getLastHurtMob() != null && owner.getLastHurtMob().isAlive() && !TameableUtils.hasSameOwnerAs(mob, owner.getLastHurtMob())) {
+                                punchingTarget = owner.getLastHurtMob();
+                            }
+                        }
+                        if (punchingTarget != null && punchingTarget.isAlive()) {
+                            TameableUtils.setPetAttackTarget(mob, punchingTarget.getId());
                         }
                     }
                 }
@@ -446,6 +457,7 @@ public class CommonProxy {
             int lightningLevel = TameableUtils.getEnchantLevel(attacker, DIEnchantmentRegistry.CHAIN_LIGHTNING);
             int bubblingLevel = TameableUtils.getEnchantLevel(attacker, DIEnchantmentRegistry.BUBBLING);
             int vampireLevel = TameableUtils.getEnchantLevel(attacker, DIEnchantmentRegistry.VAMPIRE);
+
             if (lightningLevel > 0) {
                 ChainLightningEntity lightning = DIEntityRegistry.CHAIN_LIGHTNING.get().create(event.getEntityLiving().level);
                 lightning.setCreatorEntityID(attacker.getId());
@@ -505,6 +517,16 @@ public class CommonProxy {
                         break;
                     }
                 }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onLivingDamage(LivingDamageEvent event){
+        if(event.getSource().getEntity() instanceof LivingEntity && TameableUtils.isTamed(event.getSource().getEntity())){
+            LivingEntity pet = (LivingEntity)event.getSource().getEntity();
+            if(TameableUtils.hasEnchant(pet, DIEnchantmentRegistry.IMMATURITY_CURSE)){
+                event.setAmount((float) Math.ceil(event.getAmount() * 0.7F));
             }
         }
     }

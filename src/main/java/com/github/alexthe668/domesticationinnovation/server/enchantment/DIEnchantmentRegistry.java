@@ -44,6 +44,7 @@ public class DIEnchantmentRegistry {
     public static final PetEnchantment UNDEAD_CURSE = new PetEnchantmentCurse("undead_curse", Enchantment.Rarity.VERY_RARE);
     public static final PetEnchantment INFAMY_CURSE = new PetEnchantmentCurse("infamy_curse", Enchantment.Rarity.VERY_RARE);
     public static final PetEnchantment BLIGHT_CURSE = new PetEnchantmentCurse("blight_curse", Enchantment.Rarity.VERY_RARE);
+    public static final PetEnchantment IMMATURITY_CURSE = new PetEnchantmentCurse("immaturity_curse", Enchantment.Rarity.VERY_RARE);
 
     @SubscribeEvent
     public static void registerEnchantments(final RegistryEvent.Register<Enchantment> event) {
