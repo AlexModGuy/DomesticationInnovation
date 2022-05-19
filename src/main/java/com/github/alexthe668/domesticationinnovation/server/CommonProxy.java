@@ -45,6 +45,7 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Ravager;
 import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -85,6 +86,8 @@ public class CommonProxy {
 
     private static final UUID FROST_FANG_SLOW = UUID.fromString("1eaf83ff-7207-4596-b37a-d7a07b3ec4cf");
     private static final TargetingConditions ZOMBIE_TARGET = TargetingConditions.forCombat().range(32.0D);
+    //list of pets to be teleported across dimensions, cleared after every tick
+    public static List<Triple<Entity, ServerLevel, UUID>> teleportingPets = new ArrayList<>();
 
     public void init() {
     }
@@ -105,22 +108,54 @@ public class CommonProxy {
 
     @SubscribeEvent
     public void onEntityJoinWorldEvent(EntityJoinWorldEvent event) {
-        if(event.getEntity() instanceof LivingEntity living && TameableUtils.couldBeTamed(living)){
-            if(TameableUtils.hasEnchant(living, DIEnchantmentRegistry.HEALTH_BOOST)){
-                living.setHealth((float)Math.max(living.getHealth(), TameableUtils.getSafePetHealth(living)));
+        if (event.getEntity() instanceof LivingEntity living && TameableUtils.couldBeTamed(living)) {
+            if (TameableUtils.hasEnchant(living, DIEnchantmentRegistry.HEALTH_BOOST)) {
+                living.setHealth((float) Math.max(living.getHealth(), TameableUtils.getSafePetHealth(living)));
             }
         }
     }
 
     @SubscribeEvent
     public void onEntityLeaveWorld(EntityLeaveWorldEvent event) {
-        if(event.getEntity() instanceof LivingEntity living && TameableUtils.couldBeTamed(living)){
-            if(TameableUtils.hasEnchant(living, DIEnchantmentRegistry.HEALTH_BOOST)){
+        if (event.getEntity() instanceof LivingEntity living && TameableUtils.couldBeTamed(living)) {
+            if (TameableUtils.hasEnchant(living, DIEnchantmentRegistry.HEALTH_BOOST)) {
                 TameableUtils.setSafePetHealth(living, living.getHealth());
             }
         }
     }
 
+    @SubscribeEvent
+    public void onServerTick(TickEvent.WorldTickEvent tick) {
+        if (!tick.world.isClientSide && tick.world instanceof ServerLevel) {
+            for (final var triple : teleportingPets) {
+                Entity entity = triple.a;
+                ServerLevel endpointWorld = triple.b;
+                UUID ownerUUID = triple.c;
+                entity.unRide();
+                entity.level = endpointWorld;
+                Entity player = endpointWorld.getPlayerByUUID(ownerUUID);
+                if (player != null) {
+                    Entity teleportedEntity = entity.getType().create(endpointWorld);
+                    if (teleportedEntity != null) {
+                        teleportedEntity.restoreFrom(entity);
+                        Vec3 toPos = player.position();
+                        EntityDimensions dimensions = entity.getDimensions(entity.getPose());
+                        AABB suffocationBox = new AABB(-dimensions.width / 2.0F, 0, -dimensions.width / 2.0F, dimensions.width / 2.0F, dimensions.height, dimensions.width / 2.0F);
+                        while (!endpointWorld.noCollision(entity, suffocationBox.move(toPos.x, toPos.y, toPos.z)) && toPos.y < 300) {
+                            toPos = toPos.add(0, 1, 0);
+                        }
+                        teleportedEntity.moveTo(toPos.x, toPos.y, toPos.z, entity.getYRot(), entity.getXRot());
+                        teleportedEntity.setYHeadRot(entity.getYHeadRot());
+                        teleportedEntity.fallDistance = 0.0F;
+                        teleportedEntity.setPortalCooldown();
+                        endpointWorld.addFreshEntity(teleportedEntity);
+                    }
+                    entity.remove(Entity.RemovalReason.DISCARDED);
+                }
+            }
+            teleportingPets.clear();
+        }
+    }
 
     @SubscribeEvent
     public void onProjectileImpactEvent(ProjectileImpactEvent event) {
@@ -133,6 +168,10 @@ public class CommonProxy {
                 }
             }
             if (TameableUtils.isTamed(hit) && TameableUtils.hasEnchant((LivingEntity) hit, DIEnchantmentRegistry.DEFLECTION)) {
+                if (event.getEntity() instanceof AbstractArrow arrow) {
+                    //fixes soft crash with vanilla
+                    arrow.setPierceLevel((byte) 0);
+                }
                 event.setCanceled(true);
                 float xRot = event.getProjectile().getXRot();
                 float yRot = event.getProjectile().yRotO;
@@ -539,10 +578,10 @@ public class CommonProxy {
     }
 
     @SubscribeEvent
-    public void onLivingDamage(LivingDamageEvent event){
-        if(event.getSource().getEntity() instanceof LivingEntity && TameableUtils.isTamed(event.getSource().getEntity())){
-            LivingEntity pet = (LivingEntity)event.getSource().getEntity();
-            if(TameableUtils.hasEnchant(pet, DIEnchantmentRegistry.IMMATURITY_CURSE)){
+    public void onLivingDamage(LivingDamageEvent event) {
+        if (event.getSource().getEntity() instanceof LivingEntity && TameableUtils.isTamed(event.getSource().getEntity())) {
+            LivingEntity pet = (LivingEntity) event.getSource().getEntity();
+            if (TameableUtils.hasEnchant(pet, DIEnchantmentRegistry.IMMATURITY_CURSE)) {
                 event.setAmount((float) Math.ceil(event.getAmount() * 0.7F));
             }
         }
@@ -611,7 +650,7 @@ public class CommonProxy {
         Player player = event.getPlayer();
         Entity entity = event.getTarget();
         ItemStack stack = event.getItemStack();
-        if(TameableUtils.isTamed(event.getTarget())){
+        if (TameableUtils.isTamed(event.getTarget())) {
             if (event.getItemStack().is(DIItemRegistry.DEED_OF_OWNERSHIP.get())) {
                 CompoundTag tag = stack.getTag();
                 boolean unbound = !DeedOfOwnershipItem.isBound(event.getItemStack());
@@ -896,7 +935,7 @@ public class CommonProxy {
         Predicate<Entity> enchantedPet = (animal) -> animal instanceof Mob && TameableUtils.isPetOf(owner, animal) && TameableUtils.isValidTeleporter(owner, (Mob) animal);
         for (Mob entity : fromLevel.getEntitiesOfClass(Mob.class, new AABB(fromPos.x - dist, fromPos.y - dist, fromPos.z - dist, fromPos.x + dist, fromPos.y + dist, fromPos.z + dist), EntitySelector.NO_SPECTATORS.and(enchantedPet))) {
             if (removeAndReadd) {
-                ServerEvents.teleportingPets.add(new Triple(entity, toLevel, owner.getUUID()));
+                teleportingPets.add(new Triple(entity, toLevel, owner.getUUID()));
             } else {
                 EntityDimensions dimensions = entity.getDimensions(entity.getPose());
                 AABB suffocationBox = new AABB(-dimensions.width / 2.0F, 0, -dimensions.width / 2.0F, dimensions.width / 2.0F, dimensions.height, dimensions.width / 2.0F);
@@ -920,10 +959,13 @@ public class CommonProxy {
     @SubscribeEvent
     public void onEntityTravelToDimension(EntityTravelToDimensionEvent event) {
         if (!event.isCanceled()) {
-            if (event.getEntity().level instanceof ServerLevel serverLevel) {
+            if (event.getEntity().level instanceof ServerLevel serverLevel && event.getEntity() instanceof Player) {
                 MinecraftServer server = serverLevel.getServer();
                 Level toLevel = server.getLevel(event.getDimension());
-                teleportNearbyPets((Player) event.getEntity(), event.getEntity().position(), event.getEntity().position(), event.getEntity().level, toLevel);
+                if (toLevel != null) {
+
+                    teleportNearbyPets((Player) event.getEntity(), event.getEntity().position(), event.getEntity().position(), event.getEntity().level, toLevel);
+                }
             }
         }
     }
