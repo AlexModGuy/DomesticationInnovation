@@ -6,7 +6,6 @@ import com.github.alexthe668.domesticationinnovation.server.block.PetBedBlock;
 import com.github.alexthe668.domesticationinnovation.server.block.PetBedBlockEntity;
 import com.github.alexthe668.domesticationinnovation.server.enchantment.DIEnchantmentRegistry;
 import com.github.alexthe668.domesticationinnovation.server.entity.*;
-import com.github.alexthe668.domesticationinnovation.server.event.ServerEvents;
 import com.github.alexthe668.domesticationinnovation.server.item.DIItemRegistry;
 import com.github.alexthe668.domesticationinnovation.server.item.DeedOfOwnershipItem;
 import com.github.alexthe668.domesticationinnovation.server.misc.*;
