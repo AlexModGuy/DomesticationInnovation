@@ -170,7 +170,10 @@ public class CommonProxy {
             if (TameableUtils.isTamed(hit) && TameableUtils.hasEnchant((LivingEntity) hit, DIEnchantmentRegistry.DEFLECTION)) {
                 if (event.getEntity() instanceof AbstractArrow arrow) {
                     //fixes soft crash with vanilla
-                    arrow.setPierceLevel((byte) 0);
+                    if(arrow.getPierceLevel() > 0){
+                        arrow.setPierceLevel((byte) 0);
+                        arrow.remove(Entity.RemovalReason.DISCARDED);
+                    }
                 }
                 event.setCanceled(true);
                 float xRot = event.getProjectile().getXRot();
