@@ -297,7 +297,7 @@ public class CommonProxy {
                     } else {
                         if (punching != null) {
                             boolean flag = true;
-                            for (int i = 0; i < shadowHandsLevel; i++) {
+                            for (int i = 0; i < Math.min(shadowHandsLevel, punchProgress.length); i++) {
                                 if (punchProgress[i] > 0) {
                                     punchProgress[i] = punchProgress[i] - 1;
                                     flag = false;
