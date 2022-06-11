@@ -115,7 +115,7 @@ public class DIEnchantmentRegistry {
             return e2 != CHAIN_LIGHTNING && e2 != MAGNETIC && e2 != BUBBLING && e2 != DISK_JOCKEY;
         }
         if(e1 == DISK_JOCKEY){
-            return e2 != SHADOW_HANDS;
+            return e2 != SHADOW_HANDS && e2 != MUFFLED;
         }
         if(e1 == DEFUSAL){
             return e2 != DEFLECTION;
@@ -137,6 +137,9 @@ public class DIEnchantmentRegistry {
         }
         if(e1 == BLIGHT_CURSE){
             return e2 != SHEPHERD;
+        }
+        if(e1 == MUFFLED){
+            return e2 != DISK_JOCKEY;
         }
         return true;
     }
