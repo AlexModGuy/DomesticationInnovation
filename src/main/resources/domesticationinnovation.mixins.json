@@ -28,6 +28,7 @@
     "PlayerMixin",
     "PoolsMixin",
     "RabbitMixin",
+    "SculkSensorBlockMixin",
     "ShootTongueMixin",
     "TameableAnimalMixin",
     "VillagerMixin",

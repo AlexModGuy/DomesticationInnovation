@@ -249,8 +249,10 @@ public class TameableUtils {
         Map<ResourceLocation, Integer> map = getEnchants(entity);
         if (map != null) {
             for (Map.Entry<ResourceLocation, Integer> entry : map.entrySet()) {
-                boolean isCurse = entry.getKey().getPath().contains("curse");
-                list.add(Component.translatable("enchantment." + entry.getKey().getNamespace() + "." + entry.getKey().getPath()).append(Component.literal(" ")).append(Component.translatable("enchantment.level." + entry.getValue())).withStyle(isCurse ? ChatFormatting.RED : ChatFormatting.AQUA));
+                if(DomesticationMod.CONFIG.isEnchantEnabled(entry.getKey().getPath())){
+                    boolean isCurse = entry.getKey().getPath().contains("curse");
+                    list.add(Component.translatable("enchantment." + entry.getKey().getNamespace() + "." + entry.getKey().getPath()).append(Component.literal(" ")).append(Component.translatable("enchantment.level." + entry.getValue())).withStyle(isCurse ? ChatFormatting.RED : ChatFormatting.AQUA));
+                }
             }
         }
         return list;

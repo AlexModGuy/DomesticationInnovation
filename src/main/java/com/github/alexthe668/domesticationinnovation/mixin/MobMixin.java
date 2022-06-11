@@ -86,4 +86,16 @@ public abstract class MobMixin extends LivingEntity {
 
         }
     }
+
+    @Inject(
+            method = {"Lnet/minecraft/world/entity/Mob;playAmbientSound()V"},
+            remap = true,
+            at = @At(value = "HEAD"),
+            cancellable = true
+    )
+    private void di_playAmbientSound(CallbackInfo ci) {
+        if(TameableUtils.isTamed(this) && TameableUtils.hasEnchant(this, DIEnchantmentRegistry.MUFFLED)){
+            ci.cancel();
+        }
+    }
 }

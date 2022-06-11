@@ -835,6 +835,11 @@ public class CommonProxy {
             LootPool.Builder builder = new LootPool.Builder().name("di_ore_scenting_book").add(item).when(LootItemRandomChanceCondition.randomChance(DomesticationMod.CONFIG.oreScentingLootChance.get().floatValue())).setRolls(UniformGenerator.between(0, 1)).setBonusRolls(UniformGenerator.between(0, 1));
             event.getTable().addPool(builder.build());
         }
+        if (event.getName().equals(BuiltInLootTables.ANCIENT_CITY) && DomesticationMod.CONFIG.isEnchantEnabled(DIEnchantmentRegistry.MUFFLED) && DomesticationMod.CONFIG.muffledLootChance.get() > 0) {
+            LootPoolEntryContainer.Builder item = LootItem.lootTableItem(Items.BOOK).setWeight(5).apply((new EnchantRandomlyFunction.Builder()).withEnchantment(DIEnchantmentRegistry.MUFFLED)).setWeight(1);
+            LootPool.Builder builder = new LootPool.Builder().name("di_muffled_book").add(item).when(LootItemRandomChanceCondition.randomChance(DomesticationMod.CONFIG.muffledLootChance.get().floatValue())).setRolls(UniformGenerator.between(0, 1)).setBonusRolls(UniformGenerator.between(0, 1));
+            event.getTable().addPool(builder.build());
+        }
     }
 
     @SubscribeEvent

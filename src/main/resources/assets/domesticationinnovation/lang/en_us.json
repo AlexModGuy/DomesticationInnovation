@@ -103,6 +103,8 @@
   "enchantment.domesticationinnovation.tethered_teleport.desc": "Pet will teleport with its owner, even across dimensions.",
   "enchantment.domesticationinnovation.immaturity_curse": "Curse of Immaturity",
   "enchantment.domesticationinnovation.immaturity_curse.desc": "Pet appears and behaves as a baby version of itself, with reduced attack damage.",
+  "enchantment.domesticationinnovation.muffled": "Muffled",
+  "enchantment.domesticationinnovation.muffled.desc": "Pet will be silent and not emit vibrations when moving.",
   "domesticationinnovation.sound.subtitle.collar_tag": "equipped Collar Tag",
   "domesticationinnovation.sound.subtitle.magnet_loop": "Magnet buzzes",
   "domesticationinnovation.sound.subtitle.chain_lightning": "Lightning zaps",
