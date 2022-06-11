@@ -1,8 +1,9 @@
 package com.github.alexthe668.domesticationinnovation.mixin;
 
+import com.github.alexthe666.citadel.server.entity.IComandableMob;
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
-import com.github.alexthe668.domesticationinnovation.server.entity.CommandableMob;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -21,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Cat.class)
-public abstract class CatMixin extends TamableAnimal implements CommandableMob {
+public abstract class CatMixin extends TamableAnimal implements IComandableMob {
     private static final EntityDataAccessor<Integer> COMMAND = SynchedEntityData.defineId(Cat.class, EntityDataSerializers.INT);
 
     protected CatMixin(EntityType<? extends TamableAnimal> type, Level level) {
@@ -82,5 +83,8 @@ public abstract class CatMixin extends TamableAnimal implements CommandableMob {
         this.entityData.set(COMMAND, i);
     }
 
-
+    @Override
+    public void sendCommandMessage(Player owner, int command, Component name) {
+        owner.displayClientMessage(Component.translatable("message.domesticationinnovation.command_" + command, name), true);
+    }
 }

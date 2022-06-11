@@ -49,7 +49,7 @@ public class PsychicWallEntity extends Entity {
             this.setBoundingBox(this.makeBoundingBox());
         } else {
             if (soundLoop % 15 == 0) {
-                this.playSound(DISoundRegistry.PSYCHIC_WALL, 1, random.nextFloat() * 0.3F + 0.9F);
+                this.playSound(DISoundRegistry.PSYCHIC_WALL.get(), 1, random.nextFloat() * 0.3F + 0.9F);
             }
             soundLoop++;
         }
@@ -97,8 +97,8 @@ public class PsychicWallEntity extends Entity {
                             } else {
                                 vec32 = entityhitresult.getLocation();
                             }
-                            level.addParticle(DIParticleRegistry.PSYCHIC_WALL, vec32.x, vec32.y, vec32.z, this.getWallDirection().get3DDataValue(), 0, 0);
-                            this.playSound(DISoundRegistry.PSYCHIC_WALL_DEFLECT, 1, random.nextFloat() * 0.3F + 0.9F);
+                            level.addParticle(DIParticleRegistry.PSYCHIC_WALL.get(), vec32.x, vec32.y, vec32.z, this.getWallDirection().get3DDataValue(), 0, 0);
+                            this.playSound(DISoundRegistry.PSYCHIC_WALL_DEFLECT.get(), 1, random.nextFloat() * 0.3F + 0.9F);
                         }
                     }
                 }

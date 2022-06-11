@@ -1,5 +1,6 @@
 package com.github.alexthe668.domesticationinnovation.server.misc.trades;
 
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.item.Item;
@@ -43,7 +44,7 @@ public class SellingItemTrade implements VillagerTrades.ItemListing {
         this.priceMultiplier = priceMultiplier;
     }
 
-    public MerchantOffer getOffer(Entity trader, Random rand) {
+    public MerchantOffer getOffer(Entity trader, RandomSource rand) {
         return new MerchantOffer(new ItemStack(Items.EMERALD, this.emeraldCount), new ItemStack(this.sellingItem.getItem(), this.sellingItemCount), this.maxUses, this.xpValue, this.priceMultiplier);
     }
 }

@@ -1,5 +1,6 @@
 package com.github.alexthe668.domesticationinnovation.server.entity;
 
+import com.github.alexthe666.citadel.server.entity.IComandableMob;
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -142,7 +143,7 @@ public class FeatherEntity extends FishingHook {
         if(entity instanceof TamableAnimal && (((TamableAnimal) entity).isOrderedToSit() || ((TamableAnimal) entity).isInSittingPose())){
             return false;
         }
-        if(entity instanceof CommandableMob && ((CommandableMob) entity).getCommand() == 1 && DomesticationMod.CONFIG.trinaryCommandSystem.get()){
+        if(entity instanceof IComandableMob && ((IComandableMob) entity).getCommand() == 1 && DomesticationMod.CONFIG.trinaryCommandSystem.get()){
             return false;
         }
         return true;

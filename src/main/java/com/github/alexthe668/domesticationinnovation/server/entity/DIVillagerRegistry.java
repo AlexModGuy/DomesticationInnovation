@@ -5,41 +5,38 @@ import com.github.alexthe668.domesticationinnovation.DomesticationMod;
 import com.github.alexthe668.domesticationinnovation.server.misc.DIPOIRegistry;
 import com.github.alexthe668.domesticationinnovation.server.misc.DISoundRegistry;
 import com.github.alexthe668.domesticationinnovation.server.misc.PetshopStructurePoolElement;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.mojang.datafixers.util.Pair;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.data.worldgen.ProcessorLists;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.entity.npc.VillagerProfession;
-import net.minecraft.world.level.levelgen.structure.pools.LegacySinglePoolElement;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElementType;
-import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
+import java.util.function.Predicate;
 
 @Mod.EventBusSubscriber(modid = DomesticationMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DIVillagerRegistry {
 
+    public static final DeferredRegister<VillagerProfession> DEF_REG = DeferredRegister.create(ForgeRegistries.PROFESSIONS, DomesticationMod.MODID);
     public static final StructurePoolElementType<PetshopStructurePoolElement> PETSHOP_TYPE = Registry.register(Registry.STRUCTURE_POOL_ELEMENT, new ResourceLocation(DomesticationMod.MODID, "petshop"), () -> PetshopStructurePoolElement.CODEC);
-    public static final VillagerProfession ANIMAL_TAMER = new AnimalTamerProfession().setRegistryName(DomesticationMod.MODID, "animal_tamer");
+
+    public static final RegistryObject<VillagerProfession> ANIMAL_TAMER = DEF_REG.register("animal_tamer", () -> buildVillagerProfession());
     public static boolean registeredHouses = false;
 
-    @SubscribeEvent
-    public static void registerVillagers(final RegistryEvent.Register<VillagerProfession> event) {
-        if(DomesticationMod.CONFIG.animalTamerVillager.get()){
-            event.getRegistry().register(ANIMAL_TAMER);
-        }
+    private static VillagerProfession buildVillagerProfession() {
+        Predicate<Holder<PoiType>> heldJobSite = (poiType) -> {
+            return poiType == DIPOIRegistry.PET_BED.getHolder().get();
+        };
+        Predicate<Holder<PoiType>> acquirableJobSite = (poiType) -> {
+            return poiType == DIPOIRegistry.PET_BED.getHolder().get();
+        };
+        return new VillagerProfession("animal_tamer", heldJobSite, acquirableJobSite, ImmutableSet.of(), ImmutableSet.of(), DISoundRegistry.PET_BED_USE.get());
     }
 
     public static void registerHouses() {
@@ -56,17 +53,4 @@ public class DIVillagerRegistry {
         StructurePoolElement taiga = new PetshopStructurePoolElement(new ResourceLocation(DomesticationMod.MODID, "taiga_petshop"), ProcessorLists.EMPTY);
         VillageHouseManager.register("minecraft:village/taiga/houses", (pool) -> VillageHouseManager.addToPool(pool, taiga, weight));
     }
-
-    private static class AnimalTamerProfession extends VillagerProfession {
-
-        public AnimalTamerProfession() {
-            super("animal_tamer", null, ImmutableSet.of(), ImmutableSet.of(), DISoundRegistry.PET_BED_USE);
-        }
-
-        public PoiType getJobPoiType() {
-            return DIPOIRegistry.PET_BED.get();
-        }
-
-    }
-
 }

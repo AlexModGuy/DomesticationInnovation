@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import net.minecraft.Util;
 import net.minecraft.core.Registry;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.util.random.WeightedRandom;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.npc.VillagerTrades;
@@ -42,7 +43,7 @@ public class EnchantItemTrade implements VillagerTrades.ItemListing {
         this.priceMultiplier = priceMultiplier;
     }
 
-    public MerchantOffer getOffer(Entity entity, Random random) {
+    public MerchantOffer getOffer(Entity entity, RandomSource random) {
         int i = Math.max(6, enchantXp + 5 - random.nextInt(5));
         ItemStack itemstack = enchant(random, new ItemStack(this.itemStack.getItem()), i, enchantmentCount);
         int j = Math.min(this.baseEmeraldCost + i, 64);
@@ -50,7 +51,7 @@ public class EnchantItemTrade implements VillagerTrades.ItemListing {
         return new MerchantOffer(itemstack1, itemstack, this.maxUses, this.villagerXp, this.priceMultiplier);
     }
 
-    public ItemStack enchant(Random random, ItemStack stack, int enchantXp, int howManyEnchants) {
+    public ItemStack enchant(RandomSource random, ItemStack stack, int enchantXp, int howManyEnchants) {
         List<EnchantmentInstance> list = selectEnchantment(random, stack, enchantXp, howManyEnchants);
         for(EnchantmentInstance enchantmentinstance : list) {
             stack.enchant(enchantmentinstance.enchantment, enchantmentinstance.level);
@@ -58,7 +59,7 @@ public class EnchantItemTrade implements VillagerTrades.ItemListing {
         return stack;
     }
 
-    public static List<EnchantmentInstance> selectEnchantment(Random random, ItemStack stacks, int expIThink, int enchantmentCount) {
+    public static List<EnchantmentInstance> selectEnchantment(RandomSource random, ItemStack stacks, int expIThink, int enchantmentCount) {
         List<EnchantmentInstance> list = Lists.newArrayList();
         Item item = stacks.getItem();
         int i = stacks.getItemEnchantability();

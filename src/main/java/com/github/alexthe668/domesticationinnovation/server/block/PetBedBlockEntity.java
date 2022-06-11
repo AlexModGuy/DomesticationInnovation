@@ -1,14 +1,13 @@
 package com.github.alexthe668.domesticationinnovation.server.block;
 
+import com.github.alexthe666.citadel.server.entity.IComandableMob;
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
-import com.github.alexthe668.domesticationinnovation.server.entity.CommandableMob;
 import com.github.alexthe668.domesticationinnovation.server.entity.TameableUtils;
 import com.github.alexthe668.domesticationinnovation.server.misc.DIWorldData;
 import com.github.alexthe668.domesticationinnovation.server.misc.RespawnRequest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -49,7 +48,7 @@ public class PetBedBlockEntity extends BlockEntity {
             for(RespawnRequest request : requestList){
                 data.removeRespawnRequest(request);
                 if(message != null){
-                    message.displayClientMessage(new TranslatableComponent("message.domesticationinnovation.goodbye", request.getNametag()), false);
+                    message.displayClientMessage(Component.translatable("message.domesticationinnovation.goodbye", request.getNametag()), false);
                 }
             }
         }
@@ -64,7 +63,7 @@ public class PetBedBlockEntity extends BlockEntity {
                 living.setPos(Vec3.upFromBottomCenterOf(pos, 0.8F));
                 living.setHealth(living.getMaxHealth());
                 if(!request.getNametag().isEmpty()){
-                    living.setCustomName(new TextComponent(request.getNametag()));
+                    living.setCustomName(Component.translatable(request.getNametag()));
                 }
                 switch (dir){
                     case NORTH:
@@ -80,8 +79,8 @@ public class PetBedBlockEntity extends BlockEntity {
                         living.setYRot(90);
                         break;
                 }
-                if(living instanceof CommandableMob){
-                    ((CommandableMob) living).setCommand(1);
+                if(living instanceof IComandableMob){
+                    ((IComandableMob) living).setCommand(1);
                 }
                 if(living instanceof TamableAnimal){
                     ((TamableAnimal)living).setOrderedToSit(true);
@@ -89,7 +88,7 @@ public class PetBedBlockEntity extends BlockEntity {
                 level.addFreshEntity(living);
                 Entity owner = TameableUtils.getOwnerOf(entity);
                 if(owner instanceof Player){
-                    ((Player)owner).displayClientMessage(new TranslatableComponent("message.domesticationinnovation.respawn", entity.getName()), false);
+                    ((Player)owner).displayClientMessage(Component.translatable("message.domesticationinnovation.respawn", entity.getName()), false);
                 }
                 return true;
             }
@@ -103,7 +102,7 @@ public class PetBedBlockEntity extends BlockEntity {
         for (LivingEntity entity : list){
             Entity owner = TameableUtils.getOwnerOf(entity);
             if(owner instanceof Player){
-                ((Player)owner).displayClientMessage(new TranslatableComponent("message.domesticationinnovation.remove_respawn", entity.getName()), false);
+                ((Player)owner).displayClientMessage(Component.translatable("message.domesticationinnovation.remove_respawn", entity.getName()), false);
                 TameableUtils.removePetBedPos(entity);
             }
         }

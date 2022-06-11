@@ -9,12 +9,13 @@ public class PetEnchantment extends Enchantment {
 
     private int levels;
     private int minXP;
+    private String registryName;
 
     protected PetEnchantment(String name, Rarity r, int levels, int minXP) {
         super(r, DIEnchantmentRegistry.CATEGORY, new EquipmentSlot[]{EquipmentSlot.MAINHAND});
         this.levels = levels;
         this.minXP = minXP;
-        this.setRegistryName(new ResourceLocation(DomesticationMod.MODID, name));
+        this.registryName = name;
     }
 
     public int getMinCost(int i) {
@@ -44,5 +45,9 @@ public class PetEnchantment extends Enchantment {
 
     public boolean isAllowedOnBooks() {
         return super.isAllowedOnBooks() && DomesticationMod.CONFIG.isEnchantEnabled(this);
+    }
+
+    public String getName(){
+        return registryName;
     }
 }

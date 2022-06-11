@@ -1,7 +1,7 @@
 package com.github.alexthe668.domesticationinnovation.mixin;
 
+import com.github.alexthe666.citadel.server.entity.IComandableMob;
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
-import com.github.alexthe668.domesticationinnovation.server.entity.CommandableMob;
 import net.minecraft.world.entity.ai.goal.FollowParentGoal;
 import net.minecraft.world.entity.animal.Animal;
 import org.spongepowered.asm.mixin.Final;
@@ -25,7 +25,7 @@ public class FollowParentGoalMixin {
             cancellable = true
     )
     private void di_canUse(CallbackInfoReturnable<Boolean> cir){
-        if(animal instanceof CommandableMob commandableMob && commandableMob.getCommand() != 0 && DomesticationMod.CONFIG.trinaryCommandSystem.get()){
+        if(animal instanceof IComandableMob commandableMob && commandableMob.getCommand() != 0 && DomesticationMod.CONFIG.trinaryCommandSystem.get()){
             cir.setReturnValue(false);
         }
     }
@@ -37,7 +37,7 @@ public class FollowParentGoalMixin {
             cancellable = true
     )
     private void di_canContinueToUse(CallbackInfoReturnable<Boolean> cir){
-        if(animal instanceof CommandableMob commandableMob && commandableMob.getCommand() != 0 && DomesticationMod.CONFIG.trinaryCommandSystem.get()){
+        if(animal instanceof IComandableMob commandableMob && commandableMob.getCommand() != 0 && DomesticationMod.CONFIG.trinaryCommandSystem.get()){
             cir.setReturnValue(false);
         }
     }

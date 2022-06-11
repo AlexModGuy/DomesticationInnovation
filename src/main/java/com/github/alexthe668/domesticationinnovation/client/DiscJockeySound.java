@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 
 public class DiscJockeySound  extends AbstractTickableSoundInstance {
     private final FollowingJukeboxEntity box;
@@ -12,7 +13,7 @@ public class DiscJockeySound  extends AbstractTickableSoundInstance {
     private SoundEvent recordSound;
 
     public DiscJockeySound(SoundEvent record, FollowingJukeboxEntity box) {
-        super(record, SoundSource.RECORDS);
+        super(record, SoundSource.RECORDS, box.getLevel().getRandom());
         this.box = box;
         this.attenuation = Attenuation.NONE;
         this.looping = true;

@@ -1,12 +1,13 @@
 package com.github.alexthe668.domesticationinnovation.mixin;
 
+import com.github.alexthe666.citadel.server.entity.IComandableMob;
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
-import com.github.alexthe668.domesticationinnovation.server.entity.CommandableMob;
 import com.github.alexthe668.domesticationinnovation.server.entity.ModifedToBeTameable;
 import com.github.alexthe668.domesticationinnovation.server.entity.ai.FollowOwner2Goal;
 import com.github.alexthe668.domesticationinnovation.server.entity.ai.OwnerHurtTarget2Goal;
 import com.github.alexthe668.domesticationinnovation.server.entity.ai.Sit2Goal;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -15,6 +16,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.Fox;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Final;
@@ -29,7 +31,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Mixin(Fox.class)
-public abstract class FoxMixin extends Animal implements ModifedToBeTameable, CommandableMob {
+public abstract class FoxMixin extends Animal implements ModifedToBeTameable, IComandableMob {
 
     @Shadow @Final private static EntityDataAccessor<Optional<UUID>> DATA_TRUSTED_ID_0;
     @Shadow @Final private static EntityDataAccessor<Optional<UUID>> DATA_TRUSTED_ID_1;
@@ -158,5 +160,10 @@ public abstract class FoxMixin extends Animal implements ModifedToBeTameable, Co
 
     public boolean isValidAttackTarget(LivingEntity target){
         return true;
+    }
+
+    @Override
+    public void sendCommandMessage(Player owner, int command, Component name) {
+        owner.displayClientMessage(Component.translatable("message.domesticationinnovation.command_" + command, name), true);
     }
 }

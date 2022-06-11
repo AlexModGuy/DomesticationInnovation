@@ -1,12 +1,11 @@
 package com.github.alexthe668.domesticationinnovation.server.entity.ai;
 
+import com.github.alexthe666.citadel.server.entity.IComandableMob;
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
 import com.github.alexthe668.domesticationinnovation.server.enchantment.DIEnchantmentRegistry;
-import com.github.alexthe668.domesticationinnovation.server.entity.CommandableMob;
 import com.github.alexthe668.domesticationinnovation.server.entity.ModifedToBeTameable;
 import com.github.alexthe668.domesticationinnovation.server.entity.TameableUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
@@ -45,7 +44,7 @@ public class FollowOwner2Goal extends Goal {
 
     public boolean canUse() {
         LivingEntity livingentity = ((ModifedToBeTameable) this.tamable).getTameOwner();
-        if(tamable instanceof CommandableMob commandableMob && commandableMob.getCommand() != 2 && DomesticationMod.CONFIG.trinaryCommandSystem.get()) {
+        if(tamable instanceof IComandableMob commandableMob && commandableMob.getCommand() != 2 && DomesticationMod.CONFIG.trinaryCommandSystem.get()) {
             return false;
         }else if (livingentity == null) {
             return false;
@@ -62,7 +61,7 @@ public class FollowOwner2Goal extends Goal {
     }
 
     public boolean canContinueToUse() {
-        if(tamable instanceof CommandableMob commandableMob && commandableMob.getCommand() != 2 && DomesticationMod.CONFIG.trinaryCommandSystem.get()) {
+        if(tamable instanceof IComandableMob commandableMob && commandableMob.getCommand() != 2 && DomesticationMod.CONFIG.trinaryCommandSystem.get()) {
             return false;
         }else if (this.navigation.isDone()) {
             return false;

@@ -23,8 +23,8 @@ public class TextureSizer {
             int height = 16;
             int width = 16;
             try {
-                Resource res = Minecraft.getInstance().getResourceManager().getResource(texture);
-                NativeImage nativeimage = NativeImage.read(res.getInputStream());
+                Resource res = Minecraft.getInstance().getResourceManager().getResource(texture).get();
+                NativeImage nativeimage = NativeImage.read(res.open());
                 width = nativeimage.getWidth();
                 height = nativeimage.getHeight();
             } catch (Exception e) {

@@ -117,16 +117,16 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void setupParticles() {
         DomesticationMod.LOGGER.debug("Registered particle factories");
-        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.DEFLECTION_SHIELD, new ParticleDeflectionShield.Factory());
-        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.MAGNET, ParticleMagnet.Factory::new);
-        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.ZZZ, ParticleZZZ.Factory::new);
-        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.GIANT_POP, ParticleGiantPop.Factory::new);
-        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.SIMPLE_BUBBLE, ParticleSimpleBubble.Factory::new);
-        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.VAMPIRE, ParticleVampire.Factory::new);
-        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.SNIFF, ParticleSniff.Factory::new);
-        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.PSYCHIC_WALL, ParticlePsychicWall.Factory::new);
-        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.INTIMIDATION, new ParticleIntimidation.Factory());
-        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.BLIGHT, ParticleBlight.Factory::new);
+        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.DEFLECTION_SHIELD.get(), new ParticleDeflectionShield.Factory());
+        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.MAGNET.get(), ParticleMagnet.Factory::new);
+        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.ZZZ.get(), ParticleZZZ.Factory::new);
+        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.GIANT_POP.get(), ParticleGiantPop.Factory::new);
+        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.SIMPLE_BUBBLE.get(), ParticleSimpleBubble.Factory::new);
+        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.VAMPIRE.get(), ParticleVampire.Factory::new);
+        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.SNIFF.get(), ParticleSniff.Factory::new);
+        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.PSYCHIC_WALL.get(), ParticlePsychicWall.Factory::new);
+        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.INTIMIDATION.get(), new ParticleIntimidation.Factory());
+        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.BLIGHT.get(), ParticleBlight.Factory::new);
     }
 
     @SubscribeEvent

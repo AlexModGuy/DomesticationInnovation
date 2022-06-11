@@ -38,7 +38,7 @@ public class GiantBubbleEntity extends Entity {
             pop();
         }else{
             this.setpopsIn(this.getPopsIn() - 1);
-            this.level.addParticle(DIParticleRegistry.SIMPLE_BUBBLE, this.getRandomX(1.4F), this.getRandomY(), this.getRandomZ(1.4F), (random.nextFloat() - 0.5F) * 0.3F, -0.1F, (random.nextFloat() - 0.5F) * 0.3F);
+            this.level.addParticle(DIParticleRegistry.SIMPLE_BUBBLE.get(), this.getRandomX(1.4F), this.getRandomY(), this.getRandomZ(1.4F), (random.nextFloat() - 0.5F) * 0.3F, -0.1F, (random.nextFloat() - 0.5F) * 0.3F);
         }
     }
 
@@ -55,9 +55,9 @@ public class GiantBubbleEntity extends Entity {
     }
 
     private void pop() {
-        this.playSound(DISoundRegistry.GIANT_BUBBLE_POP, 1.0F, 1.5F);
+        this.playSound(DISoundRegistry.GIANT_BUBBLE_POP.get(), 1.0F, 1.5F);
         if(!level.isClientSide){
-            ((ServerLevel)this.level).sendParticles(DIParticleRegistry.GIANT_POP, this.getX(), this.getY() + this.getBbHeight() * 0.5F, this.getZ(), 1, 0, 0, 0, 0);
+            ((ServerLevel)this.level).sendParticles(DIParticleRegistry.GIANT_POP.get(), this.getX(), this.getY() + this.getBbHeight() * 0.5F, this.getZ(), 1, 0, 0, 0, 0);
         }
         this.ejectPassengers();
         this.discard();

@@ -59,7 +59,7 @@ public class PetBedBlock extends BaseEntityBlock {
                    double d1 = (1.0F - random.nextFloat()) * 0.6F;
                    double d2 = (1.0F - random.nextFloat()) * 0.6F;
                    double d3 = (1.0F - random.nextFloat()) * 0.6F;
-                   ((ServerLevel)level).sendParticles(DIParticleRegistry.ZZZ, vec3.x + d1, vec3.y + d2, vec3.z + d3, 1,  0, 0,  0, 0.0D);
+                   ((ServerLevel)level).sendParticles(DIParticleRegistry.ZZZ.get(), vec3.x + d1, vec3.y + d2, vec3.z + d3, 1,  0, 0,  0, 0.0D);
                }
            }
         }

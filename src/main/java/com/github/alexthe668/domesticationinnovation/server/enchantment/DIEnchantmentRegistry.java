@@ -2,17 +2,22 @@ package com.github.alexthe668.domesticationinnovation.server.enchantment;
 
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
 import com.github.alexthe668.domesticationinnovation.server.item.DIItemRegistry;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
-import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.IModBusEvent;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.lang.reflect.Field;
 
 @Mod.EventBusSubscriber(modid = DomesticationMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DIEnchantmentRegistry {
     public static final EnchantmentCategory CATEGORY = EnchantmentCategory.create("pet", (item -> item == DIItemRegistry.COLLAR_TAG.get()));
+    public static final DeferredRegister<Enchantment> DEF_REG = DeferredRegister.create(ForgeRegistries.ENCHANTMENTS, DomesticationMod.MODID);
 
     public static final PetEnchantment HEALTH_BOOST = new PetEnchantment("health_boost", Enchantment.Rarity.COMMON, 3, 6);
     public static final PetEnchantment FIREPROOF = new PetEnchantment("fireproof", Enchantment.Rarity.UNCOMMON, 1, 9);
@@ -46,18 +51,18 @@ public class DIEnchantmentRegistry {
     public static final PetEnchantment BLIGHT_CURSE = new PetEnchantmentCurse("blight_curse", Enchantment.Rarity.VERY_RARE);
     public static final PetEnchantment IMMATURITY_CURSE = new PetEnchantmentCurse("immaturity_curse", Enchantment.Rarity.VERY_RARE);
 
-    @SubscribeEvent
-    public static void registerEnchantments(final RegistryEvent.Register<Enchantment> event) {
+    public static void registerEnchantments(IEventBus bus) {
         try {
             for (Field f : DIEnchantmentRegistry.class.getDeclaredFields()) {
                 Object obj = f.get(null);
-                if (obj instanceof Enchantment && DomesticationMod.CONFIG.isEnchantEnabled((Enchantment) obj)) {
-                    event.getRegistry().register((Enchantment) obj);
+                if (obj instanceof PetEnchantment petEnchantment && DomesticationMod.CONFIG.isEnchantEnabled((Enchantment) obj)) {
+                    DEF_REG.register(petEnchantment.getName(), () -> petEnchantment);
                 }
             }
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+        DEF_REG.register(bus);
     }
 
     public static boolean areCompatible(PetEnchantment e1, Enchantment e2) {

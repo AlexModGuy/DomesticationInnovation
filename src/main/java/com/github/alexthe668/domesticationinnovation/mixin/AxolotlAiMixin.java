@@ -39,8 +39,8 @@ public class AxolotlAiMixin {
             )
     )
     private static void di_makeBrain(Brain<Axolotl> brain, CallbackInfoReturnable<Brain<?>> cir) {
-        brain.addActivity(DIActivityRegistry.AXOLOTL_FOLLOW, ImmutableList.of(Pair.of(0, new AxolotlFollowOwnerBehavior()), Pair.of(1, new StartAttacking<>(AxolotlAiMixin::findAttackTargetAxl))));
-        brain.addActivity(DIActivityRegistry.AXOLOTL_STAY, ImmutableList.of(Pair.of(0, new AxolotlStayBehavior())));
+        brain.addActivity(DIActivityRegistry.AXOLOTL_FOLLOW.get(), ImmutableList.of(Pair.of(0, new AxolotlFollowOwnerBehavior()), Pair.of(1, new StartAttacking<>(AxolotlAiMixin::findAttackTargetAxl))));
+        brain.addActivity(DIActivityRegistry.AXOLOTL_STAY.get(), ImmutableList.of(Pair.of(0, new AxolotlStayBehavior())));
     }
 
     @Inject(
@@ -56,10 +56,10 @@ public class AxolotlAiMixin {
         Activity activity = brain.getActiveNonCoreActivity().orElse(null);
         if (activity != Activity.PLAY_DEAD && !axolotl.isPlayingDead() && axolotl instanceof ModifedToBeTameable modifedToBeTameable) {
             if (modifedToBeTameable.isStayingStill()) {
-                brain.setActiveActivityIfPossible(DIActivityRegistry.AXOLOTL_STAY);
+                brain.setActiveActivityIfPossible(DIActivityRegistry.AXOLOTL_STAY.get());
                 ci.cancel();
             } else if (modifedToBeTameable.isFollowingOwner()) {
-                brain.setActiveActivityToFirstValid(ImmutableList.of(Activity.PLAY_DEAD, Activity.FIGHT, DIActivityRegistry.AXOLOTL_FOLLOW));
+                brain.setActiveActivityToFirstValid(ImmutableList.of(Activity.PLAY_DEAD, Activity.FIGHT, DIActivityRegistry.AXOLOTL_FOLLOW.get()));
                 ci.cancel();
             }
         }

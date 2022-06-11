@@ -2,6 +2,7 @@ package com.github.alexthe668.domesticationinnovation.server.entity;
 
 import com.github.alexthe666.citadel.Citadel;
 import com.github.alexthe666.citadel.server.entity.CitadelEntityData;
+import com.github.alexthe666.citadel.server.entity.IComandableMob;
 import com.github.alexthe666.citadel.server.message.PropertiesMessage;
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
 import com.github.alexthe668.domesticationinnovation.server.enchantment.DIEnchantmentRegistry;
@@ -11,11 +12,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -35,6 +35,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.Tags;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -163,7 +164,7 @@ public class TameableUtils {
         int speedExtra = getEnchantLevel(enchanted, DIEnchantmentRegistry.SPEEDSTER);
         AttributeInstance health = enchanted.getAttribute(Attributes.MAX_HEALTH);
         AttributeInstance speed = enchanted.getAttribute(Attributes.MOVEMENT_SPEED);
-        if(hasEnchant(enchanted, DIEnchantmentRegistry.IMMATURITY_CURSE) || prevEnchants != null && prevEnchants.keySet().contains(DIEnchantmentRegistry.IMMATURITY_CURSE.getRegistryName())){
+        if(hasEnchant(enchanted, DIEnchantmentRegistry.IMMATURITY_CURSE) || prevEnchants != null && prevEnchants.keySet().contains(ForgeRegistries.ENCHANTMENTS.getKey(DIEnchantmentRegistry.IMMATURITY_CURSE))){
             //change pose to update client
             enchanted.setPose(Pose.FALL_FLYING);
             enchanted.refreshDimensions();
@@ -211,7 +212,7 @@ public class TameableUtils {
             for (int i = 0; i < listtag.size(); ++i) {
                 CompoundTag compoundtag = listtag.getCompound(i);
                 ResourceLocation res = EnchantmentHelper.getEnchantmentId(compoundtag);
-                if (res != null && res.equals(enchantment.getRegistryName())) {
+                if (res != null && res.equals(ForgeRegistries.ENCHANTMENTS.getKey(enchantment))) {
                     return EnchantmentHelper.getEnchantmentLevel(compoundtag);
                 }
             }
@@ -233,7 +234,7 @@ public class TameableUtils {
         for (int i = 0; i < listtag.size(); ++i) {
             CompoundTag compoundtag = listtag.getCompound(i);
             ResourceLocation res = EnchantmentHelper.getEnchantmentId(compoundtag);
-            if (DomesticationMod.CONFIG.isEnchantEnabled(res)) {
+            if (DomesticationMod.CONFIG.isEnchantEnabled(res.getPath())) {
                 enchants.put(res, EnchantmentHelper.getEnchantmentLevel(compoundtag));
             }
         }
@@ -242,12 +243,12 @@ public class TameableUtils {
 
     public static List<Component> getEnchantDescriptions(LivingEntity entity) {
         List<Component> list = new ArrayList<>();
-        list.add(new TextComponent("   ").append(new TranslatableComponent("message.domesticationinnovation.enchantments").withStyle(ChatFormatting.GOLD)));
+        list.add(Component.literal("   ").append(Component.translatable("message.domesticationinnovation.enchantments").withStyle(ChatFormatting.GOLD)));
         Map<ResourceLocation, Integer> map = getEnchants(entity);
         if (map != null) {
             for (Map.Entry<ResourceLocation, Integer> entry : map.entrySet()) {
                 boolean isCurse = entry.getKey().getPath().contains("curse");
-                list.add(new TranslatableComponent("enchantment." + entry.getKey().getNamespace() + "." + entry.getKey().getPath()).append(new TextComponent(" ")).append(new TranslatableComponent("enchantment.level." + entry.getValue())).withStyle(isCurse ? ChatFormatting.RED : ChatFormatting.AQUA));
+                list.add(Component.translatable("enchantment." + entry.getKey().getNamespace() + "." + entry.getKey().getPath()).append(Component.literal(" ")).append(Component.translatable("enchantment.level." + entry.getValue())).withStyle(isCurse ? ChatFormatting.RED : ChatFormatting.AQUA));
             }
         }
         return list;
@@ -513,7 +514,7 @@ public class TameableUtils {
                     float f = Mth.sqrt((float) (rots.x * rots.x + rots.z * rots.z));
                     double yRot = Math.atan2(-rots.z, -rots.x) * (double)(180F / (float)Math.PI) + 90F;
                     double xRot = Math.atan2(-rots.y, f) * (double)(180F / (float)Math.PI);
-                    scary.level.addParticle(DIParticleRegistry.INTIMIDATION, scary.getX(), scary.getY(), scary.getZ(), scary.getId(), xRot, yRot);
+                    scary.level.addParticle(DIParticleRegistry.INTIMIDATION.get(), scary.getX(), scary.getY(), scary.getZ(), scary.getId(), xRot, yRot);
                     setIntimidationCooldown(scary, 70 * level);
                     if(scary instanceof Mob){
                         ((Mob) scary).playAmbientSound();
@@ -535,12 +536,11 @@ public class TameableUtils {
             attractor.xRotO = attractor.getXRot();
             attractor.setXRot((float)Math.sin(tick * 0.6F) * 30F);
             Vec3 look = attractor.getEyePosition().add(attractor.getViewVector(1.0F).scale(attractor.getBbWidth()));
-            Random rand = attractor.getRandom();
             for(int i = 0; i < 3; i++){
                 double x = attractor.getRandomX(2.0F);
                 double y = attractor.position().y;
                 double z = attractor.getRandomZ(2.0F);
-                attractor.getLevel().addParticle(DIParticleRegistry.SNIFF, x, y, z, look.x, look.y, look.z);
+                attractor.getLevel().addParticle(DIParticleRegistry.SNIFF.get(), x, y, z, look.x, look.y, look.z);
             }
         }
         if (tick == 30) {
@@ -580,7 +580,7 @@ public class TameableUtils {
             List<BlockPos> grasses = new ArrayList<>();
             BlockPos blockpos = living.blockPosition();
             int half = range / 2;
-            Random r = living.getRandom();
+            RandomSource r = living.getRandom();
             int maxPlants = 2 + r.nextInt(2);
             for(int i = 0; i <= half && i >= -half; i = (i <= 0 ? 1 : 0) - i) {
                 for(int j = 0; j <= range && j >= -range; j = (j <= 0 ? 1 : 0) - j) {
@@ -600,13 +600,13 @@ public class TameableUtils {
             for(BlockPos plant : plants){
                 living.getLevel().setBlockAndUpdate(plant, Blocks.AIR.defaultBlockState());
                 for(int i = 0; i < 1 + r.nextInt(2); i++){
-                    living.getLevel().addParticle(DIParticleRegistry.BLIGHT, plant.getX() + r.nextFloat(), plant.getY() + r.nextFloat(), plant.getZ() + r.nextFloat(), 0, 0.08F, 0);
+                    living.getLevel().addParticle(DIParticleRegistry.BLIGHT.get(), plant.getX() + r.nextFloat(), plant.getY() + r.nextFloat(), plant.getZ() + r.nextFloat(), 0, 0.08F, 0);
                 }
             }
             for(BlockPos dirt : grasses){
                 living.getLevel().setBlockAndUpdate(dirt, r.nextBoolean() ? Blocks.COARSE_DIRT.defaultBlockState() : Blocks.DIRT.defaultBlockState());
                 for(int i = 0; i < 1 + r.nextInt(2); i++) {
-                    living.getLevel().addParticle(DIParticleRegistry.BLIGHT, dirt.getX() + r.nextFloat(), dirt.getY() + 1, dirt.getZ() + r.nextFloat(), 0, 0.08F, 0);
+                    living.getLevel().addParticle(DIParticleRegistry.BLIGHT.get(), dirt.getX() + r.nextFloat(), dirt.getY() + 1, dirt.getZ() + r.nextFloat(), 0, 0.08F, 0);
                 }
             }
         }
@@ -649,7 +649,7 @@ public class TameableUtils {
 
     public static boolean isValidTeleporter(LivingEntity owner, Mob animal) {
         if (hasEnchant(animal, DIEnchantmentRegistry.TETHERED_TELEPORT)) {
-            if(animal instanceof CommandableMob commandableMob){
+            if(animal instanceof IComandableMob commandableMob){
                 return commandableMob.getCommand() == 2;
             }else if(animal instanceof TamableAnimal tame){
                 return !tame.isOrderedToSit() && animal.distanceTo(owner) < 10;

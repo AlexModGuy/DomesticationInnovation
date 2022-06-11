@@ -1,8 +1,9 @@
 package com.github.alexthe668.domesticationinnovation.mixin;
 
+import com.github.alexthe666.citadel.server.entity.IComandableMob;
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
-import com.github.alexthe668.domesticationinnovation.server.entity.CommandableMob;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -16,14 +17,13 @@ import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Wolf.class)
-public abstract class WolfMixin extends TamableAnimal implements CommandableMob {
+public abstract class WolfMixin extends TamableAnimal implements IComandableMob {
     private static final EntityDataAccessor<Integer> COMMAND = SynchedEntityData.defineId(Wolf.class, EntityDataSerializers.INT);
 
     protected WolfMixin(EntityType<? extends TamableAnimal> type, Level level) {
@@ -96,5 +96,8 @@ public abstract class WolfMixin extends TamableAnimal implements CommandableMob 
         }
     }
 
-
+    @Override
+    public void sendCommandMessage(Player owner, int command, Component name) {
+        owner.displayClientMessage(Component.translatable("message.domesticationinnovation.command_" + command, name), true);
+    }
 }

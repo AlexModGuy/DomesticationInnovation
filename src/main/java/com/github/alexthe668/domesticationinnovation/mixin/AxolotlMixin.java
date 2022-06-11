@@ -1,13 +1,14 @@
 package com.github.alexthe668.domesticationinnovation.mixin;
 
+import com.github.alexthe666.citadel.server.entity.IComandableMob;
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
-import com.github.alexthe668.domesticationinnovation.server.entity.CommandableMob;
 import com.github.alexthe668.domesticationinnovation.server.entity.ModifedToBeTameable;
 import com.github.alexthe668.domesticationinnovation.server.entity.TameableUtils;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -15,7 +16,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.OldUsersConverter;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
@@ -38,8 +38,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Mixin(Axolotl.class)
-public abstract class AxolotlMixin extends Animal implements ModifedToBeTameable, CommandableMob {
-
+public abstract class AxolotlMixin extends Animal implements ModifedToBeTameable, IComandableMob {
 
     @Shadow public abstract void readAdditionalSaveData(CompoundTag p_149145_);
 
@@ -281,4 +280,8 @@ public abstract class AxolotlMixin extends Animal implements ModifedToBeTameable
         return false;
     }
 
+    @Override
+    public void sendCommandMessage(Player owner, int command, Component name) {
+        owner.displayClientMessage(Component.translatable("message.domesticationinnovation.command_" + command, name), true);
+    }
 }

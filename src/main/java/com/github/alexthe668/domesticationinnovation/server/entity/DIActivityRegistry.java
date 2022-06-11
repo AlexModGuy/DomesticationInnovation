@@ -1,21 +1,18 @@
 package com.github.alexthe668.domesticationinnovation.server.entity;
 
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
+import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.entity.schedule.Activity;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 @Mod.EventBusSubscriber(modid = DomesticationMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DIActivityRegistry {
 
-    public static final Activity AXOLOTL_FOLLOW = new Activity("axolotl_follow");
-    public static final Activity AXOLOTL_STAY = new Activity("axolotl_stay");
-
-    @SubscribeEvent
-    public static void registerActivities(RegistryEvent.Register<Activity> event) {
-        event.getRegistry().register(AXOLOTL_FOLLOW.setRegistryName(DomesticationMod.MODID + ":axolotl_follow"));
-        event.getRegistry().register(AXOLOTL_STAY.setRegistryName(DomesticationMod.MODID + ":axolotl_stay"));
-    }
-
+    public static final DeferredRegister<Activity> DEF_REG = DeferredRegister.create(ForgeRegistries.ACTIVITIES, DomesticationMod.MODID);
+    public static final RegistryObject<Activity> AXOLOTL_FOLLOW = DEF_REG.register("axolotl_follow", () -> new Activity("axolotl_follow"));
+    public static final RegistryObject<Activity> AXOLOTL_STAY = DEF_REG.register("axolotl_stay", () -> new Activity("axolotl_stay"));
 }

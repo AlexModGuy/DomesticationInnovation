@@ -1,6 +1,7 @@
 package com.github.alexthe668.domesticationinnovation;
 
 import com.github.alexthe668.domesticationinnovation.server.enchantment.DIEnchantmentRegistry;
+import com.github.alexthe668.domesticationinnovation.server.enchantment.PetEnchantment;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraftforge.common.ForgeConfigSpec;
@@ -29,7 +30,7 @@ public class DIConfig {
     public final ForgeConfigSpec.DoubleValue voidCloudLootChance;
     public final ForgeConfigSpec.DoubleValue oreScentingLootChance;
 
-    private final Map<ResourceLocation, ForgeConfigSpec.BooleanValue> enabledEnchantments = new HashMap<>();
+    private final Map<String, ForgeConfigSpec.BooleanValue> enabledEnchantments = new HashMap<>();
 
     public DIConfig(final ForgeConfigSpec.Builder builder) {
         builder.push("general");
@@ -57,10 +58,10 @@ public class DIConfig {
         try {
             for (Field f : DIEnchantmentRegistry.class.getDeclaredFields()) {
                 Object obj = f.get(null);
-                if (obj instanceof Enchantment) {
-                    ResourceLocation registryName = ((Enchantment) obj).getRegistryName();
-                    String name = registryName.getPath() + "_enabled";
-                    enabledEnchantments.put(registryName, builder.comment("true if " + registryName.getPath().replace("_", " ") + " enchant is enabled, false if disabled").translation(name).define(name, true));
+                if (obj instanceof PetEnchantment) {
+                    String registryName = ((PetEnchantment) obj).getName();
+                    String name = registryName + "_enabled";
+                    enabledEnchantments.put(registryName, builder.comment("true if " + registryName.replace("_", " ") + " enchant is enabled, false if disabled").translation(name).define(name, true));
                 }
             }
         } catch (IllegalAccessException e) {
@@ -70,10 +71,10 @@ public class DIConfig {
     }
 
     public boolean isEnchantEnabled(Enchantment enchantment){
-        return isEnchantEnabled(enchantment.getRegistryName());
+        return enchantment instanceof PetEnchantment && isEnchantEnabled(((PetEnchantment)enchantment).getName());
     }
 
-    public boolean isEnchantEnabled(ResourceLocation enchantment){
+    public boolean isEnchantEnabled(String enchantment){
         ForgeConfigSpec.BooleanValue entry = enabledEnchantments.get(enchantment);
         return entry == null || entry.get();
     }

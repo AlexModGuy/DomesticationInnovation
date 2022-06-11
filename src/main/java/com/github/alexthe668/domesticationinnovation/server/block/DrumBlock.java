@@ -1,18 +1,13 @@
 package com.github.alexthe668.domesticationinnovation.server.block;
 
-import com.github.alexthe668.domesticationinnovation.DomesticationMod;
-import com.github.alexthe668.domesticationinnovation.server.entity.CommandableMob;
+import com.github.alexthe666.citadel.server.entity.IComandableMob;
 import com.github.alexthe668.domesticationinnovation.server.entity.TameableUtils;
-import com.github.alexthe668.domesticationinnovation.server.misc.DIParticleRegistry;
 import com.github.alexthe668.domesticationinnovation.server.misc.DISoundRegistry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -21,34 +16,20 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.entity.SkullBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -80,9 +61,9 @@ public class DrumBlock extends BaseEntityBlock {
             level.setBlockAndUpdate(pos, state.cycle(COMMAND));
             int count = issueCommand(level, pos, currentCommand, player.getUUID());
             if(count > 0){
-                player.displayClientMessage(new TranslatableComponent("message.domesticationinnovation.drum_command_" + currentCommand, count), true);
+                player.displayClientMessage(Component.translatable("message.domesticationinnovation.drum_command_" + currentCommand, count), true);
             }
-            player.playSound(DISoundRegistry.DRUM, 3, 0.3F + 0.4F * random.nextFloat());
+            player.playSound(DISoundRegistry.DRUM.get(), 3, 0.3F + 0.4F * random.nextFloat());
             return InteractionResult.SUCCESS;
         }
     }
@@ -100,15 +81,15 @@ public class DrumBlock extends BaseEntityBlock {
             Predicate<Entity> tames = (animal) -> TameableUtils.isTamed((LivingEntity) animal) && TameableUtils.getOwnerUUIDOf(animal) != null && TameableUtils.getOwnerUUIDOf(animal).equals(issuer);
             AABB area = new AABB(pos.offset(-32, -32, -32), pos.offset(32, 32, 32));
             for(Animal animal : level.getEntitiesOfClass(Animal.class, area, EntitySelector.NO_SPECTATORS.and(tames))){
-                if(animal instanceof CommandableMob){
-                    ((CommandableMob) animal).setCommand(command);
+                if(animal instanceof IComandableMob){
+                    ((IComandableMob) animal).setCommand(command);
                     count++;
                 }
                 if(animal instanceof TamableAnimal){
                     if(command != 0){
                         ((TamableAnimal)animal).setOrderedToSit(command == 1);
                         ((TamableAnimal)animal).setInSittingPose(command == 1);
-                        if(!(animal instanceof CommandableMob)){
+                        if(!(animal instanceof IComandableMob)){
                             count++;
                         }
                     }
@@ -128,14 +109,14 @@ public class DrumBlock extends BaseEntityBlock {
                     uuid = drum.getPlacerUUID();
                 }
                 this.issueCommand(level, pos, state.getValue(COMMAND), uuid);
-                level.playSound(null, pos, DISoundRegistry.DRUM, SoundSource.BLOCKS, 3, 0.3F + 0.4F * random.nextFloat());
+                level.playSound(null, pos, DISoundRegistry.DRUM.get(), SoundSource.BLOCKS, 3, 0.3F + 0.4F * random.nextFloat());
             }
             level.setBlock(pos, state.setValue(POWERED, Boolean.valueOf(flag)), 3);
         }
     }
 
     public void fallOn(Level level, BlockState state, BlockPos pos, Entity entity, float f) {
-        entity.playSound(DISoundRegistry.DRUM, 3, 0.6F + 0.4F * random.nextFloat());
+        entity.playSound(DISoundRegistry.DRUM.get(), 3, 0.6F + 0.4F * random.nextFloat());
         super.fallOn(level, state, pos, entity, f);
     }
 

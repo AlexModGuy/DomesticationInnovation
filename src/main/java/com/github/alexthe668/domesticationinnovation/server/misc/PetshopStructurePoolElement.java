@@ -8,14 +8,12 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.WorldGenRegion;
-import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.level.StructureFeatureManager;
+import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
@@ -61,7 +59,7 @@ public class PetshopStructurePoolElement extends LegacySinglePoolElement {
     }
 
     @Override
-    public void handleDataMarker(LevelAccessor levelAccessor, StructureTemplate.StructureBlockInfo structureBlockInfo, BlockPos pos, Rotation rotation, Random random, BoundingBox box) {
+    public void handleDataMarker(LevelAccessor levelAccessor, StructureTemplate.StructureBlockInfo structureBlockInfo, BlockPos pos, Rotation rotation, RandomSource random, BoundingBox box) {
         String contents = structureBlockInfo.nbt.getString("metadata");
         if(!initializedMobLists){
             fishtankMobs = getAllMatchingEntities(DIEntityTags.PETSTORE_FISHTANK).toArray(new EntityType[0]);
@@ -128,7 +126,7 @@ public class PetshopStructurePoolElement extends LegacySinglePoolElement {
        return ForgeRegistries.ENTITIES.getValues().stream().filter((type -> type.is(tag))).toList();
     }
 
-    public void spawnAnimalsAt(LevelAccessor accessor, BlockPos at, int count, Random random, EntityType... types) {
+    public void spawnAnimalsAt(LevelAccessor accessor, BlockPos at, int count, RandomSource random, EntityType... types) {
         if (types.length > 0 && count > 0 && accessor.getBlockState(at).getBlock() == Blocks.STRUCTURE_BLOCK && accessor instanceof ServerLevelAccessor serverLevel) {
             for (int i = 0; i < count; i++) {
                 int index = types.length == 1 ? 0 : random.nextInt(types.length - 1);
@@ -142,20 +140,6 @@ public class PetshopStructurePoolElement extends LegacySinglePoolElement {
                 }
                 serverLevel.addFreshEntityWithPassengers(entity);
             }
-        }
-    }
-
-    @Override
-    public boolean place(StructureManager p_210435_, WorldGenLevel p_210436_, StructureFeatureManager p_210437_, ChunkGenerator p_210438_, BlockPos p_210439_, BlockPos p_210440_, Rotation p_210441_, BoundingBox p_210442_, Random p_210443_, boolean p_210444_) {
-        StructureTemplate structuretemplate = p_210435_.getOrCreate(template.left().get());
-        StructurePlaceSettings structureplacesettings = this.getSettings(p_210441_, p_210442_, p_210444_);
-        if (!structuretemplate.placeInWorld(p_210436_, p_210439_, p_210440_, structureplacesettings, p_210443_, 18)) {
-            return false;
-        } else {
-            for (StructureTemplate.StructureBlockInfo structuretemplate$structureblockinfo : StructureTemplate.processBlockInfos(p_210436_, p_210439_, p_210440_, structureplacesettings, this.getDataMarkers(p_210435_, p_210439_, p_210441_, false), structuretemplate)) {
-                this.handleDataMarker(p_210436_, structuretemplate$structureblockinfo, p_210439_, p_210441_, p_210443_, p_210442_);
-            }
-            return true;
         }
     }
 

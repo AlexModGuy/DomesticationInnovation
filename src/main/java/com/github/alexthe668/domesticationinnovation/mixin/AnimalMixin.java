@@ -1,7 +1,7 @@
 package com.github.alexthe668.domesticationinnovation.mixin;
 
+import com.github.alexthe666.citadel.server.entity.IComandableMob;
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
-import com.github.alexthe668.domesticationinnovation.server.entity.CommandableMob;
 import com.github.alexthe668.domesticationinnovation.server.entity.ModifedToBeTameable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -35,9 +35,9 @@ public abstract class AnimalMixin extends AgeableMob {
             cancellable = true
     )
     private void di_onInteract(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
-        if((Mob)this instanceof Fox && this instanceof CommandableMob && this instanceof ModifedToBeTameable tame && tame.isTame() && tame.getTameOwnerUUID().equals(player.getUUID()) && DomesticationMod.CONFIG.tameableFox.get() && DomesticationMod.CONFIG.trinaryCommandSystem.get()){
+        if((Mob)this instanceof Fox && this instanceof IComandableMob && this instanceof ModifedToBeTameable tame && tame.isTame() && tame.getTameOwnerUUID().equals(player.getUUID()) && DomesticationMod.CONFIG.tameableFox.get() && DomesticationMod.CONFIG.trinaryCommandSystem.get()){
             player.swing(hand, true);
-            cir.setReturnValue(((CommandableMob)this).playerSetCommand(player, (Animal)(Mob)this));
+            cir.setReturnValue(((IComandableMob)this).playerSetCommand(player, (Animal)(Mob)this));
         }
     }
 }

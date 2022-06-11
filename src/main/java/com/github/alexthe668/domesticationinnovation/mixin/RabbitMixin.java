@@ -1,12 +1,12 @@
 package com.github.alexthe668.domesticationinnovation.mixin;
 
+import com.github.alexthe666.citadel.server.entity.IComandableMob;
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
-import com.github.alexthe668.domesticationinnovation.server.entity.CommandableMob;
 import com.github.alexthe668.domesticationinnovation.server.entity.ModifedToBeTameable;
 import com.github.alexthe668.domesticationinnovation.server.entity.ai.*;
 import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -16,7 +16,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.AvoidEntityGoal;
-import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
@@ -33,12 +32,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.annotation.Nullable;
-import java.util.Iterator;
 import java.util.Optional;
 import java.util.UUID;
 
 @Mixin(Rabbit.class)
-public abstract class RabbitMixin extends Animal implements ModifedToBeTameable, CommandableMob {
+public abstract class RabbitMixin extends Animal implements ModifedToBeTameable, IComandableMob {
 
     @Shadow @Final private static EntityDataAccessor<Integer> DATA_TYPE_ID;
 
@@ -202,11 +200,14 @@ public abstract class RabbitMixin extends Animal implements ModifedToBeTameable,
                 this.targetSelector.addGoal(3, new OwnerHurtByTarget2Goal(this));
             }
             if (!this.hasCustomName()) {
-                this.setCustomName(new TranslatableComponent(Util.makeDescriptionId("entity", new ResourceLocation("killer_bunny"))));
+                this.setCustomName(Component.translatable(Util.makeDescriptionId("entity", new ResourceLocation("killer_bunny"))));
             }
             this.entityData.set(DATA_TYPE_ID, 99);
         }
     }
 
-
+    @Override
+    public void sendCommandMessage(Player owner, int command, Component name) {
+        owner.displayClientMessage(Component.translatable("message.domesticationinnovation.command_" + command, name), true);
+    }
 }

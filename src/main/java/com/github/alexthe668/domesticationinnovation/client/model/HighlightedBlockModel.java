@@ -5,6 +5,8 @@ import com.github.alexthe666.citadel.client.model.AdvancedModelBox;
 import com.github.alexthe666.citadel.client.model.basic.BasicModelPart;
 import com.github.alexthe668.domesticationinnovation.server.entity.RecallBallEntity;
 import com.google.common.collect.ImmutableList;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 
 public class HighlightedBlockModel extends AdvancedEntityModel<RecallBallEntity> {
     private final AdvancedModelBox box;
