@@ -2,6 +2,7 @@
   "#comment": "For the savanna pet store cage",
   "replace": false,
   "values": [
+    "minecraft:frog",
     "minecraft:parrot"
   ]
 }

@@ -30,10 +30,10 @@ public class DIVillagerRegistry {
 
     private static VillagerProfession buildVillagerProfession() {
         Predicate<Holder<PoiType>> heldJobSite = (poiType) -> {
-            return poiType == DIPOIRegistry.PET_BED.getHolder().get();
+            return poiType.is(DIPOIRegistry.PET_BED.getKey());
         };
         Predicate<Holder<PoiType>> acquirableJobSite = (poiType) -> {
-            return poiType == DIPOIRegistry.PET_BED.getHolder().get();
+            return poiType.is(DIPOIRegistry.PET_BED.getKey());
         };
         return new VillagerProfession("animal_tamer", heldJobSite, acquirableJobSite, ImmutableSet.of(), ImmutableSet.of(), DISoundRegistry.PET_BED_USE.get());
     }

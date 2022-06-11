@@ -2,6 +2,7 @@
   "#comment": "For the desert pet store cage",
   "replace": false,
   "values": [
+    "minecraft:frog",
     "minecraft:rabbit"
   ]
 }

@@ -25,6 +25,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
@@ -64,6 +65,7 @@ public class DrumBlock extends BaseEntityBlock {
                 player.displayClientMessage(Component.translatable("message.domesticationinnovation.drum_command_" + currentCommand, count), true);
             }
             player.playSound(DISoundRegistry.DRUM.get(), 3, 0.3F + 0.4F * random.nextFloat());
+            level.gameEvent(player, GameEvent.NOTE_BLOCK_PLAY, pos);
             return InteractionResult.SUCCESS;
         }
     }
@@ -110,6 +112,7 @@ public class DrumBlock extends BaseEntityBlock {
                 }
                 this.issueCommand(level, pos, state.getValue(COMMAND), uuid);
                 level.playSound(null, pos, DISoundRegistry.DRUM.get(), SoundSource.BLOCKS, 3, 0.3F + 0.4F * random.nextFloat());
+                level.gameEvent(null, GameEvent.NOTE_BLOCK_PLAY, pos);
             }
             level.setBlock(pos, state.setValue(POWERED, Boolean.valueOf(flag)), 3);
         }

@@ -750,7 +750,6 @@ public class CommonProxy {
             }
         }
         if (event.getTarget() instanceof LivingEntity living && TameableUtils.isPetOf(event.getPlayer(), entity)) {
-            System.out.println(CitadelEntityData.getCitadelTag(living));
             if (event.getItemStack().is(DIItemRegistry.COLLAR_TAG.get()) && DomesticationMod.CONFIG.collarTag.get()) {
                 if (!event.getPlayer().level.isClientSide && living.isAlive()) {
                     Map<Enchantment, Integer> itemEnchantments = EnchantmentHelper.deserializeEnchantments(stack.getEnchantmentTags());
@@ -890,6 +889,7 @@ public class CommonProxy {
             level3.add(new SellingItemTrade(Items.LEAD, 3, 2, 5, 10));
             level3.add(new SellingItemTrade(Items.LEATHER_HORSE_ARMOR, 4, 1, 3, 11));
             level3.add(new SellingItemTrade(DIBlockRegistry.DRUM.get(), 2, 3, 7, 11));
+            level3.add(new SellingItemTrade(Items.TADPOLE_BUCKET, 6, 1, 4, 13));
             level3.add(new EnchantItemTrade(DIItemRegistry.COLLAR_TAG.get(), 20, 2, 8, 3, 10));
             level4.add(new SellingItemTrade(Items.IRON_HORSE_ARMOR, 8, 1, 2, 15));
             level4.add(new SellingItemTrade(Items.AXOLOTL_BUCKET, 11, 1, 2, 15));

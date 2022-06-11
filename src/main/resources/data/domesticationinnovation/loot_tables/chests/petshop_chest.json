@@ -90,8 +90,13 @@
         },
         {
           "type": "item",
+          "name": "minecraft:tadpole_bucket",
+          "weight": 2
+        },
+        {
+          "type": "item",
           "name": "minecraft:emerald",
-          "weight": 2,
+          "weight": 3,
           "functions": [
             {
               "function": "set_count",
