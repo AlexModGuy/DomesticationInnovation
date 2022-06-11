@@ -9,7 +9,6 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
-@Mod.EventBusSubscriber(modid = DomesticationMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DIActivityRegistry {
 
     public static final DeferredRegister<Activity> DEF_REG = DeferredRegister.create(ForgeRegistries.ACTIVITIES, DomesticationMod.MODID);

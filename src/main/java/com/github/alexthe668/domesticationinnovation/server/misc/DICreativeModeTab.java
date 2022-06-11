@@ -14,7 +14,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.lang.reflect.Field;
 
-public class DICreativeModeTab  extends CreativeModeTab {
+public class DICreativeModeTab extends CreativeModeTab {
     public DICreativeModeTab() {
         super(DomesticationMod.MODID);
     }
@@ -24,9 +24,9 @@ public class DICreativeModeTab  extends CreativeModeTab {
         return new ItemStack(DIItemRegistry.COLLAR_TAG.get());
     }
 
-    @OnlyIn(Dist.CLIENT)
     public void fillItemList(NonNullList<ItemStack> items) {
         super.fillItemList(items);
+        /* TODO - reimplement enchants
         try {
             for (Field f : DIEnchantmentRegistry.class.getDeclaredFields()) {
                 Object obj = f.get(null);
@@ -39,6 +39,6 @@ public class DICreativeModeTab  extends CreativeModeTab {
             }
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
-        }
+        }*/
     }
 }

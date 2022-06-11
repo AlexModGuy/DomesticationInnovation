@@ -10,7 +10,6 @@ import net.minecraftforge.registries.RegistryObject;
 
 import java.lang.reflect.Field;
 
-@Mod.EventBusSubscriber(modid = DomesticationMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DIParticleRegistry {
 
     public static final DeferredRegister<ParticleType<?>> DEF_REG = DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES, DomesticationMod.MODID);

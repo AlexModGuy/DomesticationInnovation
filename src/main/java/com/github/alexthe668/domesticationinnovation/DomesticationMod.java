@@ -51,9 +51,9 @@ public class DomesticationMod {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupParticleEvent);
         final ModLoadingContext modLoadingContext = ModLoadingContext.get();
         modLoadingContext.registerConfig(ModConfig.Type.COMMON, CONFIG_SPEC, "domestication-innovation.toml");
-        DIEnchantmentRegistry.registerEnchantments(FMLJavaModLoadingContext.get().getModEventBus());
-        DIBlockRegistry.DEF_REG.register(FMLJavaModLoadingContext.get().getModEventBus());
         DIItemRegistry.DEF_REG.register(FMLJavaModLoadingContext.get().getModEventBus());
+        DIBlockRegistry.DEF_REG.register(FMLJavaModLoadingContext.get().getModEventBus());
+        DIEnchantmentRegistry.registerEnchantments(FMLJavaModLoadingContext.get().getModEventBus());
         DITileEntityRegistry.DEF_REG.register(FMLJavaModLoadingContext.get().getModEventBus());
         DIEntityRegistry.DEF_REG.register(FMLJavaModLoadingContext.get().getModEventBus());
         DIPOIRegistry.DEF_REG.register(FMLJavaModLoadingContext.get().getModEventBus());

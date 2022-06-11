@@ -11,7 +11,6 @@ import net.minecraftforge.registries.RegistryObject;
 
 import java.lang.reflect.Field;
 
-@Mod.EventBusSubscriber(modid = DomesticationMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DISoundRegistry {
 
     public static final DeferredRegister<SoundEvent> DEF_REG = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, DomesticationMod.MODID);
