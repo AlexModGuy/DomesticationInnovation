@@ -13,12 +13,9 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.level.StructureManager;
-import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.pools.LegacySinglePoolElement;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElementType;
@@ -27,9 +24,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.*;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 public class PetshopStructurePoolElement extends LegacySinglePoolElement {
 
@@ -62,11 +57,11 @@ public class PetshopStructurePoolElement extends LegacySinglePoolElement {
     public void handleDataMarker(LevelAccessor levelAccessor, StructureTemplate.StructureBlockInfo structureBlockInfo, BlockPos pos, Rotation rotation, RandomSource random, BoundingBox box) {
         String contents = structureBlockInfo.nbt.getString("metadata");
         if(!initializedMobLists){
-            fishtankMobs = getAllMatchingEntities(DIEntityTags.PETSTORE_FISHTANK).toArray(new EntityType[0]);
-            cage0Mobs = getAllMatchingEntities(DIEntityTags.PETSTORE_CAGE_0).toArray(new EntityType[0]);
-            cage1Mobs = getAllMatchingEntities(DIEntityTags.PETSTORE_CAGE_1).toArray(new EntityType[0]);
-            cage2Mobs = getAllMatchingEntities(DIEntityTags.PETSTORE_CAGE_2).toArray(new EntityType[0]);
-            cage3Mobs = getAllMatchingEntities(DIEntityTags.PETSTORE_CAGE_3).toArray(new EntityType[0]);
+            fishtankMobs = getAllMatchingEntities(DITagRegistry.PETSTORE_FISHTANK).toArray(new EntityType[0]);
+            cage0Mobs = getAllMatchingEntities(DITagRegistry.PETSTORE_CAGE_0).toArray(new EntityType[0]);
+            cage1Mobs = getAllMatchingEntities(DITagRegistry.PETSTORE_CAGE_1).toArray(new EntityType[0]);
+            cage2Mobs = getAllMatchingEntities(DITagRegistry.PETSTORE_CAGE_2).toArray(new EntityType[0]);
+            cage3Mobs = getAllMatchingEntities(DITagRegistry.PETSTORE_CAGE_3).toArray(new EntityType[0]);
             initializedMobLists = true;
         }
         switch (contents) {

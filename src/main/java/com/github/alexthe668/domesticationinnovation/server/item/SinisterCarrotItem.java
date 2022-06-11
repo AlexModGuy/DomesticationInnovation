@@ -2,6 +2,7 @@ package com.github.alexthe668.domesticationinnovation.server.item;
 
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
 import com.github.alexthe668.domesticationinnovation.server.entity.TameableUtils;
+import com.github.alexthe668.domesticationinnovation.server.misc.DICreativeModeTab;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
@@ -23,7 +24,7 @@ import net.minecraft.world.item.Rarity;
 public class SinisterCarrotItem extends Item {
 
     public SinisterCarrotItem() {
-        super(new Item.Properties().tab(DomesticationMod.TAB).rarity(Rarity.UNCOMMON).food((new FoodProperties.Builder()).nutrition(1).saturationMod(0.3F).effect(new MobEffectInstance(MobEffects.WITHER, 100), 1.0F).build()));
+        super(new Item.Properties().tab(DICreativeModeTab.INSTANCE).rarity(Rarity.UNCOMMON).food((new FoodProperties.Builder()).nutrition(1).saturationMod(0.3F).effect(new MobEffectInstance(MobEffects.WITHER, 100), 1.0F).build()));
     }
 
     public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity entity, InteractionHand hand) {

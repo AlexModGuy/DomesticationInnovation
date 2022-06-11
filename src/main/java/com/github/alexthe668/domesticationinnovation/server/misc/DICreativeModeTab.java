@@ -15,6 +15,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import java.lang.reflect.Field;
 
 public class DICreativeModeTab extends CreativeModeTab {
+    public static final CreativeModeTab INSTANCE = new DICreativeModeTab();
+
     public DICreativeModeTab() {
         super(DomesticationMod.MODID);
     }
@@ -26,19 +28,18 @@ public class DICreativeModeTab extends CreativeModeTab {
 
     public void fillItemList(NonNullList<ItemStack> items) {
         super.fillItemList(items);
-        /* TODO - reimplement enchants
         try {
             for (Field f : DIEnchantmentRegistry.class.getDeclaredFields()) {
                 Object obj = f.get(null);
                 if (obj instanceof Enchantment) {
                     Enchantment enchant = (Enchantment)obj;
-                    if(enchant.isAllowedOnBooks()){
+                    if(enchant.isAllowedOnBooks() && DomesticationMod.CONFIG.isEnchantEnabled(enchant)){
                         items.add(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(enchant, enchant.getMaxLevel())));
                     }
                 }
             }
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
-        }*/
+        }
     }
 }

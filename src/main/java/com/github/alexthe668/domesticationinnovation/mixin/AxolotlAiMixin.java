@@ -4,11 +4,10 @@ import com.github.alexthe668.domesticationinnovation.server.enchantment.DIEnchan
 import com.github.alexthe668.domesticationinnovation.server.entity.DIActivityRegistry;
 import com.github.alexthe668.domesticationinnovation.server.entity.ModifedToBeTameable;
 import com.github.alexthe668.domesticationinnovation.server.entity.TameableUtils;
-import com.github.alexthe668.domesticationinnovation.server.entity.ai.AxolotlFollowOwnerBehavior;
-import com.github.alexthe668.domesticationinnovation.server.entity.ai.AxolotlStayBehavior;
+import com.github.alexthe668.domesticationinnovation.server.entity.ai.AmphibianFollowOwnerBehavior;
+import com.github.alexthe668.domesticationinnovation.server.entity.ai.AmphibianStayBehavior;
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.behavior.StartAttacking;
@@ -24,7 +23,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Collections;
 import java.util.Optional;
 
 @Mixin(AxolotlAi.class)
@@ -39,8 +37,8 @@ public class AxolotlAiMixin {
             )
     )
     private static void di_makeBrain(Brain<Axolotl> brain, CallbackInfoReturnable<Brain<?>> cir) {
-        brain.addActivity(DIActivityRegistry.AXOLOTL_FOLLOW.get(), ImmutableList.of(Pair.of(0, new AxolotlFollowOwnerBehavior()), Pair.of(1, new StartAttacking<>(AxolotlAiMixin::findAttackTargetAxl))));
-        brain.addActivity(DIActivityRegistry.AXOLOTL_STAY.get(), ImmutableList.of(Pair.of(0, new AxolotlStayBehavior())));
+        brain.addActivity(DIActivityRegistry.AXOLOTL_FOLLOW.get(), ImmutableList.of(Pair.of(0, new AmphibianFollowOwnerBehavior(0.3F, 0.6F)), Pair.of(1, new StartAttacking<>(AxolotlAiMixin::findAttackTargetAxl))));
+        brain.addActivity(DIActivityRegistry.AXOLOTL_STAY.get(), ImmutableList.of(Pair.of(0, new AmphibianStayBehavior())));
     }
 
     @Inject(
@@ -78,7 +76,7 @@ public class AxolotlAiMixin {
         cir.setReturnValue(Ingredient.merge(ImmutableList.of(cir.getReturnValue(), Ingredient.of(Items.TROPICAL_FISH))));
     }
 
-        private static Optional<? extends LivingEntity> findAttackTargetAxl(Axolotl p_149299_) {
+    private static Optional<? extends LivingEntity> findAttackTargetAxl(Axolotl p_149299_) {
         return p_149299_.isInLove() ? Optional.empty() : p_149299_.getBrain().getMemory(MemoryModuleType.NEAREST_ATTACKABLE);
     }
 

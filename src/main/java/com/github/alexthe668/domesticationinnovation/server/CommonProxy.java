@@ -1,5 +1,6 @@
 package com.github.alexthe668.domesticationinnovation.server;
 
+import com.github.alexthe666.citadel.server.entity.CitadelEntityData;
 import com.github.alexthe666.citadel.server.entity.IComandableMob;
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
 import com.github.alexthe668.domesticationinnovation.server.block.DIBlockRegistry;
@@ -749,6 +750,7 @@ public class CommonProxy {
             }
         }
         if (event.getTarget() instanceof LivingEntity living && TameableUtils.isPetOf(event.getPlayer(), entity)) {
+            System.out.println(CitadelEntityData.getCitadelTag(living));
             if (event.getItemStack().is(DIItemRegistry.COLLAR_TAG.get()) && DomesticationMod.CONFIG.collarTag.get()) {
                 if (!event.getPlayer().level.isClientSide && living.isAlive()) {
                     Map<Enchantment, Integer> itemEnchantments = EnchantmentHelper.deserializeEnchantments(stack.getEnchantmentTags());

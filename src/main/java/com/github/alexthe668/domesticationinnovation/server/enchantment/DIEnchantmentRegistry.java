@@ -55,13 +55,13 @@ public class DIEnchantmentRegistry {
             for (Field f : DIEnchantmentRegistry.class.getDeclaredFields()) {
                 Object obj = f.get(null);
                 if (obj instanceof PetEnchantment petEnchantment && DomesticationMod.CONFIG.isEnchantEnabled((Enchantment) obj)) {
-                   // DEF_REG.register(petEnchantment.getName(), () -> petEnchantment);
+                    DEF_REG.register(petEnchantment.getName(), () -> petEnchantment);
                 }
             }
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
-       // DEF_REG.register(bus);
+        DEF_REG.register(bus);
     }
 
     public static boolean areCompatible(PetEnchantment e1, Enchantment e2) {

@@ -2,6 +2,7 @@ package com.github.alexthe668.domesticationinnovation.server.item;
 
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
 import com.github.alexthe668.domesticationinnovation.server.entity.FeatherEntity;
+import com.github.alexthe668.domesticationinnovation.server.misc.DICreativeModeTab;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
@@ -16,7 +17,7 @@ import net.minecraft.world.level.gameevent.GameEvent;
 public class FeatherOnAStickItem extends Item {
 
     public FeatherOnAStickItem() {
-        super(new Item.Properties().tab(DomesticationMod.TAB).durability(160));
+        super(new Item.Properties().tab(DICreativeModeTab.INSTANCE).durability(160));
     }
 
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {

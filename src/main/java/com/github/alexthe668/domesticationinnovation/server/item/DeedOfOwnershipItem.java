@@ -2,6 +2,7 @@ package com.github.alexthe668.domesticationinnovation.server.item;
 
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
 import com.github.alexthe668.domesticationinnovation.server.entity.TameableUtils;
+import com.github.alexthe668.domesticationinnovation.server.misc.DICreativeModeTab;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -17,7 +18,7 @@ import java.util.UUID;
 public class DeedOfOwnershipItem extends Item {
 
     public DeedOfOwnershipItem() {
-        super(new Item.Properties().tab(DomesticationMod.TAB).stacksTo(1));
+        super(new Item.Properties().tab(DICreativeModeTab.INSTANCE).stacksTo(1));
     }
 
     public static boolean isBound(ItemStack stack) {

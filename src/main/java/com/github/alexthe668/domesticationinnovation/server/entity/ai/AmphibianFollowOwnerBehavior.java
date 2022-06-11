@@ -11,22 +11,26 @@ import net.minecraft.world.entity.ai.behavior.Behavior;
 import net.minecraft.world.entity.ai.behavior.BehaviorUtils;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
-import net.minecraft.world.entity.animal.axolotl.Axolotl;
+import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
 
-public class AxolotlFollowOwnerBehavior extends Behavior<Axolotl> {
+public class AmphibianFollowOwnerBehavior<T extends Animal> extends Behavior<T> {
 
     private static final float START_DISTANCE = 10F;
     private static final float STOP_DISTANCE = 2F;
+    private float baseSpeedLand = 1.0F;
+    private float baseSpeedWater = 1.0F;
     private LivingEntity owner;
 
-    public AxolotlFollowOwnerBehavior() {
+    public AmphibianFollowOwnerBehavior(float baseSpeedLand, float baseSpeedWater) {
         super(ImmutableMap.of(MemoryModuleType.WALK_TARGET, MemoryStatus.REGISTERED, MemoryModuleType.LOOK_TARGET, MemoryStatus.REGISTERED), 20);
-    }
+        this.baseSpeedLand = baseSpeedLand;
+        this.baseSpeedWater = baseSpeedWater;
+   }
 
-    protected boolean checkExtraStartConditions(ServerLevel level, Axolotl axolotl) {
+    protected boolean checkExtraStartConditions(ServerLevel level, T axolotl) {
         if(axolotl instanceof ModifedToBeTameable tamed){
             owner = tamed.getTameOwner();
             if(owner != null && owner.isAlive() && !owner.isSpectator() && tamed.isFollowingOwner()){
@@ -37,23 +41,23 @@ public class AxolotlFollowOwnerBehavior extends Behavior<Axolotl> {
     }
 
 
-    protected boolean canStillUse(ServerLevel level, Axolotl axolotl, long gameTime) {
+    protected boolean canStillUse(ServerLevel level, T axolotl, long gameTime) {
         if(!axolotl.getBrain().hasMemoryValue(MemoryModuleType.BREED_TARGET) && owner != null && owner.isAlive()){
             return ((ModifedToBeTameable)axolotl).isFollowingOwner() && axolotl.distanceTo(owner) > STOP_DISTANCE;
         }
         return false;
     }
 
-    protected void stop(ServerLevel p_23492_, Axolotl axolotl, long gameTime) {
+    protected void stop(ServerLevel p_23492_, T axolotl, long gameTime) {
         axolotl.getBrain().eraseMemory(MemoryModuleType.WALK_TARGET);
     }
 
-    protected void tick(ServerLevel p_23503_, Axolotl axolotl, long gameTime) {
+    protected void tick(ServerLevel p_23503_, T axolotl, long gameTime) {
         if (axolotl.distanceToSqr(this.owner) >= 144.0D) {
             this.teleportToOwner(axolotl);
         } else{
             int speedsterLevel = TameableUtils.getEnchantLevel(axolotl, DIEnchantmentRegistry.SPEEDSTER);
-            float speed = axolotl.isInWaterOrBubble() ? 0.6F + speedsterLevel * 0.05F : 0.3F  + speedsterLevel * 0.1F;
+            float speed = axolotl.isInWaterOrBubble() ? baseSpeedWater + speedsterLevel * 0.05F : baseSpeedLand + speedsterLevel * 0.1F;
             BehaviorUtils.lookAtEntity(axolotl, owner);
             BehaviorUtils.setWalkAndLookTargetMemories(axolotl, owner, speed, (int)STOP_DISTANCE);
         }
@@ -64,7 +68,7 @@ public class AxolotlFollowOwnerBehavior extends Behavior<Axolotl> {
         return this.owner.getRandom().nextInt(p_25302_ - p_25301_ + 1) + p_25301_;
     }
 
-    private void teleportToOwner(Axolotl axolotl) {
+    private void teleportToOwner(T axolotl) {
         BlockPos blockpos = this.owner.blockPosition();
 
         for(int i = 0; i < 10; ++i) {
@@ -79,7 +83,7 @@ public class AxolotlFollowOwnerBehavior extends Behavior<Axolotl> {
 
     }
 
-    private boolean maybeTeleportTo(Axolotl axolotl, int p_25304_, int p_25305_, int p_25306_) {
+    private boolean maybeTeleportTo(T axolotl, int p_25304_, int p_25305_, int p_25306_) {
         if (Math.abs((double)p_25304_ - this.owner.getX()) < 2.0D && Math.abs((double)p_25306_ - this.owner.getZ()) < 2.0D) {
             return false;
         } else if (!this.canTeleportTo(axolotl, new BlockPos(p_25304_, p_25305_, p_25306_))) {
@@ -91,7 +95,7 @@ public class AxolotlFollowOwnerBehavior extends Behavior<Axolotl> {
         }
     }
 
-    private boolean canTeleportTo(Axolotl axolotl, BlockPos pos) {
+    private boolean canTeleportTo(T axolotl, BlockPos pos) {
         BlockPathTypes blockpathtypes = WalkNodeEvaluator.getBlockPathTypeStatic(axolotl.level, pos.mutable());
         if(axolotl.level.getFluidState(pos).is(Fluids.WATER)){
             return true;

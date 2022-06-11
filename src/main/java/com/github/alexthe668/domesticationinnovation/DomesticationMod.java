@@ -35,7 +35,6 @@ public class DomesticationMod {
     public static final String MODID = "domesticationinnovation";
     public static final Logger LOGGER = LogManager.getLogger();
     public static CommonProxy PROXY = DistExecutor.runForDist(() -> ClientProxy::new, () -> CommonProxy::new);
-    public static CreativeModeTab TAB = new DICreativeModeTab();
     public static final DIConfig CONFIG;
     private static final ForgeConfigSpec CONFIG_SPEC;
 

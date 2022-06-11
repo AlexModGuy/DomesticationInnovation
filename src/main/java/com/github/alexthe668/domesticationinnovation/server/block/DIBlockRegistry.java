@@ -2,6 +2,7 @@ package com.github.alexthe668.domesticationinnovation.server.block;
 
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
 import com.github.alexthe668.domesticationinnovation.server.item.DIItemRegistry;
+import com.github.alexthe668.domesticationinnovation.server.misc.DICreativeModeTab;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
@@ -43,7 +44,7 @@ public class DIBlockRegistry {
 
     public static RegistryObject<Block> registerBlockAndItem(String name, Supplier<Block> block){
         RegistryObject<Block> blockObj = DEF_REG.register(name, block);
-        DIItemRegistry.DEF_REG.register(name, () -> new DIBlockItem(blockObj, new Item.Properties().tab(DomesticationMod.TAB)));
+        DIItemRegistry.DEF_REG.register(name, () -> new DIBlockItem(blockObj, new Item.Properties().tab(DICreativeModeTab.INSTANCE)));
         return blockObj;
     }
 }

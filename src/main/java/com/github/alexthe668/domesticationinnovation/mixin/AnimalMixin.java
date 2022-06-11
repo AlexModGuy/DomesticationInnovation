@@ -2,7 +2,9 @@ package com.github.alexthe668.domesticationinnovation.mixin;
 
 import com.github.alexthe666.citadel.server.entity.IComandableMob;
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
+import com.github.alexthe668.domesticationinnovation.server.entity.IFrog;
 import com.github.alexthe668.domesticationinnovation.server.entity.ModifedToBeTameable;
+import com.github.alexthe668.domesticationinnovation.server.entity.TameableUtils;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.AgeableMob;
@@ -10,6 +12,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.Fox;
+import net.minecraft.world.entity.animal.frog.Frog;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
@@ -35,6 +38,9 @@ public abstract class AnimalMixin extends AgeableMob {
             cancellable = true
     )
     private void di_onInteract(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
+        if((Mob)this instanceof IFrog && ((IFrog)this).onFrogInteract(player, hand)){
+            cir.setReturnValue(InteractionResult.SUCCESS);
+        }
         if((Mob)this instanceof Fox && this instanceof IComandableMob && this instanceof ModifedToBeTameable tame && tame.isTame() && tame.getTameOwnerUUID().equals(player.getUUID()) && DomesticationMod.CONFIG.tameableFox.get() && DomesticationMod.CONFIG.trinaryCommandSystem.get()){
             player.swing(hand, true);
             cir.setReturnValue(((IComandableMob)this).playerSetCommand(player, (Animal)(Mob)this));

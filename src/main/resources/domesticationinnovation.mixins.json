@@ -18,6 +18,9 @@
     "FollowOwnerGoalMixin",
     "FollowParentGoalMixin",
     "FoxMixin",
+    "FrogAiMixin",
+    "FrogAttackablesSensorMixin",
+    "FrogMixin",
     "LivingEntityMixin",
     "MobMixin",
     "PanicGoalMixin",
@@ -25,6 +28,7 @@
     "PlayerMixin",
     "PoolsMixin",
     "RabbitMixin",
+    "ShootTongueMixin",
     "TameableAnimalMixin",
     "VillagerMixin",
     "WolfMixin"
