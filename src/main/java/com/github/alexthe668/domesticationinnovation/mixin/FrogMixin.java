@@ -150,7 +150,7 @@ public abstract class FrogMixin extends Animal implements ModifedToBeTameable, I
 
     @Nullable
     public UUID getTameOwnerUUID() {
-        return DomesticationMod.CONFIG.tameableAxolotl.get() ? this.entityData.get(OWNER_UUID).orElse(null) : null;
+        return DomesticationMod.CONFIG.tameableFrog.get() ? this.entityData.get(OWNER_UUID).orElse(null) : null;
     }
 
     public void setTameOwnerUUID(@Nullable UUID uuid) {
@@ -199,7 +199,7 @@ public abstract class FrogMixin extends Animal implements ModifedToBeTameable, I
 
     @Override
     public boolean onFrogInteract(Player player, InteractionHand hand) {
-        if (DomesticationMod.CONFIG.tameableAxolotl.get()) {
+        if (DomesticationMod.CONFIG.tameableFrog.get()) {
             ItemStack itemStack = player.getItemInHand(hand);
             if (!this.isTame() && this.isTamingItem(itemStack)) {
                 this.usePlayerItem(player, hand, itemStack);

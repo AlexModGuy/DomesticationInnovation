@@ -17,6 +17,7 @@ public class DIConfig {
     public final ForgeConfigSpec.BooleanValue tameableHorse;
     public final ForgeConfigSpec.BooleanValue tameableFox;
     public final ForgeConfigSpec.BooleanValue tameableRabbit;
+    public final ForgeConfigSpec.BooleanValue tameableFrog;
     public final ForgeConfigSpec.BooleanValue swingThroughPets;
     public final ForgeConfigSpec.BooleanValue rottenApple;
     public final ForgeConfigSpec.BooleanValue petBedRespawns;
@@ -40,6 +41,7 @@ public class DIConfig {
         tameableHorse = builder.comment("true if horses, donkeys, llamas, etc can be given enchants, beds, etc").translation("tameable_horse").define("tameable_horse", true);
         tameableFox = builder.comment("true if foxes are fully tameable (fox must be tamed via breeding)").translation("tameable_fox").define("tameable_fox", true);
         tameableRabbit = builder.comment("true if rabbits are fully tameable (rabbit must be tamed with carrots)").translation("tameable_rabbit").define("tameable_rabbit", true);
+        tameableFrog = builder.comment("true if frogs are fully tameable (rabbit must be tamed with spider eyes)").translation("tameable_rabbit").define("tameable_frog", true);
         swingThroughPets = builder.comment("true if attacks do not register on pets from their owners and go through them to attack a mob behind them").translation("swing_through_pets").define("swing_through_pets", true);
         rottenApple = builder.comment("true if apples can turn into rotten apples if they despawn").translation("rotten_apple").define("rotten_apple", true);
         petBedRespawns = builder.comment("true if mobs can respawn in pet beds the next morning after they die").translation("pet_bed_respawns").define("pet_bed_respawns", true);
@@ -54,7 +56,7 @@ public class DIConfig {
         vampirismLootChance = builder.comment("percent chance of woodland mansion loot table containing Vampire book:").translation("vampirism_loot_chance").defineInRange("vampirism_loot_chance", 0.13D, 0.0, 1.0D);
         voidCloudLootChance = builder.comment("percent chance of end city loot table containing Void Cloud book:").translation("void_cloud_loot_chance").defineInRange("void_cloud_loot_chance", 0.13D, 0.0, 1.0D);
         oreScentingLootChance = builder.comment("percent chance of mineshaft loot table containing Ore Scenting book:").translation("ore_scenting_loot_chance").defineInRange("ore_scenting_loot_chance", 0.1D, 0.0, 1.0D);
-        muffledLootChance = builder.comment("percent chance of ancient city loot table containing Muffled book:").translation("ore_scenting_loot_chance").defineInRange("ore_scenting_loot_chance", 0.15D, 0.0, 1.0D);
+        muffledLootChance = builder.comment("percent chance of ancient city loot table containing Muffled book:").translation("muffled_loot_chance").defineInRange("muffled_loot_chance", 0.15D, 0.0, 1.0D);
         builder.pop();
         builder.push("enchantments");
         try {

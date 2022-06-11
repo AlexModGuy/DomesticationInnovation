@@ -117,6 +117,9 @@ public class TameableUtils {
         if (entity instanceof Rabbit) {
             return ((ModifedToBeTameable) entity).isTame() && DomesticationMod.CONFIG.tameableRabbit.get();
         }
+        if (entity instanceof Frog) {
+            return ((ModifedToBeTameable) entity).isTame() && DomesticationMod.CONFIG.tameableFrog.get();
+        }
         return entity instanceof ModifedToBeTameable && ((ModifedToBeTameable) entity).isTame() || entity instanceof TamableAnimal && ((TamableAnimal) entity).isTame();
     }
 
