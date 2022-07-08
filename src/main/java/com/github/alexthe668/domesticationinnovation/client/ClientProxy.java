@@ -1,6 +1,5 @@
 package com.github.alexthe668.domesticationinnovation.client;
 
-import com.github.alexthe666.citadel.Citadel;
 import com.github.alexthe666.citadel.client.event.EventGetOutlineColor;
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
 import com.github.alexthe668.domesticationinnovation.client.particle.*;
@@ -12,10 +11,10 @@ import com.github.alexthe668.domesticationinnovation.server.item.DeedOfOwnership
 import com.github.alexthe668.domesticationinnovation.server.item.FeatherOnAStickItem;
 import com.github.alexthe668.domesticationinnovation.server.misc.DIParticleRegistry;
 import com.google.common.collect.ImmutableList;
-import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -46,7 +45,6 @@ import net.minecraftforge.client.event.RenderNameTagEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -139,9 +137,11 @@ public class ClientProxy extends CommonProxy {
 
     @SubscribeEvent
     public void renderNametagEvent(RenderNameTagEvent event) {
+        //Component colored = event.getOriginalContent().copy().withStyle(ChatFormatting.BLUE);
+        //event.setContent(colored);
         if (TameableUtils.isTamed(event.getEntity()) && TameableUtils.isPetOf(Minecraft.getInstance().player, event.getEntity()) && TameableUtils.hasAnyEnchants((LivingEntity) event.getEntity()) && Minecraft.getInstance().player.isShiftKeyDown()) {
             event.setResult(Event.Result.DENY);
-            renderNameTagStuffFor(event.getEntity(), event.getContent(), event.getPoseStack(), event.getMultiBufferSource(), event.getPackedLight());
+            renderNametagEnchantments(event.getEntity(), event.getContent(), event.getPoseStack(), event.getMultiBufferSource(), event.getPackedLight());
         }
     }
 
@@ -166,7 +166,7 @@ public class ClientProxy extends CommonProxy {
         }
     }
 
-    private void renderNameTagStuffFor(Entity entity, Component nameTag, PoseStack pose, MultiBufferSource buffer, int lightIn) {
+    private void renderNametagEnchantments(Entity entity, Component nameTag, PoseStack pose, MultiBufferSource buffer, int lightIn) {
         if (Minecraft.getInstance().player.isShiftKeyDown() && TameableUtils.isTamed(entity) && TameableUtils.hasAnyEnchants((LivingEntity) entity)) {
             LivingEntity living = (LivingEntity) entity;
             List<Component> list = TameableUtils.getEnchantDescriptions(living);

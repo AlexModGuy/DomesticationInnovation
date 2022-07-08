@@ -47,7 +47,7 @@ public class PetEnchantment extends Enchantment {
     public boolean isAllowedOnBooks() {
         return super.isAllowedOnBooks() && DomesticationMod.CONFIG.isEnchantEnabled(this);
     }
-    
+
     public boolean canApplyAtEnchantingTable(ItemStack stack) {
         return super.canApplyAtEnchantingTable(stack) && DomesticationMod.CONFIG.isEnchantEnabled(this);
     }
