@@ -40,7 +40,13 @@ public class DIVillagerRegistry {
 
     public static void registerHouses() {
         registeredHouses = true;
-        int weight = DomesticationMod.CONFIG.petstoreVillageWeight.get();
+        final int weight = 17;
+        try{
+            //weight = DomesticationMod.CONFIG.petstoreVillageWeight.get();
+        }catch (Exception e){
+
+        }
+
         StructurePoolElement plains = new PetshopStructurePoolElement(new ResourceLocation(DomesticationMod.MODID, "plains_petshop"), ProcessorLists.EMPTY);
         VillageHouseManager.register("minecraft:village/plains/houses", (pool) -> VillageHouseManager.addToPool(pool, plains, weight));
         StructurePoolElement desert = new PetshopStructurePoolElement(new ResourceLocation(DomesticationMod.MODID, "desert_petshop"), ProcessorLists.EMPTY);

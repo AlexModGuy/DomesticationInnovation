@@ -41,7 +41,8 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.InputEvent;
-import net.minecraftforge.client.event.RenderNameplateEvent;
+import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
+import net.minecraftforge.client.event.RenderNameTagEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
@@ -49,7 +50,6 @@ import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.HashMap;
 import java.util.List;
@@ -115,18 +115,18 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
-    public void setupParticles() {
+    public void setupParticles(RegisterParticleProvidersEvent event) {
         DomesticationMod.LOGGER.debug("Registered particle factories");
-        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.DEFLECTION_SHIELD.get(), new ParticleDeflectionShield.Factory());
-        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.MAGNET.get(), ParticleMagnet.Factory::new);
-        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.ZZZ.get(), ParticleZZZ.Factory::new);
-        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.GIANT_POP.get(), ParticleGiantPop.Factory::new);
-        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.SIMPLE_BUBBLE.get(), ParticleSimpleBubble.Factory::new);
-        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.VAMPIRE.get(), ParticleVampire.Factory::new);
-        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.SNIFF.get(), ParticleSniff.Factory::new);
-        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.PSYCHIC_WALL.get(), ParticlePsychicWall.Factory::new);
-        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.INTIMIDATION.get(), new ParticleIntimidation.Factory());
-        Minecraft.getInstance().particleEngine.register(DIParticleRegistry.BLIGHT.get(), ParticleBlight.Factory::new);
+        event.register(DIParticleRegistry.DEFLECTION_SHIELD.get(), new ParticleDeflectionShield.Factory());
+        event.register(DIParticleRegistry.MAGNET.get(), ParticleMagnet.Factory::new);
+        event.register(DIParticleRegistry.ZZZ.get(), ParticleZZZ.Factory::new);
+        event.register(DIParticleRegistry.GIANT_POP.get(), ParticleGiantPop.Factory::new);
+        event.register(DIParticleRegistry.SIMPLE_BUBBLE.get(), ParticleSimpleBubble.Factory::new);
+        event.register(DIParticleRegistry.VAMPIRE.get(), ParticleVampire.Factory::new);
+        event.register(DIParticleRegistry.SNIFF.get(), ParticleSniff.Factory::new);
+        event.register(DIParticleRegistry.PSYCHIC_WALL.get(), ParticlePsychicWall.Factory::new);
+        event.register(DIParticleRegistry.INTIMIDATION.get(), new ParticleIntimidation.Factory());
+        event.register(DIParticleRegistry.BLIGHT.get(), ParticleBlight.Factory::new);
     }
 
     @SubscribeEvent
@@ -138,7 +138,7 @@ public class ClientProxy extends CommonProxy {
     }
 
     @SubscribeEvent
-    public void renderNametagEvent(RenderNameplateEvent event) {
+    public void renderNametagEvent(RenderNameTagEvent event) {
         if (TameableUtils.isTamed(event.getEntity()) && TameableUtils.isPetOf(Minecraft.getInstance().player, event.getEntity()) && TameableUtils.hasAnyEnchants((LivingEntity) event.getEntity()) && Minecraft.getInstance().player.isShiftKeyDown()) {
             event.setResult(Event.Result.DENY);
             renderNameTagStuffFor(event.getEntity(), event.getContent(), event.getPoseStack(), event.getMultiBufferSource(), event.getPackedLight());
@@ -146,7 +146,7 @@ public class ClientProxy extends CommonProxy {
     }
 
     @SubscribeEvent
-    public void onAttackEntityFromClientEvent(InputEvent.ClickInputEvent event) {
+    public void onAttackEntityFromClientEvent(InputEvent.InteractionKeyMappingTriggered event) {
         if (event.isAttack() && DomesticationMod.CONFIG.swingThroughPets.get() && !Minecraft.getInstance().player.isShiftKeyDown() && Minecraft.getInstance().hitResult instanceof EntityHitResult && TameableUtils.isPetOf(Minecraft.getInstance().player, ((EntityHitResult) Minecraft.getInstance().hitResult).getEntity())) {
             event.setCanceled(true);
             event.setSwingHand(true);

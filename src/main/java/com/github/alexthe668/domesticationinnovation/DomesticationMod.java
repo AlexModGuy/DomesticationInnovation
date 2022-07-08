@@ -14,7 +14,7 @@ import com.github.alexthe668.domesticationinnovation.server.misc.DIPOIRegistry;
 import com.github.alexthe668.domesticationinnovation.server.misc.DIParticleRegistry;
 import com.github.alexthe668.domesticationinnovation.server.misc.DISoundRegistry;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
+import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
@@ -72,8 +72,8 @@ public class DomesticationMod {
         PROXY.init();
     }
 
-    private void setupParticleEvent(ParticleFactoryRegisterEvent event) {
-        PROXY.setupParticles();
+    private void setupParticleEvent(RegisterParticleProvidersEvent event) {
+        PROXY.setupParticles(event);
     }
 
 }

@@ -66,6 +66,7 @@ import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.*;
@@ -98,7 +99,7 @@ public class CommonProxy {
     public void clientInit() {
     }
 
-    public void setupParticles() {
+    public void setupParticles(RegisterParticleProvidersEvent event) {
     }
 
     public void updateVisualDataForMob(Entity entity, int[] arr) {

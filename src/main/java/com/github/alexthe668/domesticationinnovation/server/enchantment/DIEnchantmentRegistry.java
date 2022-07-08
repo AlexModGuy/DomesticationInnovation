@@ -55,7 +55,7 @@ public class DIEnchantmentRegistry {
         try {
             for (Field f : DIEnchantmentRegistry.class.getDeclaredFields()) {
                 Object obj = f.get(null);
-                if (obj instanceof PetEnchantment petEnchantment && DomesticationMod.CONFIG.isEnchantEnabled((Enchantment) obj)) {
+                if (obj instanceof PetEnchantment petEnchantment) {
                     DEF_REG.register(petEnchantment.getName(), () -> petEnchantment);
                 }
             }
