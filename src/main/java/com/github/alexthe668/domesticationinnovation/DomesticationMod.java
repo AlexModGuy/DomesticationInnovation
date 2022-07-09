@@ -14,7 +14,6 @@ import com.github.alexthe668.domesticationinnovation.server.misc.DIPOIRegistry;
 import com.github.alexthe668.domesticationinnovation.server.misc.DIParticleRegistry;
 import com.github.alexthe668.domesticationinnovation.server.misc.DISoundRegistry;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
@@ -47,7 +46,6 @@ public class DomesticationMod {
     public DomesticationMod() {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupClient);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupParticleEvent);
         final ModLoadingContext modLoadingContext = ModLoadingContext.get();
         modLoadingContext.registerConfig(ModConfig.Type.COMMON, CONFIG_SPEC, "domestication-innovation.toml");
         DIItemRegistry.DEF_REG.register(FMLJavaModLoadingContext.get().getModEventBus());
@@ -62,6 +60,7 @@ public class DomesticationMod {
         DIActivityRegistry.DEF_REG.register(FMLJavaModLoadingContext.get().getModEventBus());
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(PROXY);
+        PROXY.init();
     }
 
     private void setupClient(FMLClientSetupEvent event) {
@@ -69,11 +68,7 @@ public class DomesticationMod {
     }
 
     private void setup(final FMLCommonSetupEvent event) {
-        PROXY.init();
     }
 
-    private void setupParticleEvent(RegisterParticleProvidersEvent event) {
-        PROXY.setupParticles(event);
-    }
 
 }

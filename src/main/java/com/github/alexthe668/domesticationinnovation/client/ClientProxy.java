@@ -83,6 +83,7 @@ public class ClientProxy extends CommonProxy {
     @OnlyIn(Dist.CLIENT)
     public void init() {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientProxy::onAddLayers);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientProxy::setupParticles);
     }
 
     @Override
@@ -112,8 +113,7 @@ public class ClientProxy extends CommonProxy {
         });
     }
 
-    @Override
-    public void setupParticles(RegisterParticleProvidersEvent event) {
+    public static void setupParticles(RegisterParticleProvidersEvent event) {
         DomesticationMod.LOGGER.debug("Registered particle factories");
         event.register(DIParticleRegistry.DEFLECTION_SHIELD.get(), new ParticleDeflectionShield.Factory());
         event.register(DIParticleRegistry.MAGNET.get(), ParticleMagnet.Factory::new);
