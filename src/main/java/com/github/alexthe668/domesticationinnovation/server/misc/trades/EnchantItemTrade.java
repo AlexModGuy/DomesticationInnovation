@@ -62,7 +62,7 @@ public class EnchantItemTrade implements VillagerTrades.ItemListing {
     public static List<EnchantmentInstance> selectEnchantment(RandomSource random, ItemStack stacks, int expIThink, int enchantmentCount) {
         List<EnchantmentInstance> list = Lists.newArrayList();
         Item item = stacks.getItem();
-        int i = stacks.getItemEnchantability();
+        int i = stacks.getEnchantmentValue();
         if (i <= 0) {
             return list;
         } else {

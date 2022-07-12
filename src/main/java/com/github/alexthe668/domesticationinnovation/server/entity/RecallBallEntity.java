@@ -100,7 +100,7 @@ public class RecallBallEntity extends Entity {
         }
         if(this.entityData.get(OPENED) && openProgress >= 1F && !this.isFinished()){
             if(!level.isClientSide){
-                EntityType type = ForgeRegistries.ENTITIES.getValue(new ResourceLocation(this.getContainedEntityType()));
+                EntityType type = ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(this.getContainedEntityType()));
                 if(type != null){
                     Entity entity = type.create(level);
                     if(entity instanceof LivingEntity alive){

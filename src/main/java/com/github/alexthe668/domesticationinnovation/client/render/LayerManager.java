@@ -20,7 +20,7 @@ public class LayerManager {
             try{
                 renderer = event.getRenderer(entityType);
             }catch (Exception e){
-                DomesticationMod.LOGGER.warn("Could not apply pet overlays layer to " + ForgeRegistries.ENTITIES.getKey(entityType) + ", has custom renderer that is not LivingEntityRenderer.");
+                DomesticationMod.LOGGER.warn("Could not apply pet overlays layer to " + ForgeRegistries.ENTITY_TYPES.getKey(entityType) + ", has custom renderer that is not LivingEntityRenderer.");
             }
             if(renderer != null ){
                 renderer.addLayer(new LayerPetOverlays(renderer));

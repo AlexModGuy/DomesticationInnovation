@@ -4,20 +4,21 @@ license="GNU LESSER GENERAL PUBLIC LICENSE"
 issueTrackerURL="https://github.com/Alex-the-666/DomesticationInnovation/issues" #optional
 [[mods]] #mandatory
 modId="domesticationinnovation" #mandatory
-version="1.5.2" #mandatory
+version="1.5.3" #mandatory
 displayName="Domestication Innovation" #mandatory
 displayURL="https://www.curseforge.com/minecraft/mc-mods/domestication-innovation" #optional
 authors="Alexthe668, FallenReaper, Yosh" #optional
 description='''Vastly improves upon and compliments tameable mobs, both from vanilla and other mods.'''
 logoFile="domesticationinnovation.png" #optional
-
+[modproperties.domesticationinnovation]
+    catalogueItemIcon="domesticationinnovation:collar_tag"
 [[dependencies.domesticationinnovation]] #optional
     # the modid of the dependency
     modId="citadel" #mandatory
     # Does this dependency have to exist - if not, ordering below must be specified
     mandatory=true #mandatory
     # The version range of the dependency
-    versionRange="[1.12.5,)" #mandatory
+    versionRange="[1.12.6,)" #mandatory
     # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
     ordering="AFTER"
     # Side this dependency is applied on - BOTH, CLIENT or SERVER
@@ -25,6 +26,6 @@ logoFile="domesticationinnovation.png" #optional
 [[dependencies.domesticationinnovation]]
     modId="forge"
     mandatory=true
-    versionRange="[41.0.64,)"
+    versionRange="[41.0.96,)"
     ordering="NONE"
     side="BOTH"

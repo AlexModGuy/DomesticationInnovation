@@ -22,7 +22,7 @@ import java.util.function.Predicate;
 
 public class DIVillagerRegistry {
 
-    public static final DeferredRegister<VillagerProfession> DEF_REG = DeferredRegister.create(ForgeRegistries.PROFESSIONS, DomesticationMod.MODID);
+    public static final DeferredRegister<VillagerProfession> DEF_REG = DeferredRegister.create(ForgeRegistries.VILLAGER_PROFESSIONS, DomesticationMod.MODID);
     public static final StructurePoolElementType<PetshopStructurePoolElement> PETSHOP_TYPE = Registry.register(Registry.STRUCTURE_POOL_ELEMENT, new ResourceLocation(DomesticationMod.MODID, "petshop"), () -> PetshopStructurePoolElement.CODEC);
 
     public static final RegistryObject<VillagerProfession> ANIMAL_TAMER = DEF_REG.register("animal_tamer", () -> buildVillagerProfession());

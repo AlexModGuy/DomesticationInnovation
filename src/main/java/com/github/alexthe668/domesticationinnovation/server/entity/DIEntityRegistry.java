@@ -12,7 +12,7 @@ import java.lang.reflect.Field;
 
 public class DIEntityRegistry {
 
-    public static final DeferredRegister<EntityType<?>> DEF_REG = DeferredRegister.create(ForgeRegistries.ENTITIES, DomesticationMod.MODID);
+    public static final DeferredRegister<EntityType<?>> DEF_REG = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, DomesticationMod.MODID);
     public static final RegistryObject<EntityType<ChainLightningEntity>> CHAIN_LIGHTNING = DEF_REG.register("chain_lightning", () -> build(EntityType.Builder.of(ChainLightningEntity::new, MobCategory.MISC).sized(0.5F, 0.5F).setCustomClientFactory(ChainLightningEntity::new).fireImmune(), "chain_lightning"));
     public static final RegistryObject<EntityType<RecallBallEntity>> RECALL_BALL = DEF_REG.register("recall_ball", () -> build(EntityType.Builder.of(RecallBallEntity::new, MobCategory.MISC).sized(0.8F, 0.8F).setCustomClientFactory(RecallBallEntity::new).fireImmune(), "recall_ball"));
     public static final RegistryObject<EntityType<FeatherEntity>> FEATHER = DEF_REG.register("feather", () -> build(EntityType.Builder.of(FeatherEntity::new, MobCategory.MISC).sized(0.2F, 0.2F).setCustomClientFactory(FeatherEntity::new).fireImmune(), "feather"));

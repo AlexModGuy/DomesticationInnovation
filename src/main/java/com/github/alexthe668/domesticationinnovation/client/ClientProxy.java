@@ -65,7 +65,7 @@ public class ClientProxy extends CommonProxy {
     @OnlyIn(Dist.CLIENT)
     public static void onAddLayers(EntityRenderersEvent.AddLayers event) {
         List<EntityType<? extends LivingEntity>> entityTypes = ImmutableList.copyOf(
-                ForgeRegistries.ENTITIES.getValues().stream()
+                ForgeRegistries.ENTITY_TYPES.getValues().stream()
                         .filter(LayerManager::canApply)
                         .filter(DefaultAttributes::hasSupplier)
                         .map(entityType -> (EntityType<? extends LivingEntity>) entityType)

@@ -37,7 +37,7 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 apply plugin: 'org.spongepowered.mixin'
 
-version = '1.5.2-1.19'
+version = '1.5.3-1.19'
 group = 'com.github.alexthe668' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'domesticationinnovation'
 
@@ -109,10 +109,10 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.19-41.0.64'
+    minecraft 'net.minecraftforge:forge:1.19-41.0.96'
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
-    compileOnly "curse.maven:citadel4-331936:3864427"
-    runtimeOnly "curse.maven:citadel4-331936:3864427"
+    compileOnly "curse.maven:citadel4-331936:3872416"
+    runtimeOnly "curse.maven:citadel4-331936:3872416"
 }
 
 mixin {

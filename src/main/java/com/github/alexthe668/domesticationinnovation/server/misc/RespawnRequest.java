@@ -31,7 +31,7 @@ public class RespawnRequest {
     }
 
     public EntityType getEntityType() {
-        return ForgeRegistries.ENTITIES.getValue(new ResourceLocation(this.entityType));
+        return ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(this.entityType));
     }
 
     public String getDimension() {

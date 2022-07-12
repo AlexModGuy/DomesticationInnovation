@@ -118,7 +118,7 @@ public class PetshopStructurePoolElement extends LegacySinglePoolElement {
     }
 
     private List<EntityType<?>> getAllMatchingEntities(TagKey<EntityType<?>> tag) {
-       return ForgeRegistries.ENTITIES.getValues().stream().filter((type -> type.is(tag))).toList();
+       return ForgeRegistries.ENTITY_TYPES.getValues().stream().filter((type -> type.is(tag))).toList();
     }
 
     public void spawnAnimalsAt(LevelAccessor accessor, BlockPos at, int count, RandomSource random, EntityType... types) {
