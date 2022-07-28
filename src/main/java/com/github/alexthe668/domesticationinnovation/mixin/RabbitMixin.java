@@ -3,6 +3,7 @@ package com.github.alexthe668.domesticationinnovation.mixin;
 import com.github.alexthe666.citadel.server.entity.IComandableMob;
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
 import com.github.alexthe668.domesticationinnovation.server.entity.ModifedToBeTameable;
+import com.github.alexthe668.domesticationinnovation.server.entity.TameableUtils;
 import com.github.alexthe668.domesticationinnovation.server.entity.ai.*;
 import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
@@ -162,7 +163,7 @@ public abstract class RabbitMixin extends Animal implements ModifedToBeTameable,
     }
 
     public boolean isValidAttackTarget(LivingEntity target) {
-        return this.getRabbitType() == 99;
+        return this.getRabbitType() == 99 && (!this.isTame() || !TameableUtils.hasSameOwnerAs(this, target));
     }
 
     public void removeUntamedGoals(){
@@ -172,6 +173,9 @@ public abstract class RabbitMixin extends Animal implements ModifedToBeTameable,
             }).filter(WrappedGoal::isRunning).forEach(WrappedGoal::stop);
             this.goalSelector.getAvailableGoals().removeIf((wrapped) -> {
                 return wrapped.getGoal() instanceof AvoidEntityGoal;
+            });
+            this.targetSelector.getAvailableGoals().removeIf((wrapped) -> {
+                return wrapped.getGoal() instanceof NearestAttackableTargetGoal;
             });
         } catch (Exception e){
             DomesticationMod.LOGGER.warn("encountered error modifying rabbit AI");
@@ -185,8 +189,8 @@ public abstract class RabbitMixin extends Animal implements ModifedToBeTameable,
             cancellable = true
     )
     private void di_setRabbitType(int type, CallbackInfo ci) {
+        ci.cancel();
         if(type == 99){
-            ci.cancel();
             this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(30.0D);
             this.getAttribute(Attributes.ARMOR).setBaseValue(8.0D);
             this.heal(22.0F);
@@ -198,12 +202,13 @@ public abstract class RabbitMixin extends Animal implements ModifedToBeTameable,
             }else{
                 this.targetSelector.addGoal(2, new OwnerHurtTarget2Goal(this));
                 this.targetSelector.addGoal(3, new OwnerHurtByTarget2Goal(this));
+                removeUntamedGoals();
             }
             if (!this.hasCustomName()) {
                 this.setCustomName(Component.translatable(Util.makeDescriptionId("entity", new ResourceLocation("killer_bunny"))));
             }
-            this.entityData.set(DATA_TYPE_ID, 99);
         }
+        this.entityData.set(DATA_TYPE_ID, type);
     }
 
     @Override
