@@ -167,23 +167,27 @@ public class CommonProxy {
                     event.setCanceled(true);
                 }
             }
-            if (TameableUtils.isTamed(hit) && TameableUtils.hasEnchant((LivingEntity) hit, DIEnchantmentRegistry.DEFLECTION)) {
+            if (TameableUtils.isTamed(hit)) {
                 if (event.getEntity() instanceof AbstractArrow arrow) {
                     //fixes soft crash with vanilla
                     if(arrow.getPierceLevel() > 0){
                         arrow.setPierceLevel((byte) 0);
                         arrow.remove(Entity.RemovalReason.DISCARDED);
+                        event.setCanceled(true);
+                        return;
                     }
                 }
-                event.setCanceled(true);
-                float xRot = event.getProjectile().getXRot();
-                float yRot = event.getProjectile().yRotO;
-                Vec3 vec3 = event.getProjectile().position().subtract(hit.position()).normalize().scale(hit.getBbWidth() + 0.5F);
-                Vec3 vec32 = hit.position().add(vec3);
-                hit.level.addParticle(DIParticleRegistry.DEFLECTION_SHIELD.get(), vec32.x, vec32.y, vec32.z, xRot, yRot, 0.0F);
-                event.getProjectile().setDeltaMovement(event.getProjectile().getDeltaMovement().scale(-0.2D));
-                event.getProjectile().setYRot(yRot + 180);
-                event.getProjectile().setXRot(xRot + 180);
+                if(TameableUtils.hasEnchant((LivingEntity) hit, DIEnchantmentRegistry.DEFLECTION)) {
+                    event.setCanceled(true);
+                    float xRot = event.getProjectile().getXRot();
+                    float yRot = event.getProjectile().yRotO;
+                    Vec3 vec3 = event.getProjectile().position().subtract(hit.position()).normalize().scale(hit.getBbWidth() + 0.5F);
+                    Vec3 vec32 = hit.position().add(vec3);
+                    hit.level.addParticle(DIParticleRegistry.DEFLECTION_SHIELD.get(), vec32.x, vec32.y, vec32.z, xRot, yRot, 0.0F);
+                    event.getProjectile().setDeltaMovement(event.getProjectile().getDeltaMovement().scale(-0.2D));
+                    event.getProjectile().setYRot(yRot + 180);
+                    event.getProjectile().setXRot(xRot + 180);
+                }
             }
         }
     }
