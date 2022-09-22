@@ -438,6 +438,19 @@ public class CommonProxy {
                     }
                 }
             }
+            if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.BLAZING_PROTECTION)) {
+                int bars = TameableUtils.getBlazingProtectionBars(event.getEntity());
+                if(bars < 2 * TameableUtils.getEnchantLevel(event.getEntity(), DIEnchantmentRegistry.BLAZING_PROTECTION)){
+                    int cooldown = TameableUtils.getBlazingProtectionCooldown(event.getEntity());
+                    if(cooldown > 0){
+                        cooldown--;
+                    }else{
+                        TameableUtils.setBlazingProtectionBars(event.getEntity(), bars + 1);
+                        cooldown = 200;
+                    }
+                    TameableUtils.setBlazingProtectionCooldown(event.getEntity(), cooldown);
+                }
+            }
         }
 
         if (frozenTime > 0) {
@@ -471,6 +484,24 @@ public class CommonProxy {
                 } else {
                     flag = true;
                     event.setCanceled(true);
+                }
+            }
+            if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.BLAZING_PROTECTION)) {
+                int bars = TameableUtils.getBlazingProtectionBars(event.getEntity());
+                if(bars > 0){
+                    Entity attacker = event.getSource().getEntity();
+                    if(attacker instanceof LivingEntity && !TameableUtils.hasSameOwnerAs((LivingEntity)attacker, event.getEntity())){
+                        attacker.setSecondsOnFire(5 + event.getEntity().getRandom().nextInt(3));
+                        ((LivingEntity) attacker).knockback(0.4, event.getEntity().getX() - attacker.getX(), event.getEntity().getZ() - attacker.getZ());
+                    }
+                    event.setCanceled(true);
+                    flag = true;
+                    for (int i = 0; i < 3 + event.getEntity().getRandom().nextInt(3); i++) {
+                        attacker.level.addParticle(ParticleTypes.FLAME,  event.getEntity().getRandomX(0.8F), event.getEntity().getRandomY(), event.getEntity().getRandomZ(0.8F), 0.0F, 0.0F, 0.0F);
+                    }
+                    event.getEntity().playSound(DISoundRegistry.BLAZING_PROTECTION.get(), 1, event.getEntity().getVoicePitch());
+                    TameableUtils.setBlazingProtectionBars(event.getEntity(), bars - 1);
+                    TameableUtils.setBlazingProtectionCooldown(event.getEntity(), 600);
                 }
             }
             if ((event.getSource() == DamageSource.DROWN || event.getSource() == DamageSource.DRY_OUT) && TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.AMPHIBIOUS)) {
@@ -838,6 +869,11 @@ public class CommonProxy {
         if (event.getName().equals(BuiltInLootTables.ANCIENT_CITY) && DomesticationMod.CONFIG.isEnchantEnabled(DIEnchantmentRegistry.MUFFLED) && DomesticationMod.CONFIG.muffledLootChance.get() > 0) {
             LootPoolEntryContainer.Builder item = LootItem.lootTableItem(Items.BOOK).setWeight(5).apply((new EnchantRandomlyFunction.Builder()).withEnchantment(DIEnchantmentRegistry.MUFFLED)).setWeight(1);
             LootPool.Builder builder = new LootPool.Builder().name("di_muffled_book").add(item).when(LootItemRandomChanceCondition.randomChance(DomesticationMod.CONFIG.muffledLootChance.get().floatValue())).setRolls(UniformGenerator.between(0, 1)).setBonusRolls(UniformGenerator.between(0, 1));
+            event.getTable().addPool(builder.build());
+        }
+        if (event.getName().equals(BuiltInLootTables.NETHER_BRIDGE) && DomesticationMod.CONFIG.isEnchantEnabled(DIEnchantmentRegistry.BLAZING_PROTECTION) && DomesticationMod.CONFIG.blazingProtectionLootChance.get() > 0) {
+            LootPoolEntryContainer.Builder item = LootItem.lootTableItem(Items.BOOK).setWeight(5).apply((new EnchantRandomlyFunction.Builder()).withEnchantment(DIEnchantmentRegistry.BLAZING_PROTECTION)).setWeight(1);
+            LootPool.Builder builder = new LootPool.Builder().name("di_blazing_protection_book").add(item).when(LootItemRandomChanceCondition.randomChance(DomesticationMod.CONFIG.blazingProtectionLootChance.get().floatValue())).setRolls(UniformGenerator.between(0, 1)).setBonusRolls(UniformGenerator.between(0, 1));
             event.getTable().addPool(builder.build());
         }
     }

@@ -46,6 +46,7 @@ public class DIEnchantmentRegistry {
     public static final PetEnchantment INTIMIDATION = new PetEnchantment("intimidation", Enchantment.Rarity.UNCOMMON, 2, 12);
     public static final PetEnchantment TETHERED_TELEPORT = new PetEnchantment("tethered_teleport", Enchantment.Rarity.COMMON, 1, 6);
     public static final PetEnchantment MUFFLED = new PetEnchantmentLootOnly("muffled", Enchantment.Rarity.VERY_RARE, 1, 7);
+    public static final PetEnchantment BLAZING_PROTECTION = new PetEnchantmentLootOnly("blazing_protection", Enchantment.Rarity.VERY_RARE, 3, 11);
     public static final PetEnchantment UNDEAD_CURSE = new PetEnchantmentCurse("undead_curse", Enchantment.Rarity.VERY_RARE);
     public static final PetEnchantment INFAMY_CURSE = new PetEnchantmentCurse("infamy_curse", Enchantment.Rarity.VERY_RARE);
     public static final PetEnchantment BLIGHT_CURSE = new PetEnchantmentCurse("blight_curse", Enchantment.Rarity.VERY_RARE);
@@ -73,10 +74,10 @@ public class DIEnchantmentRegistry {
             return e2 != POISON_RESISTANCE && e2 != FROST_FANG && e2 != AMPHIBIOUS;
         }
         if(e1 == IMMUNITY_FRAME){
-            return e2 != DEFLECTION;
+            return e2 != DEFLECTION && e2 != BLAZING_PROTECTION;
         }
         if(e1 == DEFLECTION){
-            return e2 != IMMUNITY_FRAME && e2 != DEFUSAL && e2 != PSYCHIC_WALL;
+            return e2 != IMMUNITY_FRAME && e2 != DEFUSAL && e2 != PSYCHIC_WALL && e2 != BLAZING_PROTECTION;
         }
         if(e1 == POISON_RESISTANCE){
             return e2 != FIREPROOF;
@@ -85,7 +86,7 @@ public class DIEnchantmentRegistry {
             return e2 != FROST_FANG && e2 != MAGNETIC && e2 != BUBBLING && e2 != SHADOW_HANDS;
         }
         if(e1 == FROST_FANG){
-            return e2 != CHAIN_LIGHTNING && e2 != FIREPROOF && e2 != BUBBLING && e2 != WARPING_BITE;
+            return e2 != CHAIN_LIGHTNING && e2 != FIREPROOF && e2 != BUBBLING && e2 != WARPING_BITE && e2 != BLAZING_PROTECTION;
         }
         if(e1 == MAGNETIC){
             return e2 != CHAIN_LIGHTNING && e2 != SHEPHERD && e2 != VAMPIRE && e2 != SHADOW_HANDS && e2 != PSYCHIC_WALL && e2 != INTIMIDATION;
@@ -103,7 +104,7 @@ public class DIEnchantmentRegistry {
             return e2 != MAGNETIC && e2 != ORE_SCENTING && e2 != PSYCHIC_WALL && e2 != BLIGHT_CURSE;
         }
         if(e1 == AMPHIBIOUS){
-            return e2 != FIREPROOF;
+            return e2 != FIREPROOF && e2 != BLAZING_PROTECTION;
         }
         if(e1 == VAMPIRE){
             return e2 != MAGNETIC && e2 != HEALTH_SIPHON && e2 != GLUTTONOUS;
@@ -140,6 +141,9 @@ public class DIEnchantmentRegistry {
         }
         if(e1 == MUFFLED){
             return e2 != DISK_JOCKEY;
+        }
+        if(e1 == BLAZING_PROTECTION){
+            return e2 != IMMUNITY_FRAME && e2 != DEFLECTION && e2 != AMPHIBIOUS && e2 != FROST_FANG;
         }
         return true;
     }

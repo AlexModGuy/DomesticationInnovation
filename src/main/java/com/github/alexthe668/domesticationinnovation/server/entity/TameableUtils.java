@@ -16,7 +16,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -57,6 +56,8 @@ public class TameableUtils {
     private static final String SHADOW_PUNCH_STRIKING = "PetShadowPunchStriking";
     private static final String JUKEBOX_FOLLOWER_UUID = "PetJukeboxFollowerUUID";
     private static final String JUKEBOX_FOLLOWER_DISC = "PetJukeboxFollowerDisc";
+    private static final String BLAZING_PROTECTION_BARS = "PetBlazingProtectionBars";
+    private static final String BLAZING_PROTECTION_COOLDOWN = "PetBlazingProtectionCooldown";
     private static final String HAS_PET_BED = "HasPetBed";
     private static final String PET_BED_X = "PetBedX";
     private static final String PET_BED_Y = "PetBedY";
@@ -423,6 +424,28 @@ public class TameableUtils {
     public static void setIntimidationCooldown(LivingEntity enchanted, int time) {
         CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
         tag.putInt(INTIMIDATION_COOLDOWN, time);
+        sync(enchanted, tag);
+    }
+
+    public static int getBlazingProtectionCooldown(LivingEntity enchanted) {
+        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
+        return tag.getInt(BLAZING_PROTECTION_COOLDOWN);
+    }
+
+    public static void setBlazingProtectionCooldown(LivingEntity enchanted, int time) {
+        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
+        tag.putInt(BLAZING_PROTECTION_COOLDOWN, time);
+        sync(enchanted, tag);
+    }
+
+    public static int getBlazingProtectionBars(LivingEntity enchanted) {
+        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
+        return tag.getInt(BLAZING_PROTECTION_BARS);
+    }
+
+    public static void setBlazingProtectionBars(LivingEntity enchanted, int time) {
+        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
+        tag.putInt(BLAZING_PROTECTION_BARS, time);
         sync(enchanted, tag);
     }
 

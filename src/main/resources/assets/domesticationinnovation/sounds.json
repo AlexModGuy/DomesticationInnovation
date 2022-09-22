@@ -130,5 +130,27 @@
       }
     ],
     "subtitle": "domesticationinnovation.sound.subtitle.psychic_wall_deflect"
+  },
+  "blazing_protection": {
+    "category": "neutral",
+    "sounds": [
+      {
+        "name": "mob/blaze/hit1",
+        "pitch": 1.5
+      },
+      {
+        "name": "mob/blaze/hit2",
+        "pitch": 1.5
+      },
+      {
+        "name": "mob/blaze/hit3",
+        "pitch": 1.5
+      },
+      {
+        "name": "mob/blaze/hit4",
+        "pitch": 1.5
+      }
+    ],
+    "subtitle": "domesticationinnovation.sound.subtitle.blazing_protection"
   }
 }

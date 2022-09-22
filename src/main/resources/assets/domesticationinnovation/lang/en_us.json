@@ -106,6 +106,8 @@
   "enchantment.domesticationinnovation.immaturity_curse.desc": "Pet appears and behaves as a baby version of itself, with reduced attack damage.",
   "enchantment.domesticationinnovation.muffled": "Muffled",
   "enchantment.domesticationinnovation.muffled.desc": "Pet will be silent and not emit vibrations when moving.",
+  "enchantment.domesticationinnovation.blazing_protection": "Blazing Protection",
+  "enchantment.domesticationinnovation.blazing_protection.desc": "Pet will be protected from damage by 2 blazing bars per level, which knockback and set attackers on fire.",
   "domesticationinnovation.sound.subtitle.collar_tag": "equipped Collar Tag",
   "domesticationinnovation.sound.subtitle.magnet_loop": "Magnet buzzes",
   "domesticationinnovation.sound.subtitle.chain_lightning": "Lightning zaps",
@@ -114,5 +116,6 @@
   "domesticationinnovation.sound.subtitle.pet_bed_uses": "Pet Bed adjusted",
   "domesticationinnovation.sound.subtitle.drum": "Command Drum beats",
   "domesticationinnovation.sound.subtitle.psychic_wall": "Psychic Wall hums",
-  "domesticationinnovation.sound.subtitle.psychic_wall_deflect": "Psychic Wall deflects"
+  "domesticationinnovation.sound.subtitle.psychic_wall_deflect": "Psychic Wall deflects",
+  "domesticationinnovation.sound.subtitle.blazing_protection": "Blazing bar dissapears"
 }

@@ -3,6 +3,7 @@ package com.github.alexthe668.domesticationinnovation.client.render;
 import com.github.alexthe666.citadel.client.render.LightningBoltData;
 import com.github.alexthe666.citadel.client.render.LightningRender;
 import com.github.alexthe668.domesticationinnovation.client.ClientProxy;
+import com.github.alexthe668.domesticationinnovation.client.model.BlazingBarModel;
 import com.github.alexthe668.domesticationinnovation.client.model.ShadowHandModel;
 import com.github.alexthe668.domesticationinnovation.server.enchantment.DIEnchantmentRegistry;
 import com.github.alexthe668.domesticationinnovation.server.entity.TameableUtils;
@@ -31,6 +32,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.client.ForgeRenderTypes;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -43,6 +45,8 @@ public class LayerPetOverlays extends RenderLayer {
     private static final Vec3[] CLOUD_OFFSETS = new Vec3[CLOUD_COUNT];
     private static final Vec3[] CLOUD_SCALES = new Vec3[CLOUD_COUNT];
     private static final ShadowHandModel SHADOW_HAND_MODEL = new ShadowHandModel();
+    private static final BlazingBarModel BLAZING_BAR_MODEL = new BlazingBarModel();
+    private static final ResourceLocation BLAZE_TEXTURE = new ResourceLocation("textures/entity/blaze.png");
     private static final Map<ResourceLocation, Integer> MODELS_TO_XSIZE = new HashMap<>();
     private static final Map<ResourceLocation, Integer> MODELS_TO_YSIZE = new HashMap<>();
 
@@ -243,6 +247,26 @@ public class LayerPetOverlays extends RenderLayer {
                     matrixStackIn.popPose();
                     matrixStackIn.popPose();
                 }
+            }
+
+            if (TameableUtils.hasEnchant(living, DIEnchantmentRegistry.BLAZING_PROTECTION)) {
+                int bars = TameableUtils.getBlazingProtectionBars(living);
+                float f1 = realAge * 7;
+                float seperation = 360F / (TameableUtils.getEnchantLevel(living, DIEnchantmentRegistry.BLAZING_PROTECTION) * 2F);
+                VertexConsumer vertexconsumer = bufferIn.getBuffer(ForgeRenderTypes.getUnlitTranslucent(BLAZE_TEXTURE));
+                matrixStackIn.pushPose();
+                matrixStackIn.mulPose(Vector3f.YN.rotationDegrees(f));
+                for(int i = 0; i < bars; i++){
+                    f1 += seperation;
+                    matrixStackIn.pushPose();
+                    matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(f1));
+                    float bob = (float) Math.sin(realAge * 0.6F + Math.toRadians(seperation * i)) * 0.15F - 0.07F;
+                    matrixStackIn.translate(0, 0.4F - entity.getBbHeight() * 0.5F - bob, -entity.getBbWidth() - 0.2F);
+                    BLAZING_BAR_MODEL.animateBar(f1);
+                    BLAZING_BAR_MODEL.renderToBuffer(matrixStackIn, vertexconsumer, 240, LivingEntityRenderer.getOverlayCoords((LivingEntity) entity, 0), 1, 1, 1, 1);
+                    matrixStackIn.popPose();
+                }
+                matrixStackIn.popPose();
             }
         }
     }
