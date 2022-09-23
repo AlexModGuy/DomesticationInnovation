@@ -47,6 +47,7 @@ public class DIEnchantmentRegistry {
     public static final PetEnchantment TETHERED_TELEPORT = new PetEnchantment("tethered_teleport", Enchantment.Rarity.COMMON, 1, 6);
     public static final PetEnchantment MUFFLED = new PetEnchantmentLootOnly("muffled", Enchantment.Rarity.VERY_RARE, 1, 7);
     public static final PetEnchantment BLAZING_PROTECTION = new PetEnchantmentLootOnly("blazing_protection", Enchantment.Rarity.VERY_RARE, 3, 11);
+    public static final PetEnchantment HEALING_AURA = new PetEnchantment("healing_aura", Enchantment.Rarity.UNCOMMON, 2, 15);
     public static final PetEnchantment UNDEAD_CURSE = new PetEnchantmentCurse("undead_curse", Enchantment.Rarity.VERY_RARE);
     public static final PetEnchantment INFAMY_CURSE = new PetEnchantmentCurse("infamy_curse", Enchantment.Rarity.VERY_RARE);
     public static final PetEnchantment BLIGHT_CURSE = new PetEnchantmentCurse("blight_curse", Enchantment.Rarity.VERY_RARE);
@@ -95,7 +96,7 @@ public class DIEnchantmentRegistry {
             return e2 != UNDEAD_CURSE;
         }
         if(e1 == HEALTH_SIPHON){
-            return e2 != HEALTH_BOOST && e2 != VAMPIRE && e2 != GLUTTONOUS;
+            return e2 != HEALTH_BOOST && e2 != VAMPIRE && e2 != GLUTTONOUS  && e2 != HEALING_AURA;
         }
         if(e1 == BUBBLING){
             return e2 != CHAIN_LIGHTNING && e2 != FROST_FANG && e2 != SHADOW_HANDS && e2 != WARPING_BITE;
@@ -107,16 +108,16 @@ public class DIEnchantmentRegistry {
             return e2 != FIREPROOF && e2 != BLAZING_PROTECTION;
         }
         if(e1 == VAMPIRE){
-            return e2 != MAGNETIC && e2 != HEALTH_SIPHON && e2 != GLUTTONOUS;
+            return e2 != MAGNETIC && e2 != HEALTH_SIPHON && e2 != GLUTTONOUS  && e2 != HEALING_AURA;
         }
         if(e1 == UNDEAD_CURSE){
             return e2 != TOTAL_RECALL;
         }
         if(e1 == SHADOW_HANDS){
-            return e2 != CHAIN_LIGHTNING && e2 != MAGNETIC && e2 != BUBBLING && e2 != DISK_JOCKEY;
+            return e2 != CHAIN_LIGHTNING && e2 != MAGNETIC && e2 != BUBBLING && e2 != DISK_JOCKEY && e2 != BLAZING_PROTECTION;
         }
         if(e1 == DISK_JOCKEY){
-            return e2 != SHADOW_HANDS && e2 != MUFFLED;
+            return e2 != SHADOW_HANDS && e2 != MUFFLED && e2 != BLAZING_PROTECTION;
         }
         if(e1 == DEFUSAL){
             return e2 != DEFLECTION;
@@ -143,7 +144,10 @@ public class DIEnchantmentRegistry {
             return e2 != DISK_JOCKEY;
         }
         if(e1 == BLAZING_PROTECTION){
-            return e2 != IMMUNITY_FRAME && e2 != DEFLECTION && e2 != AMPHIBIOUS && e2 != FROST_FANG;
+            return e2 != IMMUNITY_FRAME && e2 != DEFLECTION && e2 != AMPHIBIOUS && e2 != FROST_FANG && e2 != SHADOW_HANDS && e2 != DISK_JOCKEY;
+        }
+        if(e1 == HEALING_AURA){
+            return e2 != VAMPIRE && e2 != HEALTH_SIPHON;
         }
         return true;
     }

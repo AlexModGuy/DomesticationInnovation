@@ -58,6 +58,8 @@ public class TameableUtils {
     private static final String JUKEBOX_FOLLOWER_DISC = "PetJukeboxFollowerDisc";
     private static final String BLAZING_PROTECTION_BARS = "PetBlazingProtectionBars";
     private static final String BLAZING_PROTECTION_COOLDOWN = "PetBlazingProtectionCooldown";
+    private static final String HEALING_AURA_TIME = "PetHealingAuraTime";
+    private static final String HEALING_AURA_IMPULSE = "PetHealingAuraImpulse";
     private static final String HAS_PET_BED = "HasPetBed";
     private static final String PET_BED_X = "PetBedX";
     private static final String PET_BED_Y = "PetBedY";
@@ -68,7 +70,6 @@ public class TameableUtils {
     private static final String SAFE_PET_HEALTH = "SafePetHealth";
     private static final UUID HEALTH_BOOST_UUID = UUID.fromString("556E1665-8B10-40C8-8F9D-CF9B166EEEEE");
     private static final UUID SPEED_BOOST_UUID = UUID.fromString("ff465ded-9040-4eb5-93a1-7bbe97c31744");
-    private static final ResourceLocation INFAMY_ENCHANT_ATTRACTS = new ResourceLocation(DomesticationMod.MODID + ":infamy_target_attracted");
 
     public static boolean hasSameOwnerAs(LivingEntity tameable, Entity target) {
         return hasSameOwnerAsOneWay(tameable, target) || hasSameOwnerAsOneWay(target, tameable);
@@ -438,6 +439,29 @@ public class TameableUtils {
         sync(enchanted, tag);
     }
 
+    public static int getHealingAuraTime(LivingEntity enchanted) {
+        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
+        return tag.getInt(HEALING_AURA_TIME);
+    }
+
+    public static void setHealingAuraTime(LivingEntity enchanted, int time) {
+        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
+        tag.putInt(HEALING_AURA_TIME, time);
+        sync(enchanted, tag);
+    }
+
+
+    public static boolean getHealingAuraImpulse(LivingEntity enchanted) {
+        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
+        return tag.getBoolean(HEALING_AURA_IMPULSE);
+    }
+
+    public static void setHealingAuraImpulse(LivingEntity enchanted, boolean impulse) {
+        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
+        tag.putBoolean(HEALING_AURA_IMPULSE, impulse);
+        sync(enchanted, tag);
+    }
+
     public static int getBlazingProtectionBars(LivingEntity enchanted) {
         CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
         return tag.getInt(BLAZING_PROTECTION_BARS);
@@ -640,6 +664,16 @@ public class TameableUtils {
                 }
             }
         }
+    }
+
+    public static List<LivingEntity> getAuraHealables(LivingEntity pet){
+        Predicate<Entity> hurtAndOnTeam = (animal) -> hasSameOwnerAs((LivingEntity) animal, pet) && animal.distanceTo(pet) < 4 && ((LivingEntity) animal).getHealth() < ((LivingEntity) animal).getMaxHealth();
+        return pet.level.getEntitiesOfClass(LivingEntity.class, pet.getBoundingBox().inflate(4, 4, 4), EntitySelector.NO_SPECTATORS.and(hurtAndOnTeam));
+    }
+
+    public static List<LivingEntity> getNearbyHealers(LivingEntity hurtOwner){
+        Predicate<Entity> healer = (animal) -> hasSameOwnerAs((LivingEntity) animal, hurtOwner) && hasEnchant((LivingEntity) animal, DIEnchantmentRegistry.HEALING_AURA) && getHealingAuraTime((LivingEntity) animal) == 0;
+        return hurtOwner.level.getEntitiesOfClass(LivingEntity.class, hurtOwner.getBoundingBox().inflate(16, 4, 16), EntitySelector.NO_SPECTATORS.and(healer));
     }
 
     public static float getFallDistance(LivingEntity enchanted) {

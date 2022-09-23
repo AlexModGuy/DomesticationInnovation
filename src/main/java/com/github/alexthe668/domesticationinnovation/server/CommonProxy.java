@@ -32,6 +32,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -451,6 +453,30 @@ public class CommonProxy {
                     TameableUtils.setBlazingProtectionCooldown(event.getEntity(), cooldown);
                 }
             }
+            if(TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.HEALING_AURA)){
+               int time = TameableUtils.getHealingAuraTime(event.getEntity());
+               if(time > 0){
+                   List<LivingEntity> hurtNearby = TameableUtils.getAuraHealables(event.getEntity());
+                   for(LivingEntity needsHealing : hurtNearby){
+                       if(!needsHealing.hasEffect(MobEffects.REGENERATION)){
+                           needsHealing.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, TameableUtils.getEnchantLevel(event.getEntity(), DIEnchantmentRegistry.HEALING_AURA) - 1));
+                       }
+                   }
+                   time--;
+                   if(time == 0){
+                       time = -600 - event.getEntity().getRandom().nextInt(600);
+                   }
+               }else if(time < 0){
+                   time++;
+               }else if ((event.getEntity().tickCount + event.getEntity().getId()) % 200 == 0 || TameableUtils.getHealingAuraImpulse(event.getEntity())) {
+                   List<LivingEntity> hurtNearby = TameableUtils.getAuraHealables(event.getEntity());
+                   if(!hurtNearby.isEmpty()){
+                       time = 200;
+                   }
+                   TameableUtils.setHealingAuraImpulse(event.getEntity(), false);
+               }
+                TameableUtils.setHealingAuraTime(event.getEntity(), time);
+            }
         }
 
         if (frozenTime > 0) {
@@ -610,6 +636,14 @@ public class CommonProxy {
                         event.getEntity().playSound(soundevent, 1.0F, 1.0F);
                         break;
                     }
+                }
+            }
+        }
+        if(!event.isCanceled()){
+            List<LivingEntity> nearbyHealers = TameableUtils.getNearbyHealers(event.getEntity());
+            if(!nearbyHealers.isEmpty()){
+                for(LivingEntity healer : nearbyHealers){
+                    TameableUtils.setHealingAuraImpulse(healer, true);
                 }
             }
         }

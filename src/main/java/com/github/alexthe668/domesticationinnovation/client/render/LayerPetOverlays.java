@@ -2,6 +2,7 @@ package com.github.alexthe668.domesticationinnovation.client.render;
 
 import com.github.alexthe666.citadel.client.render.LightningBoltData;
 import com.github.alexthe666.citadel.client.render.LightningRender;
+import com.github.alexthe668.domesticationinnovation.DomesticationMod;
 import com.github.alexthe668.domesticationinnovation.client.ClientProxy;
 import com.github.alexthe668.domesticationinnovation.client.model.BlazingBarModel;
 import com.github.alexthe668.domesticationinnovation.client.model.ShadowHandModel;
@@ -11,6 +12,7 @@ import com.github.alexthe668.domesticationinnovation.server.item.DIItemRegistry;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.datafixers.util.Pair;
+import com.mojang.math.Matrix3f;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
 import com.mojang.math.Vector4f;
@@ -47,6 +49,7 @@ public class LayerPetOverlays extends RenderLayer {
     private static final ShadowHandModel SHADOW_HAND_MODEL = new ShadowHandModel();
     private static final BlazingBarModel BLAZING_BAR_MODEL = new BlazingBarModel();
     private static final ResourceLocation BLAZE_TEXTURE = new ResourceLocation("textures/entity/blaze.png");
+    private static final ResourceLocation AURA_TEXTURE = new ResourceLocation(DomesticationMod.MODID, "textures/healing_aura.png");
     private static final Map<ResourceLocation, Integer> MODELS_TO_XSIZE = new HashMap<>();
     private static final Map<ResourceLocation, Integer> MODELS_TO_YSIZE = new HashMap<>();
 
@@ -106,6 +109,10 @@ public class LayerPetOverlays extends RenderLayer {
             addVertexPairAlex(vertexconsumer, matrix4f, f, f1, f2, i, j, k, l, 0.2F, width, width, width, i1, false);
         }
         poseStack.popPose();
+    }
+
+    private static void vertex(VertexConsumer p_114090_, Matrix4f p_114091_, Matrix3f p_114092_, int p_114093_, float p_114094_, int p_114095_, int p_114096_, int p_114097_, float alpha) {
+        p_114090_.vertex(p_114091_, p_114094_ - 0.5F, (float) p_114095_ - 0.5F, 0.0F).color(255, 255, 255, alpha * 255).uv((float) p_114096_, (float) p_114097_).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(p_114093_).normal(p_114092_, 0.0F, 1.0F, 0.0F).endVertex();
     }
 
     @Override
@@ -248,7 +255,6 @@ public class LayerPetOverlays extends RenderLayer {
                     matrixStackIn.popPose();
                 }
             }
-
             if (TameableUtils.hasEnchant(living, DIEnchantmentRegistry.BLAZING_PROTECTION)) {
                 int bars = TameableUtils.getBlazingProtectionBars(living);
                 float f1 = realAge * 7;
@@ -256,7 +262,7 @@ public class LayerPetOverlays extends RenderLayer {
                 VertexConsumer vertexconsumer = bufferIn.getBuffer(ForgeRenderTypes.getUnlitTranslucent(BLAZE_TEXTURE));
                 matrixStackIn.pushPose();
                 matrixStackIn.mulPose(Vector3f.YN.rotationDegrees(f));
-                for(int i = 0; i < bars; i++){
+                for (int i = 0; i < bars; i++) {
                     f1 += seperation;
                     matrixStackIn.pushPose();
                     matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(f1));
@@ -268,12 +274,34 @@ public class LayerPetOverlays extends RenderLayer {
                 }
                 matrixStackIn.popPose();
             }
+            if (TameableUtils.hasEnchant(living, DIEnchantmentRegistry.HEALING_AURA)) {
+                int t = TameableUtils.getHealingAuraTime(living);
+                if (t > 0) {
+                    float time = t > 20 ? 200 - Math.max(180, t - partialTicks) : t - partialTicks;
+                    float healscale = (Math.min(time, 20) / 20F) * 2.2F;
+                    matrixStackIn.pushPose();
+                    matrixStackIn.translate(0, 1.8F - entity.getBbHeight() * 0.5F, 0);
+                    matrixStackIn.mulPose(Vector3f.YN.rotationDegrees(f));
+                    matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(realAge * 3F));
+                    matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(90F));
+                    matrixStackIn.scale(3 * healscale, 3 * healscale, 3 * healscale);
+                    VertexConsumer vertexconsumer = bufferIn.getBuffer(DIRenderTypes.HEALING_AURA);
+                    PoseStack.Pose posestack$pose = matrixStackIn.last();
+                    Matrix4f matrix4f = posestack$pose.pose();
+                    Matrix3f matrix3f = posestack$pose.normal();
+                    vertex(vertexconsumer, matrix4f, matrix3f, 240, 0.0F, 0, 0, 1, 1);
+                    vertex(vertexconsumer, matrix4f, matrix3f, 240, 1.0F, 0, 1, 1, 1);
+                    vertex(vertexconsumer, matrix4f, matrix3f, 240, 1.0F, 1, 1, 0, 1);
+                    vertex(vertexconsumer, matrix4f, matrix3f, 240, 0.0F, 1, 0, 0, 1);
+                    matrixStackIn.popPose();
+                }
+            }
         }
     }
 
     private float getPunchFor(LivingEntity living, int i, float partialTicks) {
         int[] arr = TameableUtils.getShadowPunchTimes(living);
-        if(arr.length > i){
+        if (arr.length > i) {
             if (ClientProxy.shadowPunchRenderData.containsKey(living) && ClientProxy.shadowPunchRenderData.get(living).length > i) {
                 int[] prevArr = ClientProxy.shadowPunchRenderData.get(living);
                 return prevArr[i] + (arr[i] - prevArr[i]) * partialTicks;
@@ -299,5 +327,4 @@ public class LayerPetOverlays extends RenderLayer {
         p_173697_.vertex(p_173696_, p_173699_, p_173701_, p_173704_).overlayCoords(240).endVertex();
         p_173697_.vertex(p_173696_, p_173698_, p_173701_, p_173705_).overlayCoords(240).endVertex();
     }
-
 }

@@ -108,6 +108,8 @@
   "enchantment.domesticationinnovation.muffled.desc": "Pet will be silent and not emit vibrations when moving.",
   "enchantment.domesticationinnovation.blazing_protection": "Blazing Protection",
   "enchantment.domesticationinnovation.blazing_protection.desc": "Pet will be protected from damage by 2 blazing bars per level, which knockback and set attackers on fire.",
+  "enchantment.domesticationinnovation.healing_aura": "Healing Aura",
+  "enchantment.domesticationinnovation.healing_aura.desc": "Pet will ocassionally heal owner and other pets around it, level determines strength of healing effect.",
   "domesticationinnovation.sound.subtitle.collar_tag": "equipped Collar Tag",
   "domesticationinnovation.sound.subtitle.magnet_loop": "Magnet buzzes",
   "domesticationinnovation.sound.subtitle.chain_lightning": "Lightning zaps",
