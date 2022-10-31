@@ -25,6 +25,8 @@ public class DIConfig {
     public final ForgeConfigSpec.BooleanValue rabbitsScareRavagers;
     public final ForgeConfigSpec.BooleanValue animalTamerVillager;
     public final ForgeConfigSpec.IntValue petstoreVillageWeight;
+
+    public final ForgeConfigSpec.BooleanValue petCurseEnchantmentsLootOnly;
     public final ForgeConfigSpec.DoubleValue sinisterCarrotLootChance;
     public final ForgeConfigSpec.DoubleValue bubblingLootChance;
     public final ForgeConfigSpec.DoubleValue vampirismLootChance;
@@ -52,6 +54,7 @@ public class DIConfig {
         petstoreVillageWeight = builder.comment("the spawn weight of the pet store in villages, set to 0 to disable it entirely").translation("petstore_village_weight").defineInRange("petstore_village_weight", 17, 0, 1000);
         builder.pop();
         builder.push("loot");
+        petCurseEnchantmentsLootOnly = builder.comment("true if pet curse enchantments should only appear in loot, and not the enchanting table.").translation("pet_curse_enchantments_loot_only").define("pet_curse_enchantments_loot_only", true);
         sinisterCarrotLootChance = builder.comment("percent chance of woodland mansion loot table containing sinister carrot:").translation("sinister_carrot_loot_chance").defineInRange("sinister_carrot_loot_chance", 0.3D, 0.0, 1.0D);
         bubblingLootChance = builder.comment("percent chance of burried treasure loot table containing Bubbling book:").translation("bubbling_loot_chance").defineInRange("bubbling_loot_chance", 0.65D, 0.0, 1.0D);
         vampirismLootChance = builder.comment("percent chance of woodland mansion loot table containing Vampire book:").translation("vampirism_loot_chance").defineInRange("vampirism_loot_chance", 0.22D, 0.0, 1.0D);

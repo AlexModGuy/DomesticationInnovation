@@ -41,6 +41,8 @@ public class DIBlockRegistry {
 
     public static final RegistryObject<Block> DRUM = registerBlockAndItem("drum", () -> new DrumBlock());
 
+    public static final RegistryObject<Block> WAYWARD_LANTERN = registerBlockAndItem("wayward_lantern", () -> new WaywardLanternBlock());
+
 
     public static RegistryObject<Block> registerBlockAndItem(String name, Supplier<Block> block){
         RegistryObject<Block> blockObj = DEF_REG.register(name, block);

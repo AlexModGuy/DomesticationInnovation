@@ -17,6 +17,10 @@ public class DITileEntityRegistry {
             DIBlockRegistry.DRUM.get()
     )));
 
+    public static final RegistryObject<BlockEntityType<WaywardLanternBlockEntity>> WAYWARD_LANTERN = DEF_REG.register("wayward_lantern", () -> build(BlockEntityType.Builder.of(WaywardLanternBlockEntity::new,
+            DIBlockRegistry.WAYWARD_LANTERN.get()
+    )));
+
     public static BlockEntityType build(BlockEntityType.Builder builder){
         return (BlockEntityType) builder.build(null);
     }

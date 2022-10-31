@@ -13,6 +13,8 @@ import com.github.alexthe668.domesticationinnovation.server.item.DeedOfOwnership
 import com.github.alexthe668.domesticationinnovation.server.misc.*;
 import com.github.alexthe668.domesticationinnovation.server.misc.trades.*;
 import com.google.common.collect.ImmutableSet;
+import com.mojang.datafixers.util.Pair;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -68,6 +70,7 @@ import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.world.ForgeChunkManager;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.*;
@@ -97,6 +100,19 @@ public class CommonProxy {
     public void init() {
     }
 
+    public void serverInit() {
+        ForgeChunkManager.setForcedChunkLoadingCallback(DomesticationMod.MODID, this::removeAllChunkTickets);
+    }
+
+    private void removeAllChunkTickets(ServerLevel serverLevel, ForgeChunkManager.TicketHelper ticketHelper) {
+        int i = 0;
+        for(Map.Entry<UUID, Pair<LongSet, LongSet>> entry : ticketHelper.getEntityTickets().entrySet()){
+            ticketHelper.removeAllTickets(entry.getKey());
+            i++;
+        }
+        DomesticationMod.LOGGER.debug("Removed " + i + " chunkloading tickets");
+    }
+
     public void clientInit() {
     }
 
@@ -114,15 +130,31 @@ public class CommonProxy {
             if (TameableUtils.hasEnchant(living, DIEnchantmentRegistry.HEALTH_BOOST)) {
                 living.setHealth((float) Math.max(living.getHealth(), TameableUtils.getSafePetHealth(living)));
             }
+            if(living.isAlive() && TameableUtils.isTamed(living)){
+                DIWorldData data = DIWorldData.get(living.level);
+                if(data != null){
+                    data.removeMatchingLanternRequests(living.getUUID());
+                }
+            }
         }
     }
 
     @SubscribeEvent
     public void onEntityLeaveWorld(EntityLeaveLevelEvent event) {
-        if (event.getEntity() instanceof LivingEntity living && TameableUtils.couldBeTamed(living)) {
-            if (TameableUtils.hasEnchant(living, DIEnchantmentRegistry.HEALTH_BOOST)) {
+        if (event.getEntity() instanceof LivingEntity living) {
+            if(!living.level.isClientSide &&  living.isAlive() && TameableUtils.isTamed(living) && TameableUtils.shouldUnloadToLantern(living)){
+                UUID ownerUUID = TameableUtils.getOwnerUUIDOf(event.getEntity());
+                String saveName = event.getEntity().hasCustomName() ? event.getEntity().getCustomName().getString() : "";
+                DIWorldData data = DIWorldData.get(living.level);
+                if(data != null){
+                    LanternRequest request = new LanternRequest(living.getUUID(), Registry.ENTITY_TYPE.getKey(event.getEntity().getType()).toString(), ownerUUID, living.blockPosition(), event.getEntity().level.dayTime(), saveName);
+                    data.addLanternRequest(request);
+                }
+            }
+            if (TameableUtils.couldBeTamed(living) && TameableUtils.hasEnchant(living, DIEnchantmentRegistry.HEALTH_BOOST)) {
                 TameableUtils.setSafePetHealth(living, living.getHealth());
             }
+
         }
     }
 
@@ -360,6 +392,9 @@ public class CommonProxy {
             }
             if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.BLIGHT_CURSE)) {
                 TameableUtils.destroyRandomPlants(event.getEntity());
+            }
+            if(TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.REJUVENATION)){
+                TameableUtils.absorbExpOrbs(event.getEntity());
             }
             if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.VOID_CLOUD) && !event.getEntity().isInWaterOrBubble() && event.getEntity().fallDistance > 3.0F && !event.getEntity().isOnGround()) {
                 Entity owner = TameableUtils.getOwnerOf(event.getEntity());

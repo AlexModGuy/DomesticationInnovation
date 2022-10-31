@@ -8,6 +8,10 @@ public class PetEnchantmentCurse extends PetEnchantment {
         super(name, r, 1, 25);
     }
 
+    public int getMinCost(int cost) {
+        return 25;
+    }
+
     public int getMaxCost(int cost) {
         return 50;
     }
@@ -15,6 +19,10 @@ public class PetEnchantmentCurse extends PetEnchantment {
     public int getMaxLevel() {
         return 1;
     }
+    public boolean isTreasureOnly() {
+        return DomesticationMod.CONFIG.petCurseEnchantmentsLootOnly.get();
+    }
+
 
     public boolean isCurse() {
         return true;

@@ -68,6 +68,7 @@ public class DomesticationMod {
     }
 
     private void setup(final FMLCommonSetupEvent event) {
+        event.enqueueWork(() -> PROXY.serverInit());
     }
 
 

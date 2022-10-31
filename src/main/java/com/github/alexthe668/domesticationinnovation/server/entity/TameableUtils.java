@@ -104,6 +104,29 @@ public class TameableUtils {
         return false;
     }
 
+    public static boolean shouldUnloadToLantern(LivingEntity tameable) {
+        if (DomesticationMod.CONFIG.trinaryCommandSystem.get() && tameable instanceof IComandableMob commandableMob) {
+            System.out.println(commandableMob.getCommand());
+            return commandableMob.getCommand() == 2;
+        } else {
+            CompoundTag tag = new CompoundTag();
+            tameable.addAdditionalSaveData(tag);
+            int command = -1;
+            //compat with alexs mobs
+            for (String s : tag.getAllKeys()) {
+                if (s.endsWith("Command") && tag.contains(s, 1)) {
+                    command = tag.getInt(s);
+                }
+            }
+            if (command != -1) {
+                return command == 1;
+            } else if (tameable instanceof TamableAnimal animal) {
+                return !animal.isOrderedToSit();
+            }
+        }
+        return false;
+    }
+
     public static boolean isPetOf(Player player, Entity entity) {
         return entity != null && (entity.isAlliedTo(player) || hasSameOwnerAsOneWay(entity, player));
     }
@@ -128,6 +151,7 @@ public class TameableUtils {
     public static boolean couldBeTamed(Entity entity) {
         return entity instanceof ModifedToBeTameable || entity instanceof TamableAnimal;
     }
+
 
     public static Entity getOwnerOf(Entity entity) {
         if (entity instanceof ModifedToBeTameable) {
@@ -171,7 +195,7 @@ public class TameableUtils {
         int speedExtra = getEnchantLevel(enchanted, DIEnchantmentRegistry.SPEEDSTER);
         AttributeInstance health = enchanted.getAttribute(Attributes.MAX_HEALTH);
         AttributeInstance speed = enchanted.getAttribute(Attributes.MOVEMENT_SPEED);
-        if(hasEnchant(enchanted, DIEnchantmentRegistry.IMMATURITY_CURSE) || prevEnchants != null && prevEnchants.keySet().contains(ForgeRegistries.ENCHANTMENTS.getKey(DIEnchantmentRegistry.IMMATURITY_CURSE))){
+        if (hasEnchant(enchanted, DIEnchantmentRegistry.IMMATURITY_CURSE) || prevEnchants != null && prevEnchants.keySet().contains(ForgeRegistries.ENCHANTMENTS.getKey(DIEnchantmentRegistry.IMMATURITY_CURSE))) {
             //change pose to update client
             enchanted.setPose(Pose.FALL_FLYING);
             enchanted.refreshDimensions();
@@ -254,7 +278,7 @@ public class TameableUtils {
         Map<ResourceLocation, Integer> map = getEnchants(entity);
         if (map != null) {
             for (Map.Entry<ResourceLocation, Integer> entry : map.entrySet()) {
-                if(DomesticationMod.CONFIG.isEnchantEnabled(entry.getKey().getPath())){
+                if (DomesticationMod.CONFIG.isEnchantEnabled(entry.getKey().getPath())) {
                     boolean isCurse = entry.getKey().getPath().contains("curse");
                     list.add(Component.translatable("enchantment." + entry.getKey().getNamespace() + "." + entry.getKey().getPath()).append(Component.literal(" ")).append(Component.translatable("enchantment.level." + entry.getValue())).withStyle(isCurse ? ChatFormatting.RED : ChatFormatting.AQUA));
                 }
@@ -560,21 +584,21 @@ public class TameableUtils {
             Predicate<Entity> notOnTeamAndMonster = (animal) -> animal instanceof Monster && !hasSameOwnerAs((LivingEntity) animal, scary) && animal.distanceTo(scary) > 3 + scary.getBbWidth() * 1.6F;
             List<PathfinderMob> list = scary.level.getEntitiesOfClass(PathfinderMob.class, scary.getBoundingBox().inflate(10 * level, 8 * level, 10 * level), EntitySelector.NO_SPECTATORS.and(notOnTeamAndMonster));
             list.sort(Comparator.comparingDouble(scary::distanceToSqr));
-            if(!list.isEmpty()){
-                if(getIntimidationCooldown(scary) > 0 && !interval){
+            if (!list.isEmpty()) {
+                if (getIntimidationCooldown(scary) > 0 && !interval) {
                     setIntimidationCooldown(scary, getIntimidationCooldown(scary) - 1);
-                }else {
+                } else {
                     Vec3 rots = list.get(0).getEyePosition().subtract(scary.getEyePosition()).normalize();
                     float f = Mth.sqrt((float) (rots.x * rots.x + rots.z * rots.z));
-                    double yRot = Math.atan2(-rots.z, -rots.x) * (double)(180F / (float)Math.PI) + 90F;
-                    double xRot = Math.atan2(-rots.y, f) * (double)(180F / (float)Math.PI);
+                    double yRot = Math.atan2(-rots.z, -rots.x) * (double) (180F / (float) Math.PI) + 90F;
+                    double xRot = Math.atan2(-rots.y, f) * (double) (180F / (float) Math.PI);
                     scary.level.addParticle(DIParticleRegistry.INTIMIDATION.get(), scary.getX(), scary.getY(), scary.getZ(), scary.getId(), xRot, yRot);
                     setIntimidationCooldown(scary, 70 * level);
-                    if(scary instanceof Mob){
+                    if (scary instanceof Mob) {
                         ((Mob) scary).playAmbientSound();
                     }
                 }
-                for(PathfinderMob monster : list){
+                for (PathfinderMob monster : list) {
                     Vec3 vec = LandRandomPos.getPosAway(monster, 11 * level, 7, scary.position());
                     if (vec != null) {
                         monster.getNavigation().moveTo(vec.x, vec.y, vec.z, 1.5D);
@@ -586,11 +610,11 @@ public class TameableUtils {
 
     public static void detectRandomOres(LivingEntity attractor, int interval, int range, int effectLength, int maxOres) {
         int tick = (attractor.tickCount + attractor.getId()) % interval;
-        if(tick <= 30){
+        if (tick <= 30) {
             attractor.xRotO = attractor.getXRot();
-            attractor.setXRot((float)Math.sin(tick * 0.6F) * 30F);
+            attractor.setXRot((float) Math.sin(tick * 0.6F) * 30F);
             Vec3 look = attractor.getEyePosition().add(attractor.getViewVector(1.0F).scale(attractor.getBbWidth()));
-            for(int i = 0; i < 3; i++){
+            for (int i = 0; i < 3; i++) {
                 double x = attractor.getRandomX(2.0F);
                 double y = attractor.position().y;
                 double z = attractor.getRandomZ(2.0F);
@@ -601,22 +625,22 @@ public class TameableUtils {
             List<BlockPos> ores = new ArrayList<>();
             BlockPos blockpos = attractor.blockPosition();
             int half = range / 2;
-            for(int i = 0; i <= half && i >= -half; i = (i <= 0 ? 1 : 0) - i) {
-                for(int j = 0; j <= range && j >= -range; j = (j <= 0 ? 1 : 0) - j) {
-                    for(int k = 0; k <= range && k >= -range; k = (k <= 0 ? 1 : 0) - k) {
+            for (int i = 0; i <= half && i >= -half; i = (i <= 0 ? 1 : 0) - i) {
+                for (int j = 0; j <= range && j >= -range; j = (j <= 0 ? 1 : 0) - j) {
+                    for (int k = 0; k <= range && k >= -range; k = (k <= 0 ? 1 : 0) - k) {
                         BlockPos offset = blockpos.offset(j, i, k);
                         BlockState state = attractor.getLevel().getBlockState(offset);
                         if (state.is(Tags.Blocks.ORES)) {
                             if (ores.size() < maxOres) {
                                 ores.add(offset);
-                            }else{
+                            } else {
                                 break;
                             }
                         }
                     }
                 }
             }
-            for(BlockPos ore : ores){
+            for (BlockPos ore : ores) {
                 HighlightedBlockEntity highlight = DIEntityRegistry.HIGHLIGHTED_BLOCK.get().create(attractor.level);
                 highlight.setPos(Vec3.atBottomCenterOf(ore));
                 highlight.setLifespan(effectLength);
@@ -636,42 +660,42 @@ public class TameableUtils {
             int half = range / 2;
             RandomSource r = living.getRandom();
             int maxPlants = 2 + r.nextInt(2);
-            for(int i = 0; i <= half && i >= -half; i = (i <= 0 ? 1 : 0) - i) {
-                for(int j = 0; j <= range && j >= -range; j = (j <= 0 ? 1 : 0) - j) {
-                    for(int k = 0; k <= range && k >= -range; k = (k <= 0 ? 1 : 0) - k) {
+            for (int i = 0; i <= half && i >= -half; i = (i <= 0 ? 1 : 0) - i) {
+                for (int j = 0; j <= range && j >= -range; j = (j <= 0 ? 1 : 0) - j) {
+                    for (int k = 0; k <= range && k >= -range; k = (k <= 0 ? 1 : 0) - k) {
                         BlockPos offset = blockpos.offset(j, i, k);
                         BlockState state = living.getLevel().getBlockState(offset);
                         if (!state.isAir() && r.nextInt(4) == 0) {
-                            if(state.is(BlockTags.FLOWERS) || state.is(BlockTags.REPLACEABLE_PLANTS)|| state.is(BlockTags.CROPS)){
+                            if (state.is(BlockTags.FLOWERS) || state.is(BlockTags.REPLACEABLE_PLANTS) || state.is(BlockTags.CROPS)) {
                                 plants.add(offset);
-                            }else if(state.is(BlockTags.DIRT) && !state.is(Blocks.DIRT) && !state.is(Blocks.COARSE_DIRT) || state.is(Blocks.FARMLAND)){
+                            } else if (state.is(BlockTags.DIRT) && !state.is(Blocks.DIRT) && !state.is(Blocks.COARSE_DIRT) || state.is(Blocks.FARMLAND)) {
                                 grasses.add(offset);
                             }
                         }
                     }
                 }
             }
-            for(BlockPos plant : plants){
+            for (BlockPos plant : plants) {
                 living.getLevel().setBlockAndUpdate(plant, Blocks.AIR.defaultBlockState());
-                for(int i = 0; i < 1 + r.nextInt(2); i++){
+                for (int i = 0; i < 1 + r.nextInt(2); i++) {
                     living.getLevel().addParticle(DIParticleRegistry.BLIGHT.get(), plant.getX() + r.nextFloat(), plant.getY() + r.nextFloat(), plant.getZ() + r.nextFloat(), 0, 0.08F, 0);
                 }
             }
-            for(BlockPos dirt : grasses){
+            for (BlockPos dirt : grasses) {
                 living.getLevel().setBlockAndUpdate(dirt, r.nextBoolean() ? Blocks.COARSE_DIRT.defaultBlockState() : Blocks.DIRT.defaultBlockState());
-                for(int i = 0; i < 1 + r.nextInt(2); i++) {
+                for (int i = 0; i < 1 + r.nextInt(2); i++) {
                     living.getLevel().addParticle(DIParticleRegistry.BLIGHT.get(), dirt.getX() + r.nextFloat(), dirt.getY() + 1, dirt.getZ() + r.nextFloat(), 0, 0.08F, 0);
                 }
             }
         }
     }
 
-    public static List<LivingEntity> getAuraHealables(LivingEntity pet){
+    public static List<LivingEntity> getAuraHealables(LivingEntity pet) {
         Predicate<Entity> hurtAndOnTeam = (animal) -> hasSameOwnerAs((LivingEntity) animal, pet) && animal.distanceTo(pet) < 4 && ((LivingEntity) animal).getHealth() < ((LivingEntity) animal).getMaxHealth();
         return pet.level.getEntitiesOfClass(LivingEntity.class, pet.getBoundingBox().inflate(4, 4, 4), EntitySelector.NO_SPECTATORS.and(hurtAndOnTeam));
     }
 
-    public static List<LivingEntity> getNearbyHealers(LivingEntity hurtOwner){
+    public static List<LivingEntity> getNearbyHealers(LivingEntity hurtOwner) {
         Predicate<Entity> healer = (animal) -> hasSameOwnerAs((LivingEntity) animal, hurtOwner) && hasEnchant((LivingEntity) animal, DIEnchantmentRegistry.HEALING_AURA) && getHealingAuraTime((LivingEntity) animal) == 0;
         return hurtOwner.level.getEntitiesOfClass(LivingEntity.class, hurtOwner.getBoundingBox().inflate(16, 4, 16), EntitySelector.NO_SPECTATORS.and(healer));
     }
@@ -713,12 +737,38 @@ public class TameableUtils {
 
     public static boolean isValidTeleporter(LivingEntity owner, Mob animal) {
         if (hasEnchant(animal, DIEnchantmentRegistry.TETHERED_TELEPORT)) {
-            if(animal instanceof IComandableMob commandableMob){
+            if (animal instanceof IComandableMob commandableMob) {
                 return commandableMob.getCommand() == 2;
-            }else if(animal instanceof TamableAnimal tame){
+            } else if (animal instanceof TamableAnimal tame) {
                 return !tame.isOrderedToSit() && animal.distanceTo(owner) < 10;
             }
         }
         return false;
+    }
+
+    public static void absorbExpOrbs(LivingEntity living) {
+        if (living.getHealth() < living.getMaxHealth() && !living.level.isClientSide) {
+            for (ExperienceOrb experienceorb : living.level.getEntitiesOfClass(ExperienceOrb.class, living.getBoundingBox().inflate(3D))) {
+                if (living.getHealth() >= living.getMaxHealth()) {
+                    break;
+                }
+                Vec3 vec3 = new Vec3(living.getX() - experienceorb.getX(), living.getY() + (double) living.getEyeHeight() / 2.0D - experienceorb.getY(), living.getZ() - experienceorb.getZ());
+                double d0 = vec3.lengthSqr();
+                if (d0 < 2.0D) {
+                    float h = living.getHealth() + experienceorb.value;
+                    living.setHealth(h);
+                    if (h - living.getMaxHealth() > 0) {
+                        experienceorb.value = (int) Math.floor(h - living.getMaxHealth());
+                        break;
+                    } else {
+                        experienceorb.discard();
+                    }
+                }
+                if (d0 < 64.0D) {
+                    double d1 = 1.0D - Math.sqrt(d0) / 8.0D;
+                    experienceorb.setDeltaMovement(experienceorb.getDeltaMovement().add(vec3.normalize().scale(d1 * d1 * 0.5D)));
+                }
+            }
+        }
     }
 }

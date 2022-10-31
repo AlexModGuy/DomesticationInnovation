@@ -20,11 +20,11 @@ public class PetEnchantment extends Enchantment {
     }
 
     public int getMinCost(int i) {
-        return minXP + (i - 1) * 10;
+        return minXP + (i - 1) * minXP;
     }
 
     public int getMaxCost(int i) {
-        return super.getMinCost(i) + 30;
+        return super.getMinCost(i) + 5;
     }
 
     public int getMaxLevel() {

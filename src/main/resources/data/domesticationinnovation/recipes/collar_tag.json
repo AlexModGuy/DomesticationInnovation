@@ -9,7 +9,7 @@
       "item": "minecraft:chain"
     },
     "C": {
-      "item": "minecraft:copper_ingot"
+      "tag": "forge:ingots/copper"
     }
   },
   "result": {

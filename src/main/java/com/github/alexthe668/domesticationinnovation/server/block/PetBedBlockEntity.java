@@ -31,7 +31,7 @@ public class PetBedBlockEntity extends BlockEntity {
         if(time == 1){
             DIWorldData data = DIWorldData.get(level);
             if(data != null){
-               List<RespawnRequest> requestList = data.getRequestsFor(level, pos);
+               List<RespawnRequest> requestList = data.getRespawnRequestsFor(level, pos);
                for(RespawnRequest request : requestList){
                     if(addAndRemoveEntity(level, pos, state.getValue(PetBedBlock.FACING), request)){
                         data.removeRespawnRequest(request);
@@ -44,7 +44,7 @@ public class PetBedBlockEntity extends BlockEntity {
     public void removeAllRequestsFor(@Nullable Player message){
         DIWorldData data = DIWorldData.get(level);
         if(data != null){
-            List<RespawnRequest> requestList = data.getRequestsFor(level, this.getBlockPos());
+            List<RespawnRequest> requestList = data.getRespawnRequestsFor(level, this.getBlockPos());
             for(RespawnRequest request : requestList){
                 data.removeRespawnRequest(request);
                 if(message != null){

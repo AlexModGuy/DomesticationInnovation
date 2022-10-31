@@ -14,7 +14,6 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -38,10 +37,7 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.event.InputEvent;
-import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
-import net.minecraftforge.client.event.RenderNameTagEvent;
+import net.minecraftforge.client.event.*;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
@@ -125,6 +121,7 @@ public class ClientProxy extends CommonProxy {
         event.register(DIParticleRegistry.PSYCHIC_WALL.get(), ParticlePsychicWall.Factory::new);
         event.register(DIParticleRegistry.INTIMIDATION.get(), new ParticleIntimidation.Factory());
         event.register(DIParticleRegistry.BLIGHT.get(), ParticleBlight.Factory::new);
+        event.register(DIParticleRegistry.LANTERN_BUGS.get(), ParticleLanternBugs.Factory::new);
     }
 
     @SubscribeEvent
@@ -247,4 +244,6 @@ public class ClientProxy extends CommonProxy {
             }
         }
     }
+
+
 }
