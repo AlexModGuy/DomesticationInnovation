@@ -241,7 +241,7 @@ public class CommonProxy {
     @SubscribeEvent
     public void onLivingUpdate(LivingEvent.LivingTickEvent event) {
         int frozenTime = TameableUtils.getFrozenTime(event.getEntity());
-        if (TameableUtils.couldBeTamed(event.getEntity())) {
+        if (TameableUtils.couldBeTamed(event.getEntity()) && TameableUtils.canTickEnchantments(event.getEntity())) {
             if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.IMMUNITY_FRAME)) {
                 int i = TameableUtils.getImmuneTime(event.getEntity());
                 if (i > 0) {
@@ -896,11 +896,14 @@ public class CommonProxy {
                         living.spawnAtLocation(collarFrom);
                     }
                     living.playSound(DISoundRegistry.COLLAR_TAG.get(), 1, 1);
-                    TameableUtils.clearEnchants(living);
-                    for (Map.Entry<Enchantment, Integer> entry : itemEnchantments.entrySet()) {
-                        TameableUtils.addEnchant(living, new EnchantmentInstance(entry.getKey(), entry.getValue()));
+                    if(itemEnchantments.isEmpty()){
+                        TameableUtils.clearEnchants(living);
+                    }else{
+                        ListTag listTag = new ListTag();
+                        for (Map.Entry<Enchantment, Integer> entry : itemEnchantments.entrySet()) {
+                            TameableUtils.addEnchant(living, new EnchantmentInstance(entry.getKey(), entry.getValue()), listTag);
+                        }
                     }
-                    TameableUtils.setHasCollar(living, true);
                 }
                 event.setCanceled(true);
                 event.setCancellationResult(InteractionResult.SUCCESS);

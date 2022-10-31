@@ -68,6 +68,7 @@ public class TameableUtils {
     private static final String FALL_DISTANCE_SYNC = "SyncedFallDistance";
     private static final String ZOMBIE_PET = "ZombiePet";
     private static final String SAFE_PET_HEALTH = "SafePetHealth";
+    private static final String COLLAR_SWAP_COOLDOWN = "CollarSwapCooldown";
     private static final UUID HEALTH_BOOST_UUID = UUID.fromString("556E1665-8B10-40C8-8F9D-CF9B166EEEEE");
     private static final UUID SPEED_BOOST_UUID = UUID.fromString("ff465ded-9040-4eb5-93a1-7bbe97c31744");
 
@@ -106,7 +107,6 @@ public class TameableUtils {
 
     public static boolean shouldUnloadToLantern(LivingEntity tameable) {
         if (DomesticationMod.CONFIG.trinaryCommandSystem.get() && tameable instanceof IComandableMob commandableMob) {
-            System.out.println(commandableMob.getCommand());
             return commandableMob.getCommand() == 2;
         } else {
             CompoundTag tag = new CompoundTag();
@@ -186,6 +186,8 @@ public class TameableUtils {
         CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
         Map<ResourceLocation, Integer> prevEnchants = getEnchants(enchanted);
         tag.put(ENCHANTMENT_TAG, enchants);
+        tag.putInt(COLLAR_SWAP_COOLDOWN, 20);
+        tag.putBoolean(COLLAR_TAG, true);
         sync(enchanted, tag);
         onUpdateEnchants(prevEnchants, enchanted);
     }
@@ -294,6 +296,10 @@ public class TameableUtils {
 
     public static void addEnchant(LivingEntity entity, EnchantmentInstance enchantment) {
         ListTag listtag = getEnchantmentList(entity);
+        addEnchant(entity, enchantment, listtag);
+    }
+
+    public static void addEnchant(LivingEntity entity, EnchantmentInstance enchantment, ListTag listtag) {
         if (listtag != null && DomesticationMod.CONFIG.isEnchantEnabled(enchantment.enchantment)) {
             ResourceLocation resourcelocation = EnchantmentHelper.getEnchantmentId(enchantment.enchantment);
             boolean flag = true;
@@ -495,6 +501,26 @@ public class TameableUtils {
         CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
         tag.putInt(BLAZING_PROTECTION_BARS, time);
         sync(enchanted, tag);
+    }
+
+    public static int getCollarSwapCooldown(LivingEntity enchanted) {
+        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
+        return tag.getInt(COLLAR_SWAP_COOLDOWN);
+    }
+
+    public static void setCollarSwapCooldown(LivingEntity enchanted, int time) {
+        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
+        tag.putInt(COLLAR_SWAP_COOLDOWN, time);
+        sync(enchanted, tag);
+    }
+
+    public static boolean canTickEnchantments(LivingEntity enchanted){
+        int i = getCollarSwapCooldown(enchanted);
+        if(i > 0){
+            setCollarSwapCooldown(enchanted, i - 1);
+            return false;
+        }
+        return true;
     }
 
     private static void sync(LivingEntity enchanted, CompoundTag tag) {
