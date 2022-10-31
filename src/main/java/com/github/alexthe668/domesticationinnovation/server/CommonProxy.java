@@ -106,7 +106,7 @@ public class CommonProxy {
 
     private void removeAllChunkTickets(ServerLevel serverLevel, ForgeChunkManager.TicketHelper ticketHelper) {
         int i = 0;
-        for(Map.Entry<UUID, Pair<LongSet, LongSet>> entry : ticketHelper.getEntityTickets().entrySet()){
+        for (Map.Entry<UUID, Pair<LongSet, LongSet>> entry : ticketHelper.getEntityTickets().entrySet()) {
             ticketHelper.removeAllTickets(entry.getKey());
             i++;
         }
@@ -130,9 +130,9 @@ public class CommonProxy {
             if (TameableUtils.hasEnchant(living, DIEnchantmentRegistry.HEALTH_BOOST)) {
                 living.setHealth((float) Math.max(living.getHealth(), TameableUtils.getSafePetHealth(living)));
             }
-            if(living.isAlive() && TameableUtils.isTamed(living)){
+            if (living.isAlive() && TameableUtils.isTamed(living)) {
                 DIWorldData data = DIWorldData.get(living.level);
-                if(data != null){
+                if (data != null) {
                     data.removeMatchingLanternRequests(living.getUUID());
                 }
             }
@@ -142,11 +142,11 @@ public class CommonProxy {
     @SubscribeEvent
     public void onEntityLeaveWorld(EntityLeaveLevelEvent event) {
         if (event.getEntity() instanceof LivingEntity living) {
-            if(!living.level.isClientSide &&  living.isAlive() && TameableUtils.isTamed(living) && TameableUtils.shouldUnloadToLantern(living)){
+            if (!living.level.isClientSide && living.isAlive() && TameableUtils.isTamed(living) && TameableUtils.shouldUnloadToLantern(living)) {
                 UUID ownerUUID = TameableUtils.getOwnerUUIDOf(event.getEntity());
                 String saveName = event.getEntity().hasCustomName() ? event.getEntity().getCustomName().getString() : "";
                 DIWorldData data = DIWorldData.get(living.level);
-                if(data != null){
+                if (data != null) {
                     LanternRequest request = new LanternRequest(living.getUUID(), Registry.ENTITY_TYPE.getKey(event.getEntity().getType()).toString(), ownerUUID, living.blockPosition(), event.getEntity().level.dayTime(), saveName);
                     data.addLanternRequest(request);
                 }
@@ -204,14 +204,14 @@ public class CommonProxy {
             if (TameableUtils.isTamed(hit)) {
                 if (event.getEntity() instanceof AbstractArrow arrow) {
                     //fixes soft crash with vanilla
-                    if(arrow.getPierceLevel() > 0){
+                    if (arrow.getPierceLevel() > 0) {
                         arrow.setPierceLevel((byte) 0);
                         arrow.remove(Entity.RemovalReason.DISCARDED);
                         event.setCanceled(true);
                         return;
                     }
                 }
-                if(TameableUtils.hasEnchant((LivingEntity) hit, DIEnchantmentRegistry.DEFLECTION)) {
+                if (TameableUtils.hasEnchant((LivingEntity) hit, DIEnchantmentRegistry.DEFLECTION)) {
                     event.setCanceled(true);
                     float xRot = event.getProjectile().getXRot();
                     float yRot = event.getProjectile().yRotO;
@@ -393,7 +393,7 @@ public class CommonProxy {
             if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.BLIGHT_CURSE)) {
                 TameableUtils.destroyRandomPlants(event.getEntity());
             }
-            if(TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.REJUVENATION)){
+            if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.REJUVENATION)) {
                 TameableUtils.absorbExpOrbs(event.getEntity());
             }
             if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.VOID_CLOUD) && !event.getEntity().isInWaterOrBubble() && event.getEntity().fallDistance > 3.0F && !event.getEntity().isOnGround()) {
@@ -477,39 +477,39 @@ public class CommonProxy {
             }
             if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.BLAZING_PROTECTION)) {
                 int bars = TameableUtils.getBlazingProtectionBars(event.getEntity());
-                if(bars < 2 * TameableUtils.getEnchantLevel(event.getEntity(), DIEnchantmentRegistry.BLAZING_PROTECTION)){
+                if (bars < 2 * TameableUtils.getEnchantLevel(event.getEntity(), DIEnchantmentRegistry.BLAZING_PROTECTION)) {
                     int cooldown = TameableUtils.getBlazingProtectionCooldown(event.getEntity());
-                    if(cooldown > 0){
+                    if (cooldown > 0) {
                         cooldown--;
-                    }else{
+                    } else {
                         TameableUtils.setBlazingProtectionBars(event.getEntity(), bars + 1);
                         cooldown = 200;
                     }
                     TameableUtils.setBlazingProtectionCooldown(event.getEntity(), cooldown);
                 }
             }
-            if(TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.HEALING_AURA)){
-               int time = TameableUtils.getHealingAuraTime(event.getEntity());
-               if(time > 0){
-                   List<LivingEntity> hurtNearby = TameableUtils.getAuraHealables(event.getEntity());
-                   for(LivingEntity needsHealing : hurtNearby){
-                       if(!needsHealing.hasEffect(MobEffects.REGENERATION)){
-                           needsHealing.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, TameableUtils.getEnchantLevel(event.getEntity(), DIEnchantmentRegistry.HEALING_AURA) - 1));
-                       }
-                   }
-                   time--;
-                   if(time == 0){
-                       time = -600 - event.getEntity().getRandom().nextInt(600);
-                   }
-               }else if(time < 0){
-                   time++;
-               }else if ((event.getEntity().tickCount + event.getEntity().getId()) % 200 == 0 || TameableUtils.getHealingAuraImpulse(event.getEntity())) {
-                   List<LivingEntity> hurtNearby = TameableUtils.getAuraHealables(event.getEntity());
-                   if(!hurtNearby.isEmpty()){
-                       time = 200;
-                   }
-                   TameableUtils.setHealingAuraImpulse(event.getEntity(), false);
-               }
+            if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.HEALING_AURA)) {
+                int time = TameableUtils.getHealingAuraTime(event.getEntity());
+                if (time > 0) {
+                    List<LivingEntity> hurtNearby = TameableUtils.getAuraHealables(event.getEntity());
+                    for (LivingEntity needsHealing : hurtNearby) {
+                        if (!needsHealing.hasEffect(MobEffects.REGENERATION)) {
+                            needsHealing.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, TameableUtils.getEnchantLevel(event.getEntity(), DIEnchantmentRegistry.HEALING_AURA) - 1));
+                        }
+                    }
+                    time--;
+                    if (time == 0) {
+                        time = -600 - event.getEntity().getRandom().nextInt(600);
+                    }
+                } else if (time < 0) {
+                    time++;
+                } else if ((event.getEntity().tickCount + event.getEntity().getId()) % 200 == 0 || TameableUtils.getHealingAuraImpulse(event.getEntity())) {
+                    List<LivingEntity> hurtNearby = TameableUtils.getAuraHealables(event.getEntity());
+                    if (!hurtNearby.isEmpty()) {
+                        time = 200;
+                    }
+                    TameableUtils.setHealingAuraImpulse(event.getEntity(), false);
+                }
                 TameableUtils.setHealingAuraTime(event.getEntity(), time);
             }
         }
@@ -549,16 +549,16 @@ public class CommonProxy {
             }
             if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.BLAZING_PROTECTION)) {
                 int bars = TameableUtils.getBlazingProtectionBars(event.getEntity());
-                if(bars > 0){
+                if (bars > 0) {
                     Entity attacker = event.getSource().getEntity();
-                    if(attacker instanceof LivingEntity && !TameableUtils.hasSameOwnerAs((LivingEntity)attacker, event.getEntity())){
+                    if (attacker instanceof LivingEntity && !TameableUtils.hasSameOwnerAs((LivingEntity) attacker, event.getEntity())) {
                         attacker.setSecondsOnFire(5 + event.getEntity().getRandom().nextInt(3));
                         ((LivingEntity) attacker).knockback(0.4, event.getEntity().getX() - attacker.getX(), event.getEntity().getZ() - attacker.getZ());
                     }
                     event.setCanceled(true);
                     flag = true;
                     for (int i = 0; i < 3 + event.getEntity().getRandom().nextInt(3); i++) {
-                        attacker.level.addParticle(ParticleTypes.FLAME,  event.getEntity().getRandomX(0.8F), event.getEntity().getRandomY(), event.getEntity().getRandomZ(0.8F), 0.0F, 0.0F, 0.0F);
+                        attacker.level.addParticle(ParticleTypes.FLAME, event.getEntity().getRandomX(0.8F), event.getEntity().getRandomY(), event.getEntity().getRandomZ(0.8F), 0.0F, 0.0F, 0.0F);
                     }
                     event.getEntity().playSound(DISoundRegistry.BLAZING_PROTECTION.get(), 1, event.getEntity().getVoicePitch());
                     TameableUtils.setBlazingProtectionBars(event.getEntity(), bars - 1);
@@ -674,10 +674,10 @@ public class CommonProxy {
                 }
             }
         }
-        if(!event.isCanceled()){
+        if (!event.isCanceled()) {
             List<LivingEntity> nearbyHealers = TameableUtils.getNearbyHealers(event.getEntity());
-            if(!nearbyHealers.isEmpty()){
-                for(LivingEntity healer : nearbyHealers){
+            if (!nearbyHealers.isEmpty()) {
+                for (LivingEntity healer : nearbyHealers) {
                     TameableUtils.setHealingAuraImpulse(healer, true);
                 }
             }
@@ -823,6 +823,7 @@ public class CommonProxy {
                     if (!event.getEntity().isCreative()) {
                         stack.shrink(1);
                     }
+                    rabbit.playSound(SoundEvents.FOX_EAT);
                     if (rabbit.getRandom().nextBoolean()) {
                         for (int i = 0; i < 3; ++i) {
                             double d0 = rabbit.getRandom().nextGaussian() * 0.02D;
@@ -896,9 +897,9 @@ public class CommonProxy {
                         living.spawnAtLocation(collarFrom);
                     }
                     living.playSound(DISoundRegistry.COLLAR_TAG.get(), 1, 1);
-                    if(itemEnchantments.isEmpty()){
+                    if (itemEnchantments.isEmpty()) {
                         TameableUtils.clearEnchants(living);
-                    }else{
+                    } else {
                         ListTag listTag = new ListTag();
                         for (Map.Entry<Enchantment, Integer> entry : itemEnchantments.entrySet()) {
                             TameableUtils.addEnchant(living, new EnchantmentInstance(entry.getKey(), entry.getValue()), listTag);
@@ -1088,6 +1089,13 @@ public class CommonProxy {
                     teleportNearbyPets((Player) event.getEntity(), event.getEntity().position(), event.getEntity().position(), event.getEntity().level, toLevel);
                 }
             }
+        }
+    }
+
+    @SubscribeEvent
+    public void onSetAttackTarget(LivingSetAttackTargetEvent event) {
+        if (TameableUtils.isTamed(event.getEntity()) && event.getTarget() instanceof Player player && TameableUtils.isPetOf(player, event.getEntity())) {
+            event.setCanceled(true);
         }
     }
 }
