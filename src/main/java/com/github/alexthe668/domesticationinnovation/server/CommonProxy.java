@@ -809,7 +809,7 @@ public class CommonProxy {
             }
         }
         if (event.getTarget() instanceof Rabbit rabbit && DomesticationMod.CONFIG.tameableRabbit.get()) {
-            if (stack.getItem() == Items.CARROT || stack.getItem() == Items.GOLDEN_CARROT) {
+            if (stack.getItem() == Items.HAY_BLOCK) {
                 if (TameableUtils.isTamed(rabbit) && rabbit.getHealth() < rabbit.getMaxHealth()) {
                     rabbit.heal(3);
                     if (!event.getEntity().isCreative()) {
@@ -823,7 +823,7 @@ public class CommonProxy {
                     if (!event.getEntity().isCreative()) {
                         stack.shrink(1);
                     }
-                    if (rabbit.getRandom().nextInt(4) == 0) {
+                    if (rabbit.getRandom().nextBoolean()) {
                         for (int i = 0; i < 3; ++i) {
                             double d0 = rabbit.getRandom().nextGaussian() * 0.02D;
                             double d1 = rabbit.getRandom().nextGaussian() * 0.02D;
