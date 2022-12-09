@@ -686,6 +686,9 @@ public class CommonProxy {
 
     @SubscribeEvent
     public void onLivingDamage(LivingDamageEvent event) {
+        if(TameableUtils.isTamed(event.getEntity()) && event.getSource().getDirectEntity() instanceof Player player && TameableUtils.isPetOf(player, event.getEntity()) && !player.isShiftKeyDown()){
+            event.setCanceled(true);
+        }
         if (event.getSource().getEntity() instanceof LivingEntity && TameableUtils.isTamed(event.getSource().getEntity())) {
             LivingEntity pet = (LivingEntity) event.getSource().getEntity();
             if (TameableUtils.hasEnchant(pet, DIEnchantmentRegistry.IMMATURITY_CURSE)) {
@@ -1085,7 +1088,6 @@ public class CommonProxy {
                 MinecraftServer server = serverLevel.getServer();
                 Level toLevel = server.getLevel(event.getDimension());
                 if (toLevel != null) {
-
                     teleportNearbyPets((Player) event.getEntity(), event.getEntity().position(), event.getEntity().position(), event.getEntity().level, toLevel);
                 }
             }
