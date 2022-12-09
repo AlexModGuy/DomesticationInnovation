@@ -118,11 +118,14 @@ public class WaywardLanternBlockEntity extends BlockEntity {
         int maxDist = (int)Math.max(entity.getBbWidth() + 1, 10);
         for(int i = 0; i < 10; i++){
             BlockPos at = lanternPos.offset(random.nextInt(maxDist) - maxDist/2, 1, random.nextInt(maxDist) - maxDist/2);
-            while(entity.level.getBlockState(at).isAir() && at.getY() > entity.level.getMinBuildHeight()){
+            while(entity.level.getBlockState(at).isAir() && at.getY() > entity.level.getMinBuildHeight() && entity.level.noCollision(entity.getType().getAABB(at.getX() + 0.5F, at.getY() - 1, at.getZ() + 0.5F))){
                 at = at.below();
             }
-            if(entity.level.noCollision(entity.getType().getAABB(at.getX() + 0.5F, at.getY() + 1F, at.getZ() + 0.5F))){
+            if(entity.level.noCollision(entity.getType().getAABB(at.getX() + 0.5F, at.getY(), at.getZ() + 0.5F))){
                 return at;
+            }
+            if(entity.isInWall()){
+                return lanternPos.above();
             }
         }
         return lanternPos.above();
