@@ -71,6 +71,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.world.ForgeChunkManager;
+import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.*;
@@ -1098,6 +1099,58 @@ public class CommonProxy {
     public void onSetAttackTarget(LivingSetAttackTargetEvent event) {
         if (TameableUtils.isTamed(event.getEntity()) && event.getTarget() instanceof Player player && TameableUtils.isPetOf(player, event.getEntity())) {
             event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public void onUpdateAnvil(AnvilUpdateEvent event) {
+        if(event.getLeft().is(DIItemRegistry.COLLAR_TAG.get()) && !event.getLeft().getAllEnchantments().isEmpty() && event.getRight().is(DIItemRegistry.COLLAR_TAG.get()) && !event.getRight().getAllEnchantments().isEmpty()){
+
+            Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(event.getLeft());
+            Map<Enchantment, Integer> map1 = EnchantmentHelper.getEnchantments(event.getRight());
+            boolean canCombine = true;
+            int i = 0;
+            for(Enchantment enchantment1 : map1.keySet()) {
+                if (enchantment1 != null) {
+                    int i2 = map.getOrDefault(enchantment1, 0);
+                    int j2 = map1.get(enchantment1);
+                    j2 = i2 == j2 ? j2 + 1 : Math.max(j2, i2);
+
+                    for(Enchantment enchantment : map.keySet()) {
+                        if (enchantment != enchantment1 && !enchantment1.isCompatibleWith(enchantment)) {
+                            canCombine = false;
+                            ++i;
+                        }
+                    }
+
+                    if (canCombine) {
+                        if (j2 > enchantment1.getMaxLevel()) {
+                            j2 = enchantment1.getMaxLevel();
+                        }
+
+                        map.put(enchantment1, j2);
+                        int k3 = 0;
+                        switch (enchantment1.getRarity()) {
+                            case COMMON:
+                                k3 = 1;
+                                break;
+                            case UNCOMMON:
+                                k3 = 2;
+                                break;
+                            case RARE:
+                                k3 = 4;
+                                break;
+                            case VERY_RARE:
+                                k3 = 8;
+                        }
+                        i += k3 * j2;
+                    }
+                }
+            }
+            event.setCost(i);
+            ItemStack copy = event.getLeft().copy();
+            EnchantmentHelper.setEnchantments(map, copy);
+            event.setOutput(copy);
         }
     }
 }
