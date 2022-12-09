@@ -1,6 +1,5 @@
 package com.github.alexthe668.domesticationinnovation.server;
 
-import com.github.alexthe666.citadel.server.entity.CitadelEntityData;
 import com.github.alexthe666.citadel.server.entity.IComandableMob;
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
 import com.github.alexthe668.domesticationinnovation.server.block.DIBlockRegistry;
@@ -15,7 +14,6 @@ import com.github.alexthe668.domesticationinnovation.server.misc.trades.*;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.longs.LongSet;
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
@@ -34,7 +32,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
@@ -45,14 +42,11 @@ import net.minecraft.world.entity.ai.goal.AvoidEntityGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.animal.Fox;
 import net.minecraft.world.entity.animal.Rabbit;
-import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Ravager;
 import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -77,7 +71,6 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.*;
 import net.minecraftforge.event.entity.item.ItemExpireEvent;
 import net.minecraftforge.event.entity.living.*;
-import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.level.ExplosionEvent;
@@ -97,6 +90,8 @@ public class CommonProxy {
     private static final TargetingConditions ZOMBIE_TARGET = TargetingConditions.forCombat().range(32.0D);
     //list of pets to be teleported across dimensions, cleared after every tick
     public static List<Triple<Entity, ServerLevel, UUID>> teleportingPets = new ArrayList<>();
+
+    private static final Map<Level, CollarTickTracker> COLLAR_TICK_TRACKER_MAP = new HashMap<>();
 
     public void init() {
     }
@@ -159,8 +154,31 @@ public class CommonProxy {
         }
     }
 
+    private boolean canTickCollar(Entity entity){
+        if(entity.level.isClientSide){
+            return true;
+        }else{
+            CollarTickTracker tracker = COLLAR_TICK_TRACKER_MAP.get(entity.level);
+            return tracker == null || !tracker.isEntityBlocked(entity);
+        }
+    }
+
+    private void blockCollarTick(Entity entity){
+        if(!entity.level.isClientSide){
+            CollarTickTracker tracker = COLLAR_TICK_TRACKER_MAP.get(entity.level);
+            if(tracker == null){
+                tracker.addBlockedEntityTick(entity.getUUID(), 5);
+            }
+        }
+    }
+
     @SubscribeEvent
     public void onServerTick(TickEvent.LevelTickEvent tick) {
+        if (!tick.level.isClientSide) {
+            COLLAR_TICK_TRACKER_MAP.computeIfAbsent(tick.level, k -> new CollarTickTracker());
+            CollarTickTracker tracker = COLLAR_TICK_TRACKER_MAP.get(tick.level);
+            tracker.tick();
+        }
         if (!tick.level.isClientSide && tick.level instanceof ServerLevel) {
             for (final var triple : teleportingPets) {
                 Entity entity = triple.a;
@@ -242,7 +260,7 @@ public class CommonProxy {
     @SubscribeEvent
     public void onLivingUpdate(LivingEvent.LivingTickEvent event) {
         int frozenTime = TameableUtils.getFrozenTime(event.getEntity());
-        if (TameableUtils.couldBeTamed(event.getEntity()) && TameableUtils.canTickEnchantments(event.getEntity())) {
+        if (TameableUtils.couldBeTamed(event.getEntity()) && canTickCollar(event.getEntity())) {
             if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.IMMUNITY_FRAME)) {
                 int i = TameableUtils.getImmuneTime(event.getEntity());
                 if (i > 0) {
@@ -883,6 +901,7 @@ public class CommonProxy {
                     if (!event.getEntity().isCreative()) {
                         stack.shrink(1);
                     }
+                    blockCollarTick(living);
                     if (TameableUtils.hasCollar(living)) {
                         ItemStack collarFrom = new ItemStack(DIItemRegistry.COLLAR_TAG.get());
                         if (entityEnchantments != null) {

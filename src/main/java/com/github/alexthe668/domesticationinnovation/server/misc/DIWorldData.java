@@ -4,20 +4,16 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
-
-import javax.swing.text.html.parser.Entity;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class DIWorldData extends SavedData {
 
     private static final String IDENTIFIER = "domesticationinnovation_world_data";
     private final List<RespawnRequest> respawnRequestList = new ArrayList<>();
-
     private final List<LanternRequest> lanternRequestList = new ArrayList<>();
 
     private DIWorldData() {

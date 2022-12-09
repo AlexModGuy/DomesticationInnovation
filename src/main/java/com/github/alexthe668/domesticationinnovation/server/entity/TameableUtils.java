@@ -503,26 +503,6 @@ public class TameableUtils {
         sync(enchanted, tag);
     }
 
-    public static int getCollarSwapCooldown(LivingEntity enchanted) {
-        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
-        return tag.getInt(COLLAR_SWAP_COOLDOWN);
-    }
-
-    public static void setCollarSwapCooldown(LivingEntity enchanted, int time) {
-        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
-        tag.putInt(COLLAR_SWAP_COOLDOWN, time);
-        sync(enchanted, tag);
-    }
-
-    public static boolean canTickEnchantments(LivingEntity enchanted){
-        int i = getCollarSwapCooldown(enchanted);
-        if(i > 0){
-            setCollarSwapCooldown(enchanted, i - 1);
-            return false;
-        }
-        return true;
-    }
-
     private static void sync(LivingEntity enchanted, CompoundTag tag) {
         CitadelEntityData.setCitadelTag(enchanted, tag);
         if (!enchanted.level.isClientSide) {
