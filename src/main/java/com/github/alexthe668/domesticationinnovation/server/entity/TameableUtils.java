@@ -72,6 +72,8 @@ public class TameableUtils {
     private static final UUID HEALTH_BOOST_UUID = UUID.fromString("556E1665-8B10-40C8-8F9D-CF9B166EEEEE");
     private static final UUID SPEED_BOOST_UUID = UUID.fromString("ff465ded-9040-4eb5-93a1-7bbe97c31744");
 
+    private static final UUID SPEED_BOOST_AQUATIC_LAND_UUID = UUID.fromString("ff465ded-9040-4eb5-93a1-7bbe97c31745");
+
     public static boolean hasSameOwnerAs(LivingEntity tameable, Entity target) {
         return hasSameOwnerAsOneWay(tameable, target) || hasSameOwnerAsOneWay(target, tameable);
     }
@@ -195,6 +197,7 @@ public class TameableUtils {
     private static void onUpdateEnchants(@Nullable Map<ResourceLocation, Integer> prevEnchants, LivingEntity enchanted) {
         int healthExtra = getEnchantLevel(enchanted, DIEnchantmentRegistry.HEALTH_BOOST);
         int speedExtra = getEnchantLevel(enchanted, DIEnchantmentRegistry.SPEEDSTER);
+        boolean amphib = hasEnchant(enchanted, DIEnchantmentRegistry.AMPHIBIOUS) && !enchanted.isInWaterOrBubble() && isWaterCreature(enchanted);
         AttributeInstance health = enchanted.getAttribute(Attributes.MAX_HEALTH);
         AttributeInstance speed = enchanted.getAttribute(Attributes.MOVEMENT_SPEED);
         if (hasEnchant(enchanted, DIEnchantmentRegistry.IMMATURITY_CURSE) || prevEnchants != null && prevEnchants.keySet().contains(ForgeRegistries.ENCHANTMENTS.getKey(DIEnchantmentRegistry.IMMATURITY_CURSE))) {
@@ -227,7 +230,22 @@ public class TameableUtils {
             } else {
                 speed.removePermanentModifier(SPEED_BOOST_UUID);
             }
+            if (amphib) {
+                AttributeModifier attributemodifier = new AttributeModifier(SPEED_BOOST_AQUATIC_LAND_UUID, "amphibious pet upgrade", 0.1F, AttributeModifier.Operation.ADDITION);
+                if (speed.hasModifier(attributemodifier)) {
+                    speed.removeModifier(attributemodifier);
+                    speed.addPermanentModifier(attributemodifier);
+                } else {
+                    speed.addPermanentModifier(attributemodifier);
+                }
+            } else {
+                speed.removePermanentModifier(SPEED_BOOST_AQUATIC_LAND_UUID);
+            }
         }
+    }
+
+    private static boolean isWaterCreature(LivingEntity enchanted) {
+        return enchanted.getType().getCategory() == MobCategory.WATER_CREATURE || enchanted.getType().getCategory() == MobCategory.UNDERGROUND_WATER_CREATURE || enchanted.getType().getCategory() == MobCategory.WATER_AMBIENT;
     }
 
     @Nullable
