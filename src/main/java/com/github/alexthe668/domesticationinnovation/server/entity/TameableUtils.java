@@ -231,7 +231,7 @@ public class TameableUtils {
                 speed.removePermanentModifier(SPEED_BOOST_UUID);
             }
             if (amphib) {
-                AttributeModifier attributemodifier = new AttributeModifier(SPEED_BOOST_AQUATIC_LAND_UUID, "amphibious pet upgrade", 0.1F, AttributeModifier.Operation.ADDITION);
+                AttributeModifier attributemodifier = new AttributeModifier(SPEED_BOOST_AQUATIC_LAND_UUID, "amphibious pet upgrade", 0.13F, AttributeModifier.Operation.ADDITION);
                 if (speed.hasModifier(attributemodifier)) {
                     speed.removeModifier(attributemodifier);
                     speed.addPermanentModifier(attributemodifier);

@@ -873,7 +873,7 @@ public class CommonProxy {
                 ((IComandableMob) rabbit).playerSetCommand(event.getEntity(), rabbit);
             }
         }
-        if (event.getTarget() instanceof LivingEntity living && TameableUtils.isPetOf(event.getEntity(), entity)) {
+        if (event.getTarget() instanceof LivingEntity living && TameableUtils.isPetOf(event.getEntity(), entity) && !living.getType().is(DITagRegistry.REFUSES_COLLAR_TAGS)) {
             if (event.getItemStack().is(DIItemRegistry.COLLAR_TAG.get()) && DomesticationMod.CONFIG.collarTag.get()) {
                 if (!event.getEntity().level.isClientSide && living.isAlive()) {
                     Map<Enchantment, Integer> itemEnchantments = EnchantmentHelper.deserializeEnchantments(stack.getEnchantmentTags());
