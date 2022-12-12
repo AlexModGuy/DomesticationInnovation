@@ -1,8 +1,9 @@
 package com.github.alexthe668.domesticationinnovation.client.particle;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Quaternion;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
@@ -34,32 +35,32 @@ public class ParticlePsychicWall extends SimpleAnimatedParticle {
     public void render(VertexConsumer consumer, Camera camera, float partialTick) {
         this.renderTexturedParticle(consumer, camera, partialTick, (rot) -> {
             rot.mul(direction.getRotation());
-            rot.mul(Vector3f.XP.rotation((float) Math.PI * 0.5F));
+            rot.mul(Axis.XP.rotation((float) Math.PI * 0.5F));
         });
         this.renderTexturedParticle(consumer, camera, partialTick, (rot) -> {
             rot.mul(direction.getRotation());
-            rot.mul(Vector3f.XP.rotation((float) Math.PI * 0.5F));
-            rot.mul(Vector3f.YP.rotation(-(float)Math.PI));
+            rot.mul(Axis.XP.rotation((float) Math.PI * 0.5F));
+            rot.mul(Axis.YP.rotation(-(float)Math.PI));
         });
     }
 
-    private void renderTexturedParticle(VertexConsumer consumer, Camera camera, float partialTick, Consumer<Quaternion> rot) {
+    private void renderTexturedParticle(VertexConsumer consumer, Camera camera, float partialTick, Consumer<Quaternionf> rot) {
         Vec3 vec3 = camera.getPosition();
         float f = (float)(Mth.lerp((double)partialTick, this.xo, this.x) - vec3.x());
         float f1 = (float)(Mth.lerp((double)partialTick, this.yo, this.y) - vec3.y());
         float f2 = (float)(Mth.lerp((double)partialTick, this.zo, this.z) - vec3.z());
         Vector3f vector3f = new Vector3f(0.5F, 0.5F, 0.5F);
         vector3f.normalize();
-        Quaternion quaternion = new Quaternion(vector3f, 0.0F, true);
+        Quaternionf quaternion = new Quaternionf().setAngleAxis(0.0F, vector3f.x(), vector3f.y(), vector3f.z());
         rot.accept(quaternion);
         Vector3f vector3f1 = new Vector3f(-1.0F, -1.0F, 0.0F);
-        vector3f1.transform(quaternion);
+        vector3f1.rotate(quaternion);
         Vector3f[] avector3f = new Vector3f[]{new Vector3f(-1.0F, -1.0F, 0.0F), new Vector3f(-1.0F, 1.0F, 0.0F), new Vector3f(1.0F, 1.0F, 0.0F), new Vector3f(1.0F, -1.0F, 0.0F)};
         float f3 = this.getQuadSize(partialTick);
 
         for(int i = 0; i < 4; ++i) {
             Vector3f vector3f2 = avector3f[i];
-            vector3f2.transform(quaternion);
+            vector3f2.rotate(quaternion);
             vector3f2.mul(f3);
             vector3f2.add(f, f1, f2);
         }

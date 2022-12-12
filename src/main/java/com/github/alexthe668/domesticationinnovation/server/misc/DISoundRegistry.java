@@ -27,6 +27,6 @@ public class DISoundRegistry {
     public static final RegistryObject<SoundEvent> BLAZING_PROTECTION = createSoundEvent("blazing_protection");
 
     private static RegistryObject<SoundEvent> createSoundEvent(final String soundName) {
-        return DEF_REG.register(soundName, () -> new SoundEvent(new ResourceLocation(DomesticationMod.MODID, soundName)));
+        return DEF_REG.register(soundName, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(DomesticationMod.MODID, soundName)));
     }
 }

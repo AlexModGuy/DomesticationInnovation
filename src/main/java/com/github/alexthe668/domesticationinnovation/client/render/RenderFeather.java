@@ -4,10 +4,6 @@ import com.github.alexthe668.domesticationinnovation.server.entity.FeatherEntity
 import com.github.alexthe668.domesticationinnovation.server.item.DIItemRegistry;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Matrix3f;
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Quaternion;
-import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -22,6 +18,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 
 public class RenderFeather extends EntityRenderer<FeatherEntity> {
 
@@ -39,7 +38,7 @@ public class RenderFeather extends EntityRenderer<FeatherEntity> {
         poseStack.pushPose();
         poseStack.translate(0, 0.1F, 0);
         poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
-        poseStack.mulPose(new Quaternion(Vector3f.ZN, 35F, true));
+        poseStack.mulPose(new Quaternionf().rotateZ(35F * ((float)Math.PI / 180F)));
         Minecraft.getInstance().getItemRenderer().renderStatic(feather, ItemTransforms.TransformType.GROUND, light, OverlayTexture.NO_OVERLAY, poseStack, buffer, entity.getId());
         poseStack.popPose();
 
@@ -106,10 +105,6 @@ public class RenderFeather extends EntityRenderer<FeatherEntity> {
     //fishing rod stuff
     private static float fraction(int p_114691_, int p_114692_) {
         return (float)p_114691_ / (float)p_114692_;
-    }
-
-    private static void vertex(VertexConsumer p_114712_, Matrix4f p_114713_, Matrix3f p_114714_, int p_114715_, float p_114716_, int p_114717_, int p_114718_, int p_114719_) {
-        p_114712_.vertex(p_114713_, p_114716_ - 0.5F, (float)p_114717_ - 0.5F, 0.0F).color(255, 255, 255, 255).uv((float)p_114718_, (float)p_114719_).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(p_114715_).normal(p_114714_, 0.0F, 1.0F, 0.0F).endVertex();
     }
 
     private static void stringVertex(float p_174119_, float p_174120_, float p_174121_, VertexConsumer p_174122_, PoseStack.Pose p_174123_, float p_174124_, float p_174125_) {

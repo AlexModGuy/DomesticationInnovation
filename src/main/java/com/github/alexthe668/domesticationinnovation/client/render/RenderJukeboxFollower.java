@@ -6,8 +6,7 @@ import com.github.alexthe668.domesticationinnovation.server.entity.FollowingJuke
 import com.github.alexthe668.domesticationinnovation.server.entity.RecallBallEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Quaternion;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
@@ -34,7 +33,7 @@ public class RenderJukeboxFollower extends EntityRenderer<FollowingJukeboxEntity
     public void render(FollowingJukeboxEntity entity, float yaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int light) {
         super.render(entity, yaw, partialTicks, poseStack, buffer, light);
         poseStack.pushPose();
-        poseStack.mulPose(Vector3f.YP.rotationDegrees(Mth.lerp(partialTicks, entity.yRotO, entity.getYRot())));
+        poseStack.mulPose(Axis.YP.rotationDegrees(Mth.lerp(partialTicks, entity.yRotO, entity.getYRot())));
         poseStack.translate(0, 0.1F, 0);
         poseStack.scale(1.8F, 1.8F, 1.8F);
         Minecraft.getInstance().getItemRenderer().renderStatic(jukebox, ItemTransforms.TransformType.GROUND, light, OverlayTexture.NO_OVERLAY, poseStack, buffer, entity.getId());

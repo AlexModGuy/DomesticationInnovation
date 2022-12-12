@@ -17,7 +17,7 @@ import net.minecraft.world.level.gameevent.GameEvent;
 public class FeatherOnAStickItem extends Item {
 
     public FeatherOnAStickItem() {
-        super(new Item.Properties().tab(DICreativeModeTab.INSTANCE).durability(160));
+        super(new Item.Properties().durability(160));
     }
 
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {

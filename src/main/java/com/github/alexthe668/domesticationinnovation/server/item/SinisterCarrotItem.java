@@ -24,16 +24,16 @@ import net.minecraft.world.item.Rarity;
 public class SinisterCarrotItem extends Item {
 
     public SinisterCarrotItem() {
-        super(new Item.Properties().tab(DICreativeModeTab.INSTANCE).rarity(Rarity.UNCOMMON).food((new FoodProperties.Builder()).nutrition(1).saturationMod(0.3F).effect(new MobEffectInstance(MobEffects.WITHER, 100), 1.0F).build()));
+        super(new Item.Properties().rarity(Rarity.UNCOMMON).food((new FoodProperties.Builder()).nutrition(1).saturationMod(0.3F).effect(new MobEffectInstance(MobEffects.WITHER, 100), 1.0F).build()));
     }
 
     public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity entity, InteractionHand hand) {
         if(entity.getType() == EntityType.RABBIT && TameableUtils.isTamed(entity) && TameableUtils.isPetOf(player, entity) && net.minecraftforge.event.ForgeEventFactory.canLivingConvert(entity, EntityType.RABBIT, (timer) -> {})){
-            if(entity instanceof Rabbit rabbit && rabbit.getRabbitType() != 99){
+            if(entity instanceof Rabbit rabbit && rabbit.getVariant() != Rabbit.Variant.EVIL){
                 player.swing(hand);
                 rabbit.playSound(SoundEvents.RABBIT_ATTACK, 0.8F, rabbit.getVoicePitch());
                 rabbit.playSound(SoundEvents.ZOMBIE_INFECT, 0.8F, rabbit.getVoicePitch());
-                rabbit.setRabbitType(99);
+                rabbit.setVariant(Rabbit.Variant.EVIL);
                 if(!player.isCreative()){
                     stack.shrink(1);
                 }

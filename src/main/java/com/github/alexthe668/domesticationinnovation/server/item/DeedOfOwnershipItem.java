@@ -18,7 +18,7 @@ import java.util.UUID;
 public class DeedOfOwnershipItem extends Item {
 
     public DeedOfOwnershipItem() {
-        super(new Item.Properties().tab(DICreativeModeTab.INSTANCE).stacksTo(1));
+        super(new Item.Properties().stacksTo(1));
     }
 
     public static boolean isBound(ItemStack stack) {

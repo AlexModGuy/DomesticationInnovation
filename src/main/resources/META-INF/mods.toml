@@ -4,7 +4,7 @@ license="GNU LESSER GENERAL PUBLIC LICENSE"
 issueTrackerURL="https://github.com/Alex-the-666/DomesticationInnovation/issues" #optional
 [[mods]] #mandatory
 modId="domesticationinnovation" #mandatory
-version="1.6.1" #mandatory
+version="1.7.0" #mandatory
 displayName="Domestication Innovation" #mandatory
 displayURL="https://www.curseforge.com/minecraft/mc-mods/domestication-innovation" #optional
 authors="Alexthe668, FallenReaper, Yosh" #optional
@@ -26,6 +26,6 @@ logoFile="domesticationinnovation.png" #optional
 [[dependencies.domesticationinnovation]]
     modId="forge"
     mandatory=true
-    versionRange="[41.1.0,)"
+    versionRange="[44.0.18,)"
     ordering="NONE"
     side="BOTH"

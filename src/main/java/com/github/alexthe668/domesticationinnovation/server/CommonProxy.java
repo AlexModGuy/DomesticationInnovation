@@ -98,6 +98,7 @@ public class CommonProxy {
 
     public void serverInit() {
         ForgeChunkManager.setForcedChunkLoadingCallback(DomesticationMod.MODID, this::removeAllChunkTickets);
+        DIVillagePieceRegistry.registerHouses();
     }
 
     private void removeAllChunkTickets(ServerLevel serverLevel, ForgeChunkManager.TicketHelper ticketHelper) {
@@ -143,7 +144,7 @@ public class CommonProxy {
                 String saveName = event.getEntity().hasCustomName() ? event.getEntity().getCustomName().getString() : "";
                 DIWorldData data = DIWorldData.get(living.level);
                 if (data != null) {
-                    LanternRequest request = new LanternRequest(living.getUUID(), Registry.ENTITY_TYPE.getKey(event.getEntity().getType()).toString(), ownerUUID, living.blockPosition(), event.getEntity().level.dayTime(), saveName);
+                    LanternRequest request = new LanternRequest(living.getUUID(), ForgeRegistries.ENTITY_TYPES.getKey(event.getEntity().getType()).toString(), ownerUUID, living.blockPosition(), event.getEntity().level.dayTime(), saveName);
                     data.addLanternRequest(request);
                 }
             }
@@ -613,7 +614,7 @@ public class CommonProxy {
                     CompoundTag tag = new CompoundTag();
                     event.getEntity().addAdditionalSaveData(tag);
                     recallBall.setContainedData(tag);
-                    recallBall.setContainedEntityType(Registry.ENTITY_TYPE.getKey(event.getEntity().getType()).toString());
+                    recallBall.setContainedEntityType(ForgeRegistries.ENTITY_TYPES.getKey(event.getEntity().getType()).toString());
                     recallBall.copyPosition(event.getEntity());
                     recallBall.setYRot(event.getEntity().getYRot());
                     recallBall.setInvulnerable(true);
@@ -725,7 +726,7 @@ public class CommonProxy {
                 CompoundTag data = new CompoundTag();
                 event.getEntity().addAdditionalSaveData(data);
                 String saveName = event.getEntity().hasCustomName() ? event.getEntity().getCustomName().getString() : "";
-                RespawnRequest request = new RespawnRequest(Registry.ENTITY_TYPE.getKey(event.getEntity().getType()).toString(), TameableUtils.getPetBedDimension(event.getEntity()), data, bedPos, event.getEntity().level.dayTime(), saveName);
+                RespawnRequest request = new RespawnRequest(ForgeRegistries.ENTITY_TYPES.getKey(event.getEntity().getType()).toString(), TameableUtils.getPetBedDimension(event.getEntity()), data, bedPos, event.getEntity().level.dayTime(), saveName);
                 DIWorldData worldData = DIWorldData.get(event.getEntity().level);
                 if (worldData != null) {
                     worldData.addRespawnRequest(request);

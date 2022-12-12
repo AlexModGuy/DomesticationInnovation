@@ -46,7 +46,7 @@ public abstract class RabbitMixin extends Animal implements ModifedToBeTameable,
 
     @Shadow @Final private static EntityDataAccessor<Integer> DATA_TYPE_ID;
 
-    @Shadow public abstract int getRabbitType();
+    @Shadow public abstract Rabbit.Variant getVariant();
 
     private static final EntityDataAccessor<Optional<UUID>> OWNER_UUID = SynchedEntityData.defineId(Rabbit.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Integer> COMMAND = SynchedEntityData.defineId(Rabbit.class, EntityDataSerializers.INT);
@@ -169,7 +169,7 @@ public abstract class RabbitMixin extends Animal implements ModifedToBeTameable,
     }
 
     public boolean isValidAttackTarget(LivingEntity target) {
-        return this.getRabbitType() == 99 && (!this.isTame() || !TameableUtils.hasSameOwnerAs(this, target));
+        return this.getVariant() == Rabbit.Variant.EVIL && (!this.isTame() || !TameableUtils.hasSameOwnerAs(this, target));
     }
 
     public void removeUntamedGoals(){
@@ -191,12 +191,12 @@ public abstract class RabbitMixin extends Animal implements ModifedToBeTameable,
     @Inject(
             at = {@At("HEAD")},
             remap = true,
-            method = {"Lnet/minecraft/world/entity/animal/Rabbit;setRabbitType(I)V"},
+            method = {"Lnet/minecraft/world/entity/animal/Rabbit;setVariant(Lnet/minecraft/world/entity/animal/Rabbit$Variant;)V"},
             cancellable = true
     )
-    private void di_setRabbitType(int type, CallbackInfo ci) {
+    private void di_setRabbitType(Rabbit.Variant type, CallbackInfo ci) {
         ci.cancel();
-        if(type == 99){
+        if(type == Rabbit.Variant.EVIL){
             this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(30.0D);
             this.getAttribute(Attributes.ARMOR).setBaseValue(8.0D);
             this.heal(22.0F);
@@ -214,7 +214,7 @@ public abstract class RabbitMixin extends Animal implements ModifedToBeTameable,
                 this.setCustomName(Component.translatable(Util.makeDescriptionId("entity", new ResourceLocation("killer_bunny"))));
             }
         }
-        this.entityData.set(DATA_TYPE_ID, type);
+        this.entityData.set(DATA_TYPE_ID, type.id());
     }
 
     @Override

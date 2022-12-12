@@ -4,7 +4,6 @@ import com.github.alexthe666.citadel.client.render.LightningBoltData;
 import com.github.alexthe666.citadel.client.render.LightningRender;
 import com.github.alexthe668.domesticationinnovation.server.entity.ChainLightningEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector4f;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -12,6 +11,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import org.joml.Vector4f;
 
 public class ChainLightningRender extends EntityRenderer<ChainLightningEntity> {
 

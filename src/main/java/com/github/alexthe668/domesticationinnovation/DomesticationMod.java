@@ -9,10 +9,7 @@ import com.github.alexthe668.domesticationinnovation.server.entity.DIActivityReg
 import com.github.alexthe668.domesticationinnovation.server.entity.DIEntityRegistry;
 import com.github.alexthe668.domesticationinnovation.server.entity.DIVillagerRegistry;
 import com.github.alexthe668.domesticationinnovation.server.item.DIItemRegistry;
-import com.github.alexthe668.domesticationinnovation.server.misc.DICreativeModeTab;
-import com.github.alexthe668.domesticationinnovation.server.misc.DIPOIRegistry;
-import com.github.alexthe668.domesticationinnovation.server.misc.DIParticleRegistry;
-import com.github.alexthe668.domesticationinnovation.server.misc.DISoundRegistry;
+import com.github.alexthe668.domesticationinnovation.server.misc.*;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
@@ -46,6 +43,7 @@ public class DomesticationMod {
     public DomesticationMod() {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupClient);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(DICreativeModeTab::registerTab);
         final ModLoadingContext modLoadingContext = ModLoadingContext.get();
         modLoadingContext.registerConfig(ModConfig.Type.COMMON, CONFIG_SPEC, "domestication-innovation.toml");
         DIItemRegistry.DEF_REG.register(FMLJavaModLoadingContext.get().getModEventBus());
@@ -58,6 +56,7 @@ public class DomesticationMod {
         DIVillagerRegistry.DEF_REG.register(FMLJavaModLoadingContext.get().getModEventBus());
         DISoundRegistry.DEF_REG.register(FMLJavaModLoadingContext.get().getModEventBus());
         DIActivityRegistry.DEF_REG.register(FMLJavaModLoadingContext.get().getModEventBus());
+        DIVillagePieceRegistry.DEF_REG.register(FMLJavaModLoadingContext.get().getModEventBus());
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(PROXY);
         PROXY.init();

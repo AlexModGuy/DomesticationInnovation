@@ -6,13 +6,12 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Vector3f;
 import net.minecraft.Util;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.TheEndPortalRenderer;
 import net.minecraft.resources.ResourceLocation;
+import org.joml.Matrix4f;
 
 import java.util.List;
 
@@ -63,17 +62,16 @@ public class DIRenderTypes extends RenderType {
         long i = Util.getMillis() * time;
         float f = (float) (i % 110000L) / 110000.0F;
         float f1 = (float) (i % 30000L) / 30000.0F;
-        Matrix4f matrix4f = Matrix4f.createTranslateMatrix(0.0F, -f1, 0.0F);
-        matrix4f.multiply(Matrix4f.createScaleMatrix(in, in, in));
+        Matrix4f matrix4f = (new Matrix4f()).translation(0, -f1, 0.0F);
+        matrix4f.scale(in);
         RenderSystem.setTextureMatrix(matrix4f);
     }
 
     private static void setupIframeShading(float in, long time) {
         long i = Util.getMillis() * time;
         float f1 = (float) (i % 30000L) / 30000.0F;
-        Matrix4f matrix4f = Matrix4f.createTranslateMatrix(0.0F, f1, 0.0F);
-        matrix4f.multiply(Vector3f.ZP.rotationDegrees(45.0F));
-        matrix4f.multiply(Matrix4f.createScaleMatrix(in, in, in));
+        Matrix4f matrix4f = (new Matrix4f()).translation(0, f1, 0.0F);
+        matrix4f.rotateZ((float) (Math.PI / 4F)).scale(in);
         RenderSystem.setTextureMatrix(matrix4f);
     }
 
@@ -82,8 +80,8 @@ public class DIRenderTypes extends RenderType {
         float f1 = (float) (i % 30000L) / 30000.0F;
         float f2 = (float) Math.sin(i / 20000.0F) + 1.0F;
         float f3 = (float) Math.cos(i / 20000.0F) + 1.0F;
-        Matrix4f matrix4f = Matrix4f.createTranslateMatrix(1 + f2, 1 + f3, 0.0F);
-        matrix4f.multiply(Matrix4f.createScaleMatrix(in, in, in));
+        Matrix4f matrix4f = (new Matrix4f()).translation(1 + f2, 1 + f3, 0.0F);
+        matrix4f.scale(in);
         RenderSystem.setTextureMatrix(matrix4f);
     }
 
@@ -94,8 +92,8 @@ public class DIRenderTypes extends RenderType {
         }
 
         private static void setupZombieTexturing(int x, int y) {
-            Matrix4f matrix4f = Matrix4f.createTranslateMatrix(0.0F, 0.0F, 0.0F);
-            matrix4f.multiply(Matrix4f.createScaleMatrix(x / 64F, y / 64F, 1));
+            Matrix4f matrix4f = (new Matrix4f()).translation(0.0F, 0.0F, 0.0F);
+            matrix4f.scale(x / 64F, y / 64F, 1);
             RenderSystem.setTextureMatrix(matrix4f);
         }
     }

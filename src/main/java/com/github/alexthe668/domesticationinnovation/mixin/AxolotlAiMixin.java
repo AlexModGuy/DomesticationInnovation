@@ -10,8 +10,6 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.Brain;
-import net.minecraft.world.entity.ai.behavior.StartAttacking;
-import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.animal.axolotl.Axolotl;
 import net.minecraft.world.entity.animal.axolotl.AxolotlAi;
 import net.minecraft.world.entity.schedule.Activity;
@@ -22,8 +20,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.Optional;
 
 @Mixin(AxolotlAi.class)
 public class AxolotlAiMixin {
@@ -37,7 +33,7 @@ public class AxolotlAiMixin {
             )
     )
     private static void di_makeBrain(Brain<Axolotl> brain, CallbackInfoReturnable<Brain<?>> cir) {
-        brain.addActivity(DIActivityRegistry.AXOLOTL_FOLLOW.get(), ImmutableList.of(Pair.of(0, new AmphibianFollowOwnerBehavior(0.3F, 0.6F)), Pair.of(1, new StartAttacking<>(AxolotlAiMixin::findAttackTargetAxl))));
+        brain.addActivity(DIActivityRegistry.AXOLOTL_FOLLOW.get(), ImmutableList.of(Pair.of(0, new AmphibianFollowOwnerBehavior(0.3F, 0.6F))));
         brain.addActivity(DIActivityRegistry.AXOLOTL_STAY.get(), ImmutableList.of(Pair.of(0, new AmphibianStayBehavior())));
     }
 
@@ -75,11 +71,6 @@ public class AxolotlAiMixin {
     private static void di_getTemptationItems(CallbackInfoReturnable<Ingredient> cir) {
         cir.setReturnValue(Ingredient.merge(ImmutableList.of(cir.getReturnValue(), Ingredient.of(Items.TROPICAL_FISH))));
     }
-
-    private static Optional<? extends LivingEntity> findAttackTargetAxl(Axolotl p_149299_) {
-        return p_149299_.isInLove() ? Optional.empty() : p_149299_.getBrain().getMemory(MemoryModuleType.NEAREST_ATTACKABLE);
-    }
-
 
     @Inject(
             method = {"Lnet/minecraft/world/entity/animal/axolotl/AxolotlAi;getSpeedModifierChasing(Lnet/minecraft/world/entity/LivingEntity;)F"},
@@ -119,4 +110,6 @@ public class AxolotlAiMixin {
         int speedsterLevel = TameableUtils.getEnchantLevel(axolotl, DIEnchantmentRegistry.SPEEDSTER);
         cir.setReturnValue(axolotl.isInWaterOrBubble() ? 0.5F + speedsterLevel * 0.05F : 0.15F + speedsterLevel * 0.15F);
     }
+
+
 }

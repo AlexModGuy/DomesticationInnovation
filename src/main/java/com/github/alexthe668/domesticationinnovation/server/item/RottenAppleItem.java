@@ -22,7 +22,7 @@ import net.minecraft.world.item.ItemStack;
 public class RottenAppleItem extends Item {
 
     public RottenAppleItem() {
-        super(new Item.Properties().tab(DICreativeModeTab.INSTANCE).food((new FoodProperties.Builder()).nutrition(3).saturationMod(0.3F).effect(new MobEffectInstance(MobEffects.POISON, 100, 1), 1.0F).build()));
+        super(new Item.Properties().food((new FoodProperties.Builder()).nutrition(3).saturationMod(0.3F).effect(new MobEffectInstance(MobEffects.POISON, 100, 1), 1.0F).build()));
     }
 
     public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity entity, InteractionHand hand) {

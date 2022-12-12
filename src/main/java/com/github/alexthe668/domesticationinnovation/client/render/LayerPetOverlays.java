@@ -12,10 +12,7 @@ import com.github.alexthe668.domesticationinnovation.server.item.DIItemRegistry;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.datafixers.util.Pair;
-import com.mojang.math.Matrix3f;
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Vector3f;
-import com.mojang.math.Vector4f;
+import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -35,6 +32,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.ForgeRenderTypes;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
+import org.joml.Vector4f;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -139,15 +139,15 @@ public class LayerPetOverlays extends RenderLayer {
                     float f1 = (float) (Mth.atan2(d2, d0) * (double) (180F / (float) Math.PI)) - 90.0F;
                     float f2 = (float) (-(Mth.atan2(d1, d4) * (double) (180F / (float) Math.PI)));
                     matrixStackIn.pushPose();
-                    matrixStackIn.mulPose(Vector3f.YN.rotationDegrees(f));
-                    matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(f1));
-                    matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(f2));
+                    matrixStackIn.mulPose(Axis.YN.rotationDegrees(f));
+                    matrixStackIn.mulPose(Axis.YP.rotationDegrees(f1));
+                    matrixStackIn.mulPose(Axis.XP.rotationDegrees(f2));
                     matrixStackIn.pushPose();
                     float bob1 = (float) Math.sin(realAge * 0.5F) * 0.05F;
                     float bob2 = (float) Math.sin(realAge * 0.3F) * 0.09F - 0.03F;
                     float bob3 = (float) Math.cos(realAge * 0.1F) * 0.05F;
                     matrixStackIn.translate(bob1, 1.25F - entity.getBbHeight() * 0.5F - bob2, -entity.getBbWidth() - 0.125F - bob3);
-                    matrixStackIn.mulPose(Vector3f.XN.rotationDegrees(90));
+                    matrixStackIn.mulPose(Axis.XN.rotationDegrees(90));
                     matrixStackIn.scale(1.6F, 1.6F, 3F);
                     Minecraft.getInstance().getItemRenderer().renderStatic(MAGNET, ItemTransforms.TransformType.GROUND, packedLightIn, OverlayTexture.NO_OVERLAY, matrixStackIn, bufferIn, entity.getId());
                     matrixStackIn.popPose();
@@ -170,8 +170,8 @@ public class LayerPetOverlays extends RenderLayer {
                         lightningRender.update(living, bolt, partialTicks);
                     }
                     matrixStackIn.pushPose();
-                    matrixStackIn.mulPose(Vector3f.YN.rotationDegrees(f));
-                    matrixStackIn.mulPose(Vector3f.XN.rotationDegrees(180));
+                    matrixStackIn.mulPose(Axis.YN.rotationDegrees(f));
+                    matrixStackIn.mulPose(Axis.XN.rotationDegrees(180));
                     matrixStackIn.pushPose();
                     matrixStackIn.translate(-x, -y, -z);
                     lightningRender.render(partialTicks, matrixStackIn, bufferIn);
@@ -182,8 +182,8 @@ public class LayerPetOverlays extends RenderLayer {
             if (TameableUtils.hasEnchant(living, DIEnchantmentRegistry.VOID_CLOUD) && !living.isInWaterOrBubble() && !living.isOnGround() && TameableUtils.getFallDistance(living) >= 3.0F) {
                 matrixStackIn.pushPose();
                 matrixStackIn.translate(0.4F, 1.25F + entity.getBbHeight(), 0.2F);
-                matrixStackIn.mulPose(Vector3f.YN.rotationDegrees(f));
-                matrixStackIn.mulPose(Vector3f.XN.rotationDegrees(180));
+                matrixStackIn.mulPose(Axis.YN.rotationDegrees(f));
+                matrixStackIn.mulPose(Axis.XN.rotationDegrees(180));
                 for (int i = 0; i < CLOUD_COUNT; i++) {
                     float xSin = (float) Math.sin(realAge * 0.05F + i * 2F) * 0.1F;
                     float ySin = (float) Math.cos(realAge * 0.05F + i * 2F) * 0.1F;
@@ -236,9 +236,9 @@ public class LayerPetOverlays extends RenderLayer {
                     }
                     matrixStackIn.pushPose();
                     if (punching != null) {
-                        matrixStackIn.mulPose(Vector3f.YN.rotationDegrees(f));
-                        matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(f1));
-                        matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(f2));
+                        matrixStackIn.mulPose(Axis.YN.rotationDegrees(f));
+                        matrixStackIn.mulPose(Axis.YP.rotationDegrees(f1));
+                        matrixStackIn.mulPose(Axis.XP.rotationDegrees(f2));
                     }
 
                     matrixStackIn.pushPose();
@@ -261,11 +261,11 @@ public class LayerPetOverlays extends RenderLayer {
                 float seperation = 360F / (TameableUtils.getEnchantLevel(living, DIEnchantmentRegistry.BLAZING_PROTECTION) * 2F);
                 VertexConsumer vertexconsumer = bufferIn.getBuffer(ForgeRenderTypes.getUnlitTranslucent(BLAZE_TEXTURE));
                 matrixStackIn.pushPose();
-                matrixStackIn.mulPose(Vector3f.YN.rotationDegrees(f));
+                matrixStackIn.mulPose(Axis.YN.rotationDegrees(f));
                 for (int i = 0; i < bars; i++) {
                     f1 += seperation;
                     matrixStackIn.pushPose();
-                    matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(f1));
+                    matrixStackIn.mulPose(Axis.YP.rotationDegrees(f1));
                     float bob = (float) Math.sin(realAge * 0.6F + Math.toRadians(seperation * i)) * 0.15F - 0.07F;
                     matrixStackIn.translate(0, 0.4F - entity.getBbHeight() * 0.5F - bob, -entity.getBbWidth() - 0.2F);
                     BLAZING_BAR_MODEL.animateBar(f1);
@@ -282,9 +282,9 @@ public class LayerPetOverlays extends RenderLayer {
                     float healscale = (Math.min(time, 20) / 20F) * 2.2F * pulse;
                     matrixStackIn.pushPose();
                     matrixStackIn.translate(0, 1.8F - entity.getBbHeight() * 0.5F, 0);
-                    matrixStackIn.mulPose(Vector3f.YN.rotationDegrees(f));
-                    matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(realAge * 3F));
-                    matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(90F));
+                    matrixStackIn.mulPose(Axis.YN.rotationDegrees(f));
+                    matrixStackIn.mulPose(Axis.YP.rotationDegrees(realAge * 3F));
+                    matrixStackIn.mulPose(Axis.XP.rotationDegrees(90F));
                     matrixStackIn.scale(3 * healscale, 3 * healscale, 3 * healscale);
                     VertexConsumer vertexconsumer = bufferIn.getBuffer(DIRenderTypes.HEALING_AURA);
                     PoseStack.Pose posestack$pose = matrixStackIn.last();

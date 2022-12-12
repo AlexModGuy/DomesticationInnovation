@@ -46,7 +46,7 @@ public class DIBlockRegistry {
 
     public static RegistryObject<Block> registerBlockAndItem(String name, Supplier<Block> block){
         RegistryObject<Block> blockObj = DEF_REG.register(name, block);
-        DIItemRegistry.DEF_REG.register(name, () -> new DIBlockItem(blockObj, new Item.Properties().tab(DICreativeModeTab.INSTANCE)));
+        DIItemRegistry.DEF_REG.register(name, () -> new DIBlockItem(blockObj, new Item.Properties()));
         return blockObj;
     }
 }

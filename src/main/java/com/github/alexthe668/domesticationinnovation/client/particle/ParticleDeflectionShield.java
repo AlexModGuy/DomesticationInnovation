@@ -3,7 +3,7 @@ package com.github.alexthe668.domesticationinnovation.client.particle;
 import com.github.alexthe668.domesticationinnovation.server.item.DIItemRegistry;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -58,8 +58,8 @@ public class ParticleDeflectionShield extends Particle {
         posestack.pushPose();
         posestack.translate(f, f1 + up + down, f2);
         //xRot + 45 - 45 * fadeIn + 45 * fadeOut
-        posestack.mulPose(Vector3f.YP.rotationDegrees(yRot));
-        posestack.mulPose(Vector3f.XN.rotationDegrees(xRot));
+        posestack.mulPose(Axis.YP.rotationDegrees(yRot));
+        posestack.mulPose(Axis.XN.rotationDegrees(xRot));
         posestack.scale(scale, scale, scale);
         Minecraft.getInstance().getItemRenderer().renderStatic(new ItemStack(DIItemRegistry.DEFLECTION_SHIELD.get()), ItemTransforms.TransformType.GROUND, 240, OverlayTexture.NO_OVERLAY, posestack, multibuffersource$buffersource, 0);
         multibuffersource$buffersource.endBatch();

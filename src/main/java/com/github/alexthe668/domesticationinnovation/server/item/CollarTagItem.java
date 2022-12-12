@@ -8,7 +8,7 @@ import net.minecraft.world.item.ItemStack;
 public class CollarTagItem extends Item {
 
     public CollarTagItem() {
-        super(new Item.Properties().tab(DICreativeModeTab.INSTANCE));
+        super(new Item.Properties());
     }
 
     @Override

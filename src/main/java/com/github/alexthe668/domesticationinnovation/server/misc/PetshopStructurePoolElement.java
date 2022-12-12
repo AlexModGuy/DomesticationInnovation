@@ -1,7 +1,6 @@
 package com.github.alexthe668.domesticationinnovation.server.misc;
 
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
-import com.github.alexthe668.domesticationinnovation.server.entity.DIVillagerRegistry;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -155,7 +154,7 @@ public class PetshopStructurePoolElement extends LegacySinglePoolElement {
     }
 
     public StructurePoolElementType<?> getType() {
-        return DIVillagerRegistry.PETSHOP_TYPE;
+        return DIVillagePieceRegistry.PETSHOP.get();
     }
 
     public String toString() {

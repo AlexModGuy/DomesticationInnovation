@@ -41,9 +41,7 @@ public class FrogAiMixin {
             )
     )
     private static void di_makeBrain(Brain<Frog> brain, CallbackInfoReturnable<Brain<?>> cir) {
-        brain.addActivity(DIActivityRegistry.FROG_FOLLOW.get(), ImmutableList.of(Pair.of(0, new AmphibianFollowOwnerBehavior(1.25F, 1.0F)), Pair.of(1, new StartAttacking<>(FrogAiMixin::canAttack , (p_218605_) -> {
-            return p_218605_.getBrain().getMemory(MemoryModuleType.ATTACK_TARGET);
-        })), Pair.of(2, new ShootTongue(SoundEvents.FROG_TONGUE, SoundEvents.FROG_EAT))));
+        brain.addActivity(DIActivityRegistry.FROG_FOLLOW.get(), ImmutableList.of(Pair.of(0, new AmphibianFollowOwnerBehavior(1.25F, 1.0F)), Pair.of(2, new ShootTongue(SoundEvents.FROG_TONGUE, SoundEvents.FROG_EAT))));
         brain.addActivity(DIActivityRegistry.FROG_STAY.get(), ImmutableList.of(Pair.of(0, new AmphibianStayBehavior())));
     }
 

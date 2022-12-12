@@ -12,8 +12,7 @@ import com.github.alexthe668.domesticationinnovation.server.item.FeatherOnAStick
 import com.github.alexthe668.domesticationinnovation.server.misc.DIParticleRegistry;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -44,6 +43,7 @@ import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.joml.Matrix4f;
 
 import java.util.HashMap;
 import java.util.List;
@@ -186,7 +186,7 @@ public class ClientProxy extends CommonProxy {
                 float f3 = !list.isEmpty() ? (float) (-font.width(list.get(0)) / 2) : (float) (-font.width(nameTag) / 2);
                 pose.pushPose();
                 pose.translate(f3 + 12, (-10 * list.size()) + 16, 0);
-                pose.mulPose(Vector3f.XP.rotationDegrees(180.0F));
+                pose.mulPose(Axis.XP.rotationDegrees(180.0F));
                 pose.scale(22F, 22F, 22F);
                 Minecraft.getInstance().getItemRenderer().renderStatic(new ItemStack(DIItemRegistry.COLLAR_TAG.get()), ItemTransforms.TransformType.GROUND, lightIn, OverlayTexture.NO_OVERLAY, pose, buffer, entity.getId());
                 pose.popPose();
