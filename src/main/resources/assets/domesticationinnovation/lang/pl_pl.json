@@ -25,6 +25,7 @@
   "block.domesticationinnovation.pet_bed_red": "Czerwone legowisko",
   "block.domesticationinnovation.pet_bed_black": "Czarne legowisko",
   "block.domesticationinnovation.drum": "Bęben dowodzenia",
+  "block.domesticationinnovation.wayward_lantern": "Zbłąkana latarnia",
   "message.domesticationinnovation.command_0": "%s wędruje",
   "message.domesticationinnovation.command_1": "%s waruje",
   "message.domesticationinnovation.command_2": "%s podążą",
@@ -36,6 +37,7 @@
   "message.domesticationinnovation.goodbye": "%s nie odrodzi się, żegnaj...",
   "message.domesticationinnovation.enchantments": "Zaklęcia:",
   "message.domesticationinnovation.set_owner": "%s jest teraz właścicielem %s",
+  "message.domesticationinnovation.wayward_lantern_return": "%s odnalazł drogę do najbliższej Zbłąkanej latarni",
   "entity.minecraft.villager.domesticationinnovation.animal_tamer": "Poskramiacz zwierząt",
   "entity.domesticationinnovation.chain_lightning": "Piorun",
   "entity.domesticationinnovation.recall_ball": "Kula przyzywania",
@@ -106,6 +108,12 @@
   "enchantment.domesticationinnovation.immaturity_curse.desc": "Zwierzak wygląda się i zachowuje jak dziecięca wersja siebie, z obniżonymi obrażeniami od ataku.",
   "enchantment.domesticationinnovation.muffled": "Wyciszony",
   "enchantment.domesticationinnovation.muffled.desc": "Zwierzak będzie cichy i nie wyda żadnego dźwięku podczas ruchu.",
+  "enchantment.domesticationinnovation.blazing_protection": "Ochrona Płomyka",
+  "enchantment.domesticationinnovation.blazing_protection.desc": "Zwierzę będzie chronione przed obrażeniami przez 2 płonące pręty na poziom, które powalają i podpalają napastników.",
+  "enchantment.domesticationinnovation.healing_aura": "Lecznicza Aura",
+  "enchantment.domesticationinnovation.healing_aura.desc": "Zwierzę od czasu do czasu uzdrawia właściciela i inne zwierzęta w jego otoczeniu, poziom określa siłę efektu uzdrawiania.",
+  "enchantment.domesticationinnovation.rejuvenation": "Odmłodzenie",
+  "enchantment.domesticationinnovation.rejuvenation.desc": "Gdy zwierzę zostanie zranione, może wchłonąć kulki doświadczenia, aby się uleczyć.",
   "domesticationinnovation.sound.subtitle.collar_tag": "Wyposażono w przywieszkę do obroży",
   "domesticationinnovation.sound.subtitle.magnet_loop": "Magnes buczy",
   "domesticationinnovation.sound.subtitle.chain_lightning": "Błyskawica strzela",
@@ -115,4 +123,5 @@
   "domesticationinnovation.sound.subtitle.drum": "Bęben dowodzenia bije",
   "domesticationinnovation.sound.subtitle.psychic_wall": "Fizyczna ściana brzęczy",
   "domesticationinnovation.sound.subtitle.psychic_wall_deflect": "Fizyczna ściana odbija"
+   "domesticationinnovation.sound.subtitle.blazing_protection": "Płonący pręt znika"
 }
