@@ -40,7 +40,7 @@ public class ParticleBlight extends SimpleAnimatedParticle {
     }
 
     public int getLightColor(float p_107249_) {
-        BlockPos blockpos = new BlockPos(this.x, this.y, this.z);
+        BlockPos blockpos = new BlockPos((int) this.x, (int) this.y, (int) this.z);
         return this.level.hasChunkAt(blockpos) ? LevelRenderer.getLightColor(this.level, blockpos) : 0;
     }
 

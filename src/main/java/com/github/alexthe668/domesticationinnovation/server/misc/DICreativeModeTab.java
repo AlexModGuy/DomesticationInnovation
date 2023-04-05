@@ -30,7 +30,7 @@ public class DICreativeModeTab {
     }
 
     public static void registerTab(CreativeModeTabEvent.Register event) {
-        event.registerCreativeModeTab(TAB, builder -> builder.title(Component.translatable("itemGroup.domesticationinnovation")).icon(DICreativeModeTab::makeIcon).displayItems((flags, output, isOp) -> {
+        event.registerCreativeModeTab(TAB, builder -> builder.title(Component.translatable("itemGroup.domesticationinnovation")).icon(DICreativeModeTab::makeIcon).displayItems((parameters, output) -> {
             for (RegistryObject<Item> item : DIItemRegistry.DEF_REG.getEntries()) {
                 if (item.get() instanceof CustomTabBehavior customTabBehavior) {
                     customTabBehavior.fillItemCategory(output);

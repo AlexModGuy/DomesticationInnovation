@@ -28,6 +28,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.phys.Vec3;
@@ -98,8 +99,8 @@ public class LayerPetOverlays extends RenderLayer {
         float f3 = 0.025F;
         VertexConsumer vertexconsumer = bufferSource.getBuffer(RenderType.leash());
         Matrix4f matrix4f = poseStack.last().pose();
-        BlockPos blockpos = new BlockPos(fromVec);
-        BlockPos blockpos1 = new BlockPos(to);
+        BlockPos blockpos = BlockPos.containing(fromVec);
+        BlockPos blockpos1 = BlockPos.containing(to);
         int i = 0;
         int j = from.level.getBrightness(LightLayer.BLOCK, blockpos1);
         int k = from.level.getBrightness(LightLayer.SKY, blockpos);
@@ -149,7 +150,7 @@ public class LayerPetOverlays extends RenderLayer {
                     matrixStackIn.translate(bob1, 1.25F - entity.getBbHeight() * 0.5F - bob2, -entity.getBbWidth() - 0.125F - bob3);
                     matrixStackIn.mulPose(Axis.XN.rotationDegrees(90));
                     matrixStackIn.scale(1.6F, 1.6F, 3F);
-                    Minecraft.getInstance().getItemRenderer().renderStatic(MAGNET, ItemTransforms.TransformType.GROUND, packedLightIn, OverlayTexture.NO_OVERLAY, matrixStackIn, bufferIn, entity.getId());
+                    Minecraft.getInstance().getItemRenderer().renderStatic(MAGNET, ItemDisplayContext.GROUND, packedLightIn, OverlayTexture.NO_OVERLAY, matrixStackIn, bufferIn, entity.level, entity.getId());
                     matrixStackIn.popPose();
                     matrixStackIn.popPose();
                 }

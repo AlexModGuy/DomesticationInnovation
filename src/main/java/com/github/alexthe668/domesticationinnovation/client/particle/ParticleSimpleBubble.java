@@ -34,7 +34,7 @@ public class ParticleSimpleBubble extends SimpleAnimatedParticle {
     }
 
     public int getLightColor(float p_107249_) {
-        BlockPos blockpos = new BlockPos(this.x, this.y, this.z);
+        BlockPos blockpos = BlockPos.containing(this.x, this.y, this.z);
         return this.level.hasChunkAt(blockpos) ? LevelRenderer.getLightColor(this.level, blockpos) : 0;
     }
 

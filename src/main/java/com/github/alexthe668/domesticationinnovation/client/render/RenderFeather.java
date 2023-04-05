@@ -15,6 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
@@ -39,7 +40,7 @@ public class RenderFeather extends EntityRenderer<FeatherEntity> {
         poseStack.translate(0, 0.1F, 0);
         poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
         poseStack.mulPose(new Quaternionf().rotateZ(35F * ((float)Math.PI / 180F)));
-        Minecraft.getInstance().getItemRenderer().renderStatic(feather, ItemTransforms.TransformType.GROUND, light, OverlayTexture.NO_OVERLAY, poseStack, buffer, entity.getId());
+        Minecraft.getInstance().getItemRenderer().renderStatic(feather, ItemDisplayContext.GROUND, light, OverlayTexture.NO_OVERLAY, poseStack, buffer, entity.level, entity.getId());
         poseStack.popPose();
 
         //fishng rod stuff

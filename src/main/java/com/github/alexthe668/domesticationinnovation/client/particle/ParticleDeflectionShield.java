@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
@@ -61,7 +62,7 @@ public class ParticleDeflectionShield extends Particle {
         posestack.mulPose(Axis.YP.rotationDegrees(yRot));
         posestack.mulPose(Axis.XN.rotationDegrees(xRot));
         posestack.scale(scale, scale, scale);
-        Minecraft.getInstance().getItemRenderer().renderStatic(new ItemStack(DIItemRegistry.DEFLECTION_SHIELD.get()), ItemTransforms.TransformType.GROUND, 240, OverlayTexture.NO_OVERLAY, posestack, multibuffersource$buffersource, 0);
+        Minecraft.getInstance().getItemRenderer().renderStatic(new ItemStack(DIItemRegistry.DEFLECTION_SHIELD.get()), ItemDisplayContext.GROUND, 240, OverlayTexture.NO_OVERLAY, posestack, multibuffersource$buffersource, level, 0);
         multibuffersource$buffersource.endBatch();
         posestack.popPose();
     }

@@ -34,15 +34,5 @@ public abstract class LivingEntityMixin extends Entity {
         return TameableUtils.hasEnchant(((LivingEntity) (Entity)this), DIEnchantmentRegistry.AMPHIBIOUS);
     }
 
-    @Inject(
-            method = {"Lnet/minecraft/world/entity/LivingEntity;rideableUnderWater()Z"},
-            remap = true,
-            at = @At(value = "HEAD"),
-            cancellable = true
-    )
-    protected void di_rideableInWater(CallbackInfoReturnable<Boolean> cir) {
-        if(TameableUtils.isTamed(this) && this.isLandAndSea()){
-            cir.setReturnValue(true);
-        }
-    }
+
 }

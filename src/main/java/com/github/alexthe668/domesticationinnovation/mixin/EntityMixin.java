@@ -76,7 +76,17 @@ public class EntityMixin {
         }
     }
 
-
+    @Inject(
+            method = {"Lnet/minecraft/world/entity/Entity;dismountsUnderwater()Z"},
+            remap = true,
+            at = @At(value = "HEAD"),
+            cancellable = true
+    )
+    protected void di_rideableInWater(CallbackInfoReturnable<Boolean> cir) {
+        if((Object)this instanceof LivingEntity && TameableUtils.isTamed((LivingEntity)(Object)this) && TameableUtils.hasEnchant((LivingEntity)(Object)this, DIEnchantmentRegistry.AMPHIBIOUS)){
+            cir.setReturnValue(true);
+        }
+    }
 
     @Inject(
             method = {"Lnet/minecraft/world/entity/Entity;getMovementEmission()Lnet/minecraft/world/entity/Entity$MovementEmission;"},

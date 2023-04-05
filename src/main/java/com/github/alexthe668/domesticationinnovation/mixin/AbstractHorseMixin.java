@@ -52,12 +52,12 @@ public abstract class AbstractHorseMixin extends Animal implements ModifedToBeTa
     @Shadow public abstract void setOwnerUUID(@org.jetbrains.annotations.Nullable UUID p_30587_);
 
     @Inject(
-            method = {"Lnet/minecraft/world/entity/animal/horse/AbstractHorse;travel(Lnet/minecraft/world/phys/Vec3;)V"},
+            method = {"Lnet/minecraft/world/entity/animal/horse/AbstractHorse;tickRidden(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/phys/Vec3;)V"},
             remap = true,
             at = {@At("HEAD")},
             cancellable = true
     )
-    private void di_travel(Vec3 vec3, CallbackInfo ci) {
+    private void di_travel(LivingEntity rider, Vec3 vec3, CallbackInfo ci) {
         if (this.isAlive() && this.isVehicle() && this.isInWaterOrBubble() && TameableUtils.hasEnchant(this, DIEnchantmentRegistry.AMPHIBIOUS)) {
             LivingEntity livingentity = (LivingEntity) this.getControllingPassenger();
             this.setYRot(livingentity.getYRot());
@@ -82,7 +82,7 @@ public abstract class AbstractHorseMixin extends Animal implements ModifedToBeTa
             } else if (livingentity instanceof Player) {
                 this.setDeltaMovement(this.getDeltaMovement().multiply(0.6D, 1.0D, 0.6D).add(0, -down, 0));
             }
-            this.calculateEntityAnimation(this, false);
+            this.calculateEntityAnimation(false);
             this.tryCheckInsideBlocks();
             ci.cancel();
         }

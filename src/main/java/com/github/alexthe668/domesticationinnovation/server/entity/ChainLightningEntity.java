@@ -65,7 +65,7 @@ public class ChainLightningEntity extends Entity {
                 if(!level.isClientSide){
                     if(!hasShocked){
                         hasShocked = true;
-                        current.hurt(DamageSource.LIGHTNING_BOLT, 3);
+                        current.hurt(current.damageSources().lightningBolt(), 3);
                     }
                 }
             }

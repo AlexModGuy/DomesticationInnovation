@@ -26,8 +26,4 @@ public interface ModifedToBeTameable extends OwnableEntity {
         return getTameOwnerUUID();
     }
 
-    @Nullable
-    default Entity getOwner(){
-        return getTameOwner();
-    }
 }

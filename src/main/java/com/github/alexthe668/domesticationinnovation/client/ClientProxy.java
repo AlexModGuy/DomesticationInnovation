@@ -30,6 +30,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.DefaultAttributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
@@ -188,25 +189,25 @@ public class ClientProxy extends CommonProxy {
                 pose.translate(f3 + 12, (-10 * list.size()) + 16, 0);
                 pose.mulPose(Axis.XP.rotationDegrees(180.0F));
                 pose.scale(22F, 22F, 22F);
-                Minecraft.getInstance().getItemRenderer().renderStatic(new ItemStack(DIItemRegistry.COLLAR_TAG.get()), ItemTransforms.TransformType.GROUND, lightIn, OverlayTexture.NO_OVERLAY, pose, buffer, entity.getId());
+                Minecraft.getInstance().getItemRenderer().renderStatic(new ItemStack(DIItemRegistry.COLLAR_TAG.get()), ItemDisplayContext.GROUND, lightIn, OverlayTexture.NO_OVERLAY, pose, buffer, entity.level, entity.getId());
                 pose.popPose();
 
                 Matrix4f matrix4f = pose.last().pose();
                 float f1 = Minecraft.getInstance().options.getBackgroundOpacity(0.25F);
                 int j = (int) (f1 * 255.0F) << 24;
                 float f2 = (float) (-font.width(nameTag) / 2);
-                font.drawInBatch(nameTag, f2, (float) i - 0.25F, 553648127, false, matrix4f, buffer, flag, j, lightIn);
+                font.drawInBatch(nameTag, f2, (float) i - 0.25F, 553648127, false, matrix4f, buffer, Font.DisplayMode.NORMAL, j, lightIn);
                 if (flag) {
-                    font.drawInBatch(nameTag, f2, (float) i - 0.25F, -1, false, matrix4f, buffer, false, 0, lightIn);
+                    font.drawInBatch(nameTag, f2, (float) i - 0.25F, -1, false, matrix4f, buffer, Font.DisplayMode.NORMAL, 0, lightIn);
                 }
                 pose.pushPose();
                 pose.scale(0.8F, 0.8F, 0.8F);
                 matrix4f = pose.last().pose();
                 for (int k = 0; k < list.size(); k++) {
                     float f4 = (float) (-font.width(list.get(k)) / 2);
-                    font.drawInBatch(list.get(k), f4, i * 1.25F + k * 10 + 12, 553648127, false, matrix4f, buffer, flag, j, lightIn);
+                    font.drawInBatch(list.get(k), f4, i * 1.25F + k * 10 + 12, 553648127, false, matrix4f, buffer, Font.DisplayMode.NORMAL, j, lightIn);
                     if (flag) {
-                        font.drawInBatch(list.get(k), f4, i * 1.25F + k * 10 + 12, -1, false, matrix4f, buffer, false, 0, lightIn);
+                        font.drawInBatch(list.get(k), f4, i * 1.25F + k * 10 + 12, -1, false, matrix4f, buffer, Font.DisplayMode.NORMAL, 0, lightIn);
                     }
                 }
                 pose.popPose();

@@ -10,7 +10,9 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MoverType;
@@ -48,7 +50,7 @@ public class GiantBubbleEntity extends Entity {
     }
 
     public boolean hurt(DamageSource source, float f) {
-        if(source.isProjectile() && f > 0 || source == DamageSource.OUT_OF_WORLD){
+        if(source.is(DamageTypeTags.IS_PROJECTILE) && f > 0 || source.is(DamageTypes.OUT_OF_WORLD)){
             this.pop();
             return true;
         }

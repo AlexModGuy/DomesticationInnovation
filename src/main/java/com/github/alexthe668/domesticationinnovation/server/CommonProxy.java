@@ -32,6 +32,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
@@ -69,6 +70,7 @@ import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.*;
+import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.item.ItemExpireEvent;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -342,7 +344,7 @@ public class CommonProxy {
                                     if (punchProgress[i] < 10) {
                                         punchProgress[i] = punchProgress[i] + 1;
                                     } else {
-                                        punching.hurt(DamageSource.mobAttack(mob), Mth.clamp(shadowHandsLevel, 2, 4));
+                                        punching.hurt(punching.damageSources().mobAttack(mob), Mth.clamp(shadowHandsLevel, 2, 4));
                                         striking[i] = 0;
                                     }
                                 }
@@ -556,7 +558,7 @@ public class CommonProxy {
 
     @SubscribeEvent
     public void onLivingHurt(LivingAttackEvent event) {
-        if (TameableUtils.isTamed(event.getEntity()) && event.getSource() != DIDamageTypes.SIPHON_DAMAGE) {
+        if (TameableUtils.isTamed(event.getEntity()) && !event.getSource().is(DIDamageTypes.SIPHON)) {
             boolean flag = false;
             if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.IMMUNITY_FRAME)) {
                 int level = TameableUtils.getEnchantLevel(event.getEntity(), DIEnchantmentRegistry.IMMUNITY_FRAME);
@@ -585,11 +587,11 @@ public class CommonProxy {
                     TameableUtils.setBlazingProtectionCooldown(event.getEntity(), 600);
                 }
             }
-            if ((event.getSource() == DamageSource.DROWN || event.getSource() == DamageSource.DRY_OUT) && TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.AMPHIBIOUS)) {
+            if ((event.getSource().is(DamageTypes.DROWN) || event.getSource().is(DamageTypes.DRY_OUT)) && TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.AMPHIBIOUS)) {
                 event.setCanceled(true);
                 flag = true;
             }
-            if (!flag && (event.getSource().isFall() || event.getSource() == DamageSource.OUT_OF_WORLD) && TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.VOID_CLOUD)) {
+            if (!flag && (event.getSource().is(DamageTypes.FALL) || event.getSource().is(DamageTypes.OUT_OF_WORLD)) && TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.VOID_CLOUD)) {
                 event.setCanceled(true);
                 flag = true;
             }
@@ -599,7 +601,7 @@ public class CommonProxy {
                     owner.hurt(event.getSource(), event.getAmount());
                     event.setCanceled(true);
                     flag = true;
-                    event.getEntity().hurt(DIDamageTypes.SIPHON_DAMAGE, 0.0F);
+                    event.getEntity().hurt(DIDamageTypes.causeSiphonDamage(owner.level.registryAccess()), 0.0F);
                 }
             }
             if (!flag && TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.TOTAL_RECALL) && event.getEntity().getHealth() - event.getAmount() <= 2.0D && !TameableUtils.isZombiePet(event.getEntity())) {
@@ -986,7 +988,7 @@ public class CommonProxy {
     }
 
     @SubscribeEvent
-    public void onEntityJoinWorld(LivingSpawnEvent.SpecialSpawn event) {
+    public void onEntityJoinWorld(MobSpawnEvent.FinalizeSpawn event) {
         try {
             if (event.getEntity() != null && event.getEntity() instanceof Ravager && DomesticationMod.CONFIG.rabbitsScareRavagers.get()) {
                 Ravager ravager = (Ravager) event.getEntity();
@@ -1116,8 +1118,8 @@ public class CommonProxy {
     }
 
     @SubscribeEvent
-    public void onSetAttackTarget(LivingSetAttackTargetEvent event) {
-        if (TameableUtils.isTamed(event.getEntity()) && event.getTarget() instanceof Player player && TameableUtils.isPetOf(player, event.getEntity())) {
+    public void onSetAttackTarget(LivingChangeTargetEvent event) {
+        if (TameableUtils.isTamed(event.getEntity()) && event.getNewTarget() instanceof Player player && TameableUtils.isPetOf(player, event.getEntity())) {
             event.setCanceled(true);
         }
     }

@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -36,7 +37,7 @@ public class RenderJukeboxFollower extends EntityRenderer<FollowingJukeboxEntity
         poseStack.mulPose(Axis.YP.rotationDegrees(Mth.lerp(partialTicks, entity.yRotO, entity.getYRot())));
         poseStack.translate(0, 0.1F, 0);
         poseStack.scale(1.8F, 1.8F, 1.8F);
-        Minecraft.getInstance().getItemRenderer().renderStatic(jukebox, ItemTransforms.TransformType.GROUND, light, OverlayTexture.NO_OVERLAY, poseStack, buffer, entity.getId());
+        Minecraft.getInstance().getItemRenderer().renderStatic(jukebox, ItemDisplayContext.GROUND, light, OverlayTexture.NO_OVERLAY, poseStack, buffer, entity.level, entity.getId());
         poseStack.popPose();
 
     }
