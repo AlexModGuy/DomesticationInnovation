@@ -96,19 +96,19 @@ public class RecallBallEntity extends Entity {
             openProgress -= 0.1F;
         }
         if(random.nextFloat() < 0.4F){
-            this.level.addParticle(ParticleTypes.PORTAL, this.getRandomX(0.5D), this.getRandomY() - 0.25D, this.getRandomZ(0.5D), (this.random.nextDouble() - 0.5D) * 2.0D, -this.random.nextDouble(), (this.random.nextDouble() - 0.5D) * 2.0D);
+            this.level().addParticle(ParticleTypes.PORTAL, this.getRandomX(0.5D), this.getRandomY() - 0.25D, this.getRandomZ(0.5D), (this.random.nextDouble() - 0.5D) * 2.0D, -this.random.nextDouble(), (this.random.nextDouble() - 0.5D) * 2.0D);
         }
         if(this.entityData.get(OPENED) && openProgress >= 1F && !this.isFinished()){
-            if(!level.isClientSide){
+            if(!level().isClientSide){
                 EntityType type = ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(this.getContainedEntityType()));
                 if(type != null){
-                    Entity entity = type.create(level);
+                    Entity entity = type.create(level());
                     if(entity instanceof LivingEntity alive){
                         alive.readAdditionalSaveData(this.getContainedData());
                         alive.setHealth(Math.max(2, alive.getMaxHealth() * 0.25F));
                         alive.setYRot(random.nextFloat() * 360 - 180);
                         alive.copyPosition(this);
-                        level.addFreshEntity(alive);
+                        level().addFreshEntity(alive);
                     }
                     this.entityData.set(FINISHED, true);
                     this.entityData.set(OPENED, false);

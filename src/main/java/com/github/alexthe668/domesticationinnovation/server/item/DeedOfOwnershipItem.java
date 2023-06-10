@@ -1,10 +1,6 @@
 package com.github.alexthe668.domesticationinnovation.server.item;
 
-import com.github.alexthe668.domesticationinnovation.DomesticationMod;
-import com.github.alexthe668.domesticationinnovation.server.entity.TameableUtils;
-import com.github.alexthe668.domesticationinnovation.server.misc.DICreativeModeTab;
 import net.minecraft.ChatFormatting;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -13,7 +9,6 @@ import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.UUID;
 
 public class DeedOfOwnershipItem extends Item {
 

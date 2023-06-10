@@ -144,7 +144,7 @@ public abstract class FoxMixin extends Animal implements ModifedToBeTameable, IC
     public LivingEntity getTameOwner() {
         try {
             UUID uuid = this.getTameOwnerUUID();
-            return uuid == null ? null : this.level.getPlayerByUUID(uuid);
+            return uuid == null ? null : this.level().getPlayerByUUID(uuid);
         } catch (IllegalArgumentException illegalargumentexception) {
             return null;
         }

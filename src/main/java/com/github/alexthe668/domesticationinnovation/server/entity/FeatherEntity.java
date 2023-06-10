@@ -69,10 +69,9 @@ public class FeatherEntity extends FishingHook {
     }
 
     public void tick() {
-        prevOnGround = onGround;
         super.tick();
         this.setDeltaMovement(this.getDeltaMovement().multiply(0.8D, 0.8D, 0.8D));
-        if(this.isOnGround() && !level.isClientSide){
+        if(this.onGround() && !level().isClientSide){
             if(!prevOnGround){
                 closestPet = findClosestPetOf(this.getPlayerOwner());
             }
@@ -89,11 +88,12 @@ public class FeatherEntity extends FishingHook {
                 }
             }
         }
+        prevOnGround = onGround();
     }
 
     private LivingEntity findClosestPetOf(Player owner) {
         LivingEntity closestValid = null;
-        for (Entity entity : this.level.getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(21.0D))) {
+        for (Entity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(21.0D))) {
             if (TameableUtils.isTamed(entity) && TameableUtils.isPetOf(owner, entity) && isPetAmbulatory((LivingEntity) entity) && ((LivingEntity)entity).hasLineOfSight(this)) {
                 if (closestValid == null || this.distanceTo(entity) < this.distanceTo(closestValid)) {
                     closestValid = (LivingEntity)entity;
@@ -115,7 +115,7 @@ public class FeatherEntity extends FishingHook {
     public Entity getOwner(){
         Entity prev = super.getOwner();
         if(this.entityData.get(OWNER_ID) != -1){
-            return level.getEntity(this.entityData.get(OWNER_ID));
+            return level().getEntity(this.entityData.get(OWNER_ID));
         }else{
             return prev;
         }
@@ -130,8 +130,8 @@ public class FeatherEntity extends FishingHook {
     @Nullable
     @Override
     public Player getPlayerOwner() {
-        if(level.isClientSide  && this.entityData.get(OWNER_ID) != -1){
-            Entity entity = level.getEntity(this.entityData.get(OWNER_ID));
+        if(level().isClientSide  && this.entityData.get(OWNER_ID) != -1){
+            Entity entity = level().getEntity(this.entityData.get(OWNER_ID));
             return entity instanceof Player ? (Player) entity : null;
         }else{
             Entity entity = this.getOwner();

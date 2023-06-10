@@ -1,0 +1,10 @@
+{
+  "type": "domesticationinnovation:di_loot_modifier",
+  "loot_type": 2,
+  "conditions": [
+    {
+      "condition": "forge:loot_table_id",
+      "loot_table_id": "minecraft:chests/woodland_mansion"
+    }
+  ]
+}

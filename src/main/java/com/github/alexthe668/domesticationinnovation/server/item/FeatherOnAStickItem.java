@@ -1,8 +1,6 @@
 package com.github.alexthe668.domesticationinnovation.server.item;
 
-import com.github.alexthe668.domesticationinnovation.DomesticationMod;
 import com.github.alexthe668.domesticationinnovation.server.entity.FeatherEntity;
-import com.github.alexthe668.domesticationinnovation.server.misc.DICreativeModeTab;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;

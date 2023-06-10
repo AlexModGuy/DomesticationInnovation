@@ -37,7 +37,7 @@ public class RenderJukeboxFollower extends EntityRenderer<FollowingJukeboxEntity
         poseStack.mulPose(Axis.YP.rotationDegrees(Mth.lerp(partialTicks, entity.yRotO, entity.getYRot())));
         poseStack.translate(0, 0.1F, 0);
         poseStack.scale(1.8F, 1.8F, 1.8F);
-        Minecraft.getInstance().getItemRenderer().renderStatic(jukebox, ItemDisplayContext.GROUND, light, OverlayTexture.NO_OVERLAY, poseStack, buffer, entity.level, entity.getId());
+        Minecraft.getInstance().getItemRenderer().renderStatic(jukebox, ItemDisplayContext.GROUND, light, OverlayTexture.NO_OVERLAY, poseStack, buffer, entity.level(), entity.getId());
         poseStack.popPose();
 
     }

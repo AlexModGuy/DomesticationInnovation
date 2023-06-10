@@ -25,7 +25,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -41,10 +41,9 @@ public class PetBedBlock extends BaseEntityBlock {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     private static Random random = new Random();
     public PetBedBlock(String variantName, DyeColor color) {
-        super(BlockBehaviour.Properties.of(Material.WOOL, color).sound(SoundType.WOOD).strength(0.8F).noOcclusion());
+        super(BlockBehaviour.Properties.of().mapColor(color).pushReaction(PushReaction.BLOCK).sound(SoundType.WOOD).strength(0.8F).noOcclusion());
         this.registerDefaultState(this.stateDefinition.any().setValue(WATERLOGGED, Boolean.valueOf(false)).setValue(FACING, Direction.NORTH));
     }
-
 
     public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
         if(TameableUtils.isTamed(entity) && !level.isClientSide && DomesticationMod.CONFIG.petBedRespawns.get()){

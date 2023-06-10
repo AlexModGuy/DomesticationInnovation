@@ -13,7 +13,7 @@ public class DiscJockeySound  extends AbstractTickableSoundInstance {
     private SoundEvent recordSound;
 
     public DiscJockeySound(SoundEvent record, FollowingJukeboxEntity box) {
-        super(record, SoundSource.RECORDS, box.getLevel().getRandom());
+        super(record, SoundSource.RECORDS, box.level().getRandom());
         this.box = box;
         this.attenuation = Attenuation.NONE;
         this.looping = true;

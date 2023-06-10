@@ -390,7 +390,7 @@ public class TameableUtils {
     @Nullable
     public static Entity getPetAttackTarget(LivingEntity enchanted) {
         int i = getPetAttackTargetID(enchanted);
-        return i == -1 ? null : enchanted.level.getEntity(i);
+        return i == -1 ? null : enchanted.level().getEntity(i);
     }
 
     public static void setPetAttackTarget(LivingEntity enchanted, int id) {
@@ -523,7 +523,7 @@ public class TameableUtils {
 
     private static void sync(LivingEntity enchanted, CompoundTag tag) {
         CitadelEntityData.setCitadelTag(enchanted, tag);
-        if (!enchanted.level.isClientSide) {
+        if (!enchanted.level().isClientSide) {
             Citadel.sendMSGToAll(new PropertiesMessage("CitadelTagUpdate", tag, enchanted.getId()));
         } else {
             Citadel.sendMSGToServer(new PropertiesMessage("CitadelTagUpdate", tag, enchanted.getId()));
@@ -579,7 +579,7 @@ public class TameableUtils {
     public static void attractAnimals(LivingEntity attractor, int max) {
         if ((attractor.tickCount + attractor.getId()) % 8 == 0) {
             Predicate<Entity> notOnTeam = (animal) -> !hasSameOwnerAs((LivingEntity) animal, attractor) && animal.distanceTo(attractor) > 3 + attractor.getBbWidth() * 1.6F;
-            List<Animal> list = attractor.level.getEntitiesOfClass(Animal.class, attractor.getBoundingBox().inflate(16, 8, 16), EntitySelector.NO_SPECTATORS.and(notOnTeam));
+            List<Animal> list = attractor.level().getEntitiesOfClass(Animal.class, attractor.getBoundingBox().inflate(16, 8, 16), EntitySelector.NO_SPECTATORS.and(notOnTeam));
             list.sort(Comparator.comparingDouble(attractor::distanceToSqr));
             for (int i = 0; i < Math.min(max, list.size()); i++) {
                 Animal e = list.get(i);
@@ -594,7 +594,7 @@ public class TameableUtils {
     public static void aggroRandomMonsters(LivingEntity attractor) {
         if ((attractor.tickCount + attractor.getId()) % 400 == 0) {
             Predicate<Entity> notOnTeamAndMonster = (animal) -> animal instanceof Monster && !hasSameOwnerAs((LivingEntity) animal, attractor) && animal.distanceTo(attractor) > 3 + attractor.getBbWidth() * 1.6F;
-            List<Mob> list = attractor.level.getEntitiesOfClass(Mob.class, attractor.getBoundingBox().inflate(20, 8, 20), EntitySelector.NO_SPECTATORS.and(notOnTeamAndMonster));
+            List<Mob> list = attractor.level().getEntitiesOfClass(Mob.class, attractor.getBoundingBox().inflate(20, 8, 20), EntitySelector.NO_SPECTATORS.and(notOnTeamAndMonster));
             list.sort(Comparator.comparingDouble(attractor::distanceToSqr));
             if (!list.isEmpty()) {
                 list.get(0).setTarget(attractor);
@@ -606,7 +606,7 @@ public class TameableUtils {
         boolean interval = (scary.tickCount + scary.getId()) % Math.max(140, 600 - level * 200) == 0;
         if (interval || scary.hurtTime == 4 || getIntimidationCooldown(scary) > 0) {
             Predicate<Entity> notOnTeamAndMonster = (animal) -> animal instanceof Monster && !hasSameOwnerAs((LivingEntity) animal, scary) && animal.distanceTo(scary) > 3 + scary.getBbWidth() * 1.6F;
-            List<PathfinderMob> list = scary.level.getEntitiesOfClass(PathfinderMob.class, scary.getBoundingBox().inflate(10 * level, 8 * level, 10 * level), EntitySelector.NO_SPECTATORS.and(notOnTeamAndMonster));
+            List<PathfinderMob> list = scary.level().getEntitiesOfClass(PathfinderMob.class, scary.getBoundingBox().inflate(10 * level, 8 * level, 10 * level), EntitySelector.NO_SPECTATORS.and(notOnTeamAndMonster));
             list.sort(Comparator.comparingDouble(scary::distanceToSqr));
             if (!list.isEmpty()) {
                 if (getIntimidationCooldown(scary) > 0 && !interval) {
@@ -616,7 +616,7 @@ public class TameableUtils {
                     float f = Mth.sqrt((float) (rots.x * rots.x + rots.z * rots.z));
                     double yRot = Math.atan2(-rots.z, -rots.x) * (double) (180F / (float) Math.PI) + 90F;
                     double xRot = Math.atan2(-rots.y, f) * (double) (180F / (float) Math.PI);
-                    scary.level.addParticle(DIParticleRegistry.INTIMIDATION.get(), scary.getX(), scary.getY(), scary.getZ(), scary.getId(), xRot, yRot);
+                    scary.level().addParticle(DIParticleRegistry.INTIMIDATION.get(), scary.getX(), scary.getY(), scary.getZ(), scary.getId(), xRot, yRot);
                     setIntimidationCooldown(scary, 70 * level);
                     if (scary instanceof Mob) {
                         ((Mob) scary).playAmbientSound();
@@ -642,7 +642,7 @@ public class TameableUtils {
                 double x = attractor.getRandomX(2.0F);
                 double y = attractor.position().y;
                 double z = attractor.getRandomZ(2.0F);
-                attractor.getLevel().addParticle(DIParticleRegistry.SNIFF.get(), x, y, z, look.x, look.y, look.z);
+                attractor.level().addParticle(DIParticleRegistry.SNIFF.get(), x, y, z, look.x, look.y, look.z);
             }
         }
         if (tick == 30) {
@@ -653,7 +653,7 @@ public class TameableUtils {
                 for (int j = 0; j <= range && j >= -range; j = (j <= 0 ? 1 : 0) - j) {
                     for (int k = 0; k <= range && k >= -range; k = (k <= 0 ? 1 : 0) - k) {
                         BlockPos offset = blockpos.offset(j, i, k);
-                        BlockState state = attractor.getLevel().getBlockState(offset);
+                        BlockState state = attractor.level().getBlockState(offset);
                         if (state.is(Tags.Blocks.ORES)) {
                             if (ores.size() < maxOres) {
                                 ores.add(offset);
@@ -665,12 +665,12 @@ public class TameableUtils {
                 }
             }
             for (BlockPos ore : ores) {
-                HighlightedBlockEntity highlight = DIEntityRegistry.HIGHLIGHTED_BLOCK.get().create(attractor.level);
+                HighlightedBlockEntity highlight = DIEntityRegistry.HIGHLIGHTED_BLOCK.get().create(attractor.level());
                 highlight.setPos(Vec3.atBottomCenterOf(ore));
                 highlight.setLifespan(effectLength);
                 highlight.setXRot(0);
                 highlight.setYRot(0);
-                attractor.getLevel().addFreshEntity(highlight);
+                attractor.level().addFreshEntity(highlight);
             }
         }
     }
@@ -688,9 +688,9 @@ public class TameableUtils {
                 for (int j = 0; j <= range && j >= -range; j = (j <= 0 ? 1 : 0) - j) {
                     for (int k = 0; k <= range && k >= -range; k = (k <= 0 ? 1 : 0) - k) {
                         BlockPos offset = blockpos.offset(j, i, k);
-                        BlockState state = living.getLevel().getBlockState(offset);
+                        BlockState state = living.level().getBlockState(offset);
                         if (!state.isAir() && r.nextInt(4) == 0) {
-                            if (state.is(BlockTags.FLOWERS) || state.is(BlockTags.REPLACEABLE_PLANTS) || state.is(BlockTags.CROPS)) {
+                            if (state.is(BlockTags.FLOWERS) || state.is(BlockTags.REPLACEABLE_BY_TREES) || state.is(BlockTags.CROPS)) {
                                 plants.add(offset);
                             } else if (state.is(BlockTags.DIRT) && !state.is(Blocks.DIRT) && !state.is(Blocks.COARSE_DIRT) || state.is(Blocks.FARMLAND)) {
                                 grasses.add(offset);
@@ -700,15 +700,15 @@ public class TameableUtils {
                 }
             }
             for (BlockPos plant : plants) {
-                living.getLevel().setBlockAndUpdate(plant, Blocks.AIR.defaultBlockState());
+                living.level().setBlockAndUpdate(plant, Blocks.AIR.defaultBlockState());
                 for (int i = 0; i < 1 + r.nextInt(2); i++) {
-                    living.getLevel().addParticle(DIParticleRegistry.BLIGHT.get(), plant.getX() + r.nextFloat(), plant.getY() + r.nextFloat(), plant.getZ() + r.nextFloat(), 0, 0.08F, 0);
+                    living.level().addParticle(DIParticleRegistry.BLIGHT.get(), plant.getX() + r.nextFloat(), plant.getY() + r.nextFloat(), plant.getZ() + r.nextFloat(), 0, 0.08F, 0);
                 }
             }
             for (BlockPos dirt : grasses) {
-                living.getLevel().setBlockAndUpdate(dirt, r.nextBoolean() ? Blocks.COARSE_DIRT.defaultBlockState() : Blocks.DIRT.defaultBlockState());
+                living.level().setBlockAndUpdate(dirt, r.nextBoolean() ? Blocks.COARSE_DIRT.defaultBlockState() : Blocks.DIRT.defaultBlockState());
                 for (int i = 0; i < 1 + r.nextInt(2); i++) {
-                    living.getLevel().addParticle(DIParticleRegistry.BLIGHT.get(), dirt.getX() + r.nextFloat(), dirt.getY() + 1, dirt.getZ() + r.nextFloat(), 0, 0.08F, 0);
+                    living.level().addParticle(DIParticleRegistry.BLIGHT.get(), dirt.getX() + r.nextFloat(), dirt.getY() + 1, dirt.getZ() + r.nextFloat(), 0, 0.08F, 0);
                 }
             }
         }
@@ -716,12 +716,12 @@ public class TameableUtils {
 
     public static List<LivingEntity> getAuraHealables(LivingEntity pet) {
         Predicate<Entity> hurtAndOnTeam = (animal) -> hasSameOwnerAs((LivingEntity) animal, pet) && animal.distanceTo(pet) < 4 && ((LivingEntity) animal).getHealth() < ((LivingEntity) animal).getMaxHealth();
-        return pet.level.getEntitiesOfClass(LivingEntity.class, pet.getBoundingBox().inflate(4, 4, 4), EntitySelector.NO_SPECTATORS.and(hurtAndOnTeam));
+        return pet.level().getEntitiesOfClass(LivingEntity.class, pet.getBoundingBox().inflate(4, 4, 4), EntitySelector.NO_SPECTATORS.and(hurtAndOnTeam));
     }
 
     public static List<LivingEntity> getNearbyHealers(LivingEntity hurtOwner) {
         Predicate<Entity> healer = (animal) -> hasSameOwnerAs((LivingEntity) animal, hurtOwner) && hasEnchant((LivingEntity) animal, DIEnchantmentRegistry.HEALING_AURA) && getHealingAuraTime((LivingEntity) animal) == 0;
-        return hurtOwner.level.getEntitiesOfClass(LivingEntity.class, hurtOwner.getBoundingBox().inflate(16, 4, 16), EntitySelector.NO_SPECTATORS.and(healer));
+        return hurtOwner.level().getEntitiesOfClass(LivingEntity.class, hurtOwner.getBoundingBox().inflate(16, 4, 16), EntitySelector.NO_SPECTATORS.and(healer));
     }
 
     public static float getFallDistance(LivingEntity enchanted) {
@@ -751,7 +751,7 @@ public class TameableUtils {
 
     public static int getCharismaBonusForOwner(Player player) {
         Predicate<Entity> pet = (animal) -> isTamed(animal) && isPetOf(player, animal);
-        List<LivingEntity> list = player.level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(25, 8, 25), EntitySelector.NO_SPECTATORS.and(pet));
+        List<LivingEntity> list = player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(25, 8, 25), EntitySelector.NO_SPECTATORS.and(pet));
         int charismas = 0;
         for (LivingEntity entity : list) {
             charismas += 10 * getEnchantLevel(entity, DIEnchantmentRegistry.CHARISMA);
@@ -771,8 +771,8 @@ public class TameableUtils {
     }
 
     public static void absorbExpOrbs(LivingEntity living) {
-        if (living.getHealth() < living.getMaxHealth() && !living.level.isClientSide) {
-            for (ExperienceOrb experienceorb : living.level.getEntitiesOfClass(ExperienceOrb.class, living.getBoundingBox().inflate(3D))) {
+        if (living.getHealth() < living.getMaxHealth() && !living.level().isClientSide) {
+            for (ExperienceOrb experienceorb : living.level().getEntitiesOfClass(ExperienceOrb.class, living.getBoundingBox().inflate(3D))) {
                 if (living.getHealth() >= living.getMaxHealth()) {
                     break;
                 }

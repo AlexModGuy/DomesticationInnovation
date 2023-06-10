@@ -121,13 +121,13 @@ public abstract class FrogMixin extends Animal implements ModifedToBeTameable, I
     }
 
     private void spawnTamingParticles(boolean smoke) {
-        if (!level.isClientSide) {
+        if (!level().isClientSide) {
             ParticleOptions particleoptions = smoke ? ParticleTypes.SMOKE : ParticleTypes.HEART;
             for (int i = 0; i < 7; ++i) {
                 double d0 = this.getRandom().nextGaussian() * 0.02D;
                 double d1 = this.getRandom().nextGaussian() * 0.02D;
                 double d2 = this.getRandom().nextGaussian() * 0.02D;
-                ((ServerLevel) this.getLevel()).sendParticles(particleoptions, this.getRandomX(1.0D), this.getRandomY() + 0.5D, this.getRandomZ(1.0D), 3, d0, d1, d2, 0.03F);
+                ((ServerLevel) this.level()).sendParticles(particleoptions, this.getRandomX(1.0D), this.getRandomY() + 0.5D, this.getRandomZ(1.0D), 3, d0, d1, d2, 0.03F);
             }
         }
     }
@@ -161,7 +161,7 @@ public abstract class FrogMixin extends Animal implements ModifedToBeTameable, I
     public LivingEntity getTameOwner() {
         try {
             UUID uuid = this.getTameOwnerUUID();
-            return uuid == null ? null : this.level.getPlayerByUUID(uuid);
+            return uuid == null ? null : this.level().getPlayerByUUID(uuid);
         } catch (IllegalArgumentException illegalargumentexception) {
             return null;
         }
@@ -205,7 +205,7 @@ public abstract class FrogMixin extends Animal implements ModifedToBeTameable, I
                 this.usePlayerItem(player, hand, itemStack);
                 this.heal(2);
                 this.playSound(SoundEvents.FROG_EAT, this.getSoundVolume(), this.getVoicePitch());
-                if (!this.level.isClientSide) {
+                if (!this.level().isClientSide) {
                     if (this.getRandom().nextInt(4) == 0) {
                         this.spawnTamingParticles(true);
                     } else {

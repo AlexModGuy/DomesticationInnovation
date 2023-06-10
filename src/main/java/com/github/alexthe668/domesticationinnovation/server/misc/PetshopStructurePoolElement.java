@@ -54,7 +54,7 @@ public class PetshopStructurePoolElement extends LegacySinglePoolElement {
 
     @Override
     public void handleDataMarker(LevelAccessor levelAccessor, StructureTemplate.StructureBlockInfo structureBlockInfo, BlockPos pos, Rotation rotation, RandomSource random, BoundingBox box) {
-        String contents = structureBlockInfo.nbt.getString("metadata");
+        String contents = structureBlockInfo.nbt().getString("metadata");
         if(!initializedMobLists){
             fishtankMobs = getAllMatchingEntities(DITagRegistry.PETSTORE_FISHTANK).toArray(new EntityType[0]);
             cage0Mobs = getAllMatchingEntities(DITagRegistry.PETSTORE_CAGE_0).toArray(new EntityType[0]);
@@ -90,28 +90,28 @@ public class PetshopStructurePoolElement extends LegacySinglePoolElement {
                     }
                     state = coralBlock.defaultBlockState().setValue(BaseCoralPlantTypeBlock.WATERLOGGED, true);
                 }
-                spawnAnimalsAt(levelAccessor, structureBlockInfo.pos, 2,  random, fishtankMobs);
-                levelAccessor.setBlock(structureBlockInfo.pos, state, 2);
+                spawnAnimalsAt(levelAccessor, structureBlockInfo.pos(), 2,  random, fishtankMobs);
+                levelAccessor.setBlock(structureBlockInfo.pos(), state, 2);
                 break;
             case "petshop_chest":
-                levelAccessor.setBlock(structureBlockInfo.pos, Blocks.AIR.defaultBlockState(), 2);
-                RandomizableContainerBlockEntity.setLootTable(levelAccessor, random, structureBlockInfo.pos.below(), CHEST);
+                levelAccessor.setBlock(structureBlockInfo.pos(), Blocks.AIR.defaultBlockState(), 2);
+                RandomizableContainerBlockEntity.setLootTable(levelAccessor, random, structureBlockInfo.pos().below(), CHEST);
                 break;
             case "petshop_cage_0"://wolf, rabbit or cat
-                spawnAnimalsAt(levelAccessor, structureBlockInfo.pos, 1 + random.nextInt(2), random, cage0Mobs);
-                levelAccessor.setBlock(structureBlockInfo.pos, Blocks.AIR.defaultBlockState(), 4);
+                spawnAnimalsAt(levelAccessor, structureBlockInfo.pos(), 1 + random.nextInt(2), random, cage0Mobs);
+                levelAccessor.setBlock(structureBlockInfo.pos(), Blocks.AIR.defaultBlockState(), 4);
                 break;
             case "petshop_cage_1"://desert terrarium
-                spawnAnimalsAt(levelAccessor, structureBlockInfo.pos, 2 + random.nextInt(2), random, cage1Mobs);
-                levelAccessor.setBlock(structureBlockInfo.pos, Blocks.AIR.defaultBlockState(), 2);
+                spawnAnimalsAt(levelAccessor, structureBlockInfo.pos(), 2 + random.nextInt(2), random, cage1Mobs);
+                levelAccessor.setBlock(structureBlockInfo.pos(), Blocks.AIR.defaultBlockState(), 2);
                 break;
             case "petshop_cage_2"://ice terrarium
-                spawnAnimalsAt(levelAccessor, structureBlockInfo.pos, 1 + random.nextInt(2), random, cage2Mobs);
-                levelAccessor.setBlock(structureBlockInfo.pos, Blocks.AIR.defaultBlockState(), 2);
+                spawnAnimalsAt(levelAccessor, structureBlockInfo.pos(), 1 + random.nextInt(2), random, cage2Mobs);
+                levelAccessor.setBlock(structureBlockInfo.pos(), Blocks.AIR.defaultBlockState(), 2);
                 break;
             case "petshop_cage_3"://parrot
-                spawnAnimalsAt(levelAccessor, structureBlockInfo.pos, 1, random, cage3Mobs);
-                levelAccessor.setBlock(structureBlockInfo.pos, Blocks.AIR.defaultBlockState(), 2);
+                spawnAnimalsAt(levelAccessor, structureBlockInfo.pos(), 1, random, cage3Mobs);
+                levelAccessor.setBlock(structureBlockInfo.pos(), Blocks.AIR.defaultBlockState(), 2);
                 break;
         }
     }

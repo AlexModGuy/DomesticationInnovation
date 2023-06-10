@@ -62,7 +62,7 @@ public class ChainLightningEntity extends Entity {
         if (creator instanceof LivingEntity) {
             if (current != null) {
                 this.setPos(new Vec3(current.getX(), current.getY() + current.getBbHeight() * 0.5F, current.getZ()));
-                if(!level.isClientSide){
+                if(!level().isClientSide){
                     if(!hasShocked){
                         hasShocked = true;
                         current.hurt(current.damageSources().lightningBolt(), 3);
@@ -70,11 +70,11 @@ public class ChainLightningEntity extends Entity {
                 }
             }
         }
-        if(!level.isClientSide){
+        if(!level().isClientSide){
             if(!hasChained){
                 if(this.getChainsLeft() > 0 && creator instanceof LivingEntity) {
                     Entity closestValid = null;
-                    for (Entity entity : this.level.getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(8.0D))) {
+                    for (Entity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(8.0D))) {
                         if (!entity.equals(creator) && !TameableUtils.hasSameOwnerAs((LivingEntity) creator, entity) && !previouslyShocked.contains(entity) && !creator.isAlliedTo(entity) && entity instanceof Mob && this.hasLineOfSight(entity)) {
                             if (closestValid == null || this.distanceTo(entity) < this.distanceTo(closestValid)) {
                                 closestValid = entity;
@@ -96,7 +96,7 @@ public class ChainLightningEntity extends Entity {
     }
 
     private boolean hasLineOfSight(Entity entity) {
-        if (entity.level != this.level) {
+        if (entity.level() != this.level()) {
             return false;
         } else {
             Vec3 vec3 = new Vec3(this.getX(), this.getEyeY(), this.getZ());
@@ -104,13 +104,13 @@ public class ChainLightningEntity extends Entity {
             if (vec31.distanceTo(vec3) > 128.0D) {
                 return false;
             } else {
-                return this.level.clip(new ClipContext(vec3, vec31, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this)).getType() == HitResult.Type.MISS;
+                return this.level().clip(new ClipContext(vec3, vec31, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this)).getType() == HitResult.Type.MISS;
             }
         }     
     }
 
     private void createLightningAt(Entity closestValid) {
-        ChainLightningEntity child = DIEntityRegistry.CHAIN_LIGHTNING.get().create(this.level);
+        ChainLightningEntity child = DIEntityRegistry.CHAIN_LIGHTNING.get().create(this.level());
         child.previouslyShocked = new ArrayList<>(previouslyShocked);
         child.previouslyShocked.add(closestValid);
         child.setCreatorEntityID(this.getCreatorEntityID());
@@ -118,7 +118,7 @@ public class ChainLightningEntity extends Entity {
         child.setToEntityID(closestValid.getId());
         child.copyPosition(closestValid);
         child.setChainsLeft(this.getChainsLeft() - 1);
-        this.level.addFreshEntity(child);
+        this.level().addFreshEntity(child);
     }
 
     public int getCreatorEntityID() {
@@ -130,7 +130,7 @@ public class ChainLightningEntity extends Entity {
     }
 
     public Entity getCreatorEntity() {
-        return getCreatorEntityID() == -1 ? null : this.level.getEntity(getCreatorEntityID());
+        return getCreatorEntityID() == -1 ? null : this.level().getEntity(getCreatorEntityID());
     }
 
     public int getFromEntityID() {
@@ -142,7 +142,7 @@ public class ChainLightningEntity extends Entity {
     }
 
     public Entity getFromEntity() {
-        return getFromEntityID() == -1 ? null : this.level.getEntity(getFromEntityID());
+        return getFromEntityID() == -1 ? null : this.level().getEntity(getFromEntityID());
     }
 
     public int getToEntityID() {
@@ -154,7 +154,7 @@ public class ChainLightningEntity extends Entity {
     }
 
     public Entity getToEntity() {
-        return getToEntityID() == -1 ? null : this.level.getEntity(getToEntityID());
+        return getToEntityID() == -1 ? null : this.level().getEntity(getToEntityID());
     }
 
     public int getChainsLeft() {

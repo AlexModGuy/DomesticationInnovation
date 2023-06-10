@@ -52,12 +52,12 @@ public abstract class AbstractHorseMixin extends Animal implements ModifedToBeTa
     @Shadow public abstract void setOwnerUUID(@org.jetbrains.annotations.Nullable UUID p_30587_);
 
     @Inject(
-            method = {"Lnet/minecraft/world/entity/animal/horse/AbstractHorse;tickRidden(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/phys/Vec3;)V"},
+            method = {"Lnet/minecraft/world/entity/animal/horse/AbstractHorse;tickRidden(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/phys/Vec3;)V"},
             remap = true,
             at = {@At("HEAD")},
             cancellable = true
     )
-    private void di_travel(LivingEntity rider, Vec3 vec3, CallbackInfo ci) {
+    private void di_tickRidden(Player rider, Vec3 vec3, CallbackInfo ci) {
         if (this.isAlive() && this.isVehicle() && this.isInWaterOrBubble() && TameableUtils.hasEnchant(this, DIEnchantmentRegistry.AMPHIBIOUS)) {
             LivingEntity livingentity = (LivingEntity) this.getControllingPassenger();
             this.setYRot(livingentity.getYRot());
@@ -107,7 +107,7 @@ public abstract class AbstractHorseMixin extends Animal implements ModifedToBeTa
     public LivingEntity getTameOwner() {
         try {
             UUID uuid = this.getTameOwnerUUID();
-            return uuid == null ? null : this.level.getPlayerByUUID(uuid);
+            return uuid == null ? null : this.level().getPlayerByUUID(uuid);
         } catch (IllegalArgumentException illegalargumentexception) {
             return null;
         }

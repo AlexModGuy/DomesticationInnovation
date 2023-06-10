@@ -1,7 +1,5 @@
 package com.github.alexthe668.domesticationinnovation.server.item;
 
-import com.github.alexthe668.domesticationinnovation.DomesticationMod;
-import com.github.alexthe668.domesticationinnovation.server.misc.DICreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 

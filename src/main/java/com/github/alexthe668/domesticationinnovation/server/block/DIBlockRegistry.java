@@ -2,20 +2,14 @@ package com.github.alexthe668.domesticationinnovation.server.block;
 
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
 import com.github.alexthe668.domesticationinnovation.server.item.DIItemRegistry;
-import com.github.alexthe668.domesticationinnovation.server.misc.DICreativeModeTab;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.ShulkerBoxBlock;
-import net.minecraftforge.common.ForgeSpawnEggItem;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import com.github.alexthe668.domesticationinnovation.server.item.DIBlockItem;
 
-import java.util.Objects;
 import java.util.function.Supplier;
 
 public class DIBlockRegistry {

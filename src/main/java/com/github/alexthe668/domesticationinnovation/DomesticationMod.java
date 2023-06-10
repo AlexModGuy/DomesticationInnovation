@@ -10,11 +10,8 @@ import com.github.alexthe668.domesticationinnovation.server.entity.DIEntityRegis
 import com.github.alexthe668.domesticationinnovation.server.entity.DIVillagerRegistry;
 import com.github.alexthe668.domesticationinnovation.server.item.DIItemRegistry;
 import com.github.alexthe668.domesticationinnovation.server.misc.*;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.server.ServerAboutToStartEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -43,7 +40,6 @@ public class DomesticationMod {
     public DomesticationMod() {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupClient);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(DICreativeModeTab::registerTab);
         final ModLoadingContext modLoadingContext = ModLoadingContext.get();
         modLoadingContext.registerConfig(ModConfig.Type.COMMON, CONFIG_SPEC, "domestication-innovation.toml");
         DIItemRegistry.DEF_REG.register(FMLJavaModLoadingContext.get().getModEventBus());
@@ -57,6 +53,8 @@ public class DomesticationMod {
         DISoundRegistry.DEF_REG.register(FMLJavaModLoadingContext.get().getModEventBus());
         DIActivityRegistry.DEF_REG.register(FMLJavaModLoadingContext.get().getModEventBus());
         DIVillagePieceRegistry.DEF_REG.register(FMLJavaModLoadingContext.get().getModEventBus());
+        DICreativeTabRegistry.DEF_REG.register(FMLJavaModLoadingContext.get().getModEventBus());
+        DILootRegistry.DEF_REG.register(FMLJavaModLoadingContext.get().getModEventBus());
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(PROXY);
         PROXY.init();

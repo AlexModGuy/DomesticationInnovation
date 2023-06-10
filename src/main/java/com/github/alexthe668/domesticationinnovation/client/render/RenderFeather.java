@@ -40,7 +40,7 @@ public class RenderFeather extends EntityRenderer<FeatherEntity> {
         poseStack.translate(0, 0.1F, 0);
         poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
         poseStack.mulPose(new Quaternionf().rotateZ(35F * ((float)Math.PI / 180F)));
-        Minecraft.getInstance().getItemRenderer().renderStatic(feather, ItemDisplayContext.GROUND, light, OverlayTexture.NO_OVERLAY, poseStack, buffer, entity.level, entity.getId());
+        Minecraft.getInstance().getItemRenderer().renderStatic(feather, ItemDisplayContext.GROUND, light, OverlayTexture.NO_OVERLAY, poseStack, buffer, entity.level(), entity.getId());
         poseStack.popPose();
 
         //fishng rod stuff

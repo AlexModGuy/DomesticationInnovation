@@ -1,8 +1,6 @@
 package com.github.alexthe668.domesticationinnovation.server.item;
 
-import com.github.alexthe668.domesticationinnovation.DomesticationMod;
 import com.github.alexthe668.domesticationinnovation.server.entity.TameableUtils;
-import com.github.alexthe668.domesticationinnovation.server.misc.DICreativeModeTab;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
@@ -48,9 +46,9 @@ public class SinisterCarrotItem extends Item {
             CompoundTag horseExtras = new CompoundTag();
             horse.addAdditionalSaveData(horseExtras);
             for(int i = 0; i < 6 + horse.getRandom().nextInt(5); i++){
-                horse.level.addParticle(ParticleTypes.SNEEZE, horse.getRandomX(1.0F), horse.getRandomY(), horse.getRandomZ(1.0F), 0F, 0F, 0F);
+                horse.level().addParticle(ParticleTypes.SNEEZE, horse.getRandomX(1.0F), horse.getRandomY(), horse.getRandomZ(1.0F), 0F, 0F, 0F);
             }
-            SkeletonHorse skeleton = EntityType.SKELETON_HORSE.create(horse.level);
+            SkeletonHorse skeleton = EntityType.SKELETON_HORSE.create(horse.level());
             if(horse.isLeashed()){
                 skeleton.setLeashedTo(horse.getLeashHolder(), true);
             }
@@ -64,7 +62,7 @@ public class SinisterCarrotItem extends Item {
             skeleton.readAdditionalSaveData(horseExtras);
             skeleton.setPersistenceRequired();
             net.minecraftforge.event.ForgeEventFactory.onLivingConvert(horse, skeleton);
-            player.level.addFreshEntity(skeleton);
+            player.level().addFreshEntity(skeleton);
             horse.discard();
             if(!player.isCreative()){
                 stack.shrink(1);

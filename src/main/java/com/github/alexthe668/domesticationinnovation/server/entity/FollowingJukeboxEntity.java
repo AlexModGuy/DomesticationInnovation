@@ -51,7 +51,7 @@ public class FollowingJukeboxEntity extends Entity {
         Entity following = getFollowing();
         this.setPos(this.position().add(this.getDeltaMovement()));
         this.setYRot(this.getYRot() + 2F);
-        if (!level.isClientSide) {
+        if (!level().isClientSide) {
             if (following != null) {
                 float width = following.getBbWidth() + 0.6F;
                 this.setRecordItem(this.getDiscFromOwner());
@@ -66,9 +66,9 @@ public class FollowingJukeboxEntity extends Entity {
                     this.setDeltaMovement(vec3);
                 }
                 if (!this.isSilent() && !this.getRecordItem().isEmpty()) {
-                    this.level.broadcastEntityEvent(this, (byte) 66);
+                    this.level().broadcastEntityEvent(this, (byte) 66);
                 } else {
-                    this.level.broadcastEntityEvent(this, (byte) 67);
+                    this.level().broadcastEntityEvent(this, (byte) 67);
                 }
                 if(following instanceof LivingEntity && !TameableUtils.hasEnchant((LivingEntity) following, DIEnchantmentRegistry.DISK_JOCKEY)){
                     this.setFollowingUUID(null);
@@ -115,8 +115,8 @@ public class FollowingJukeboxEntity extends Entity {
 
     public Entity getFollowing() {
         UUID id = getFollowerUUID();
-        if (id != null && !level.isClientSide) {
-            return ((ServerLevel) level).getEntity(id);
+        if (id != null && !level().isClientSide) {
+            return ((ServerLevel) level()).getEntity(id);
         }
         return null;
     }
@@ -133,7 +133,7 @@ public class FollowingJukeboxEntity extends Entity {
         if(getFollowing() instanceof LivingEntity living){
             TameableUtils.setPetJukeboxDisc(living, stack);
             if(stack.isEmpty()){
-                this.level.broadcastEntityEvent(this, (byte) 67);
+                this.level().broadcastEntityEvent(this, (byte) 67);
             }
         }
     }
@@ -189,7 +189,7 @@ public class FollowingJukeboxEntity extends Entity {
                 float f = random.nextFloat();
                 float f1 = random.nextFloat();
                 float f2 = random.nextFloat();
-                this.level.addParticle(ParticleTypes.NOTE, this.getX(), this.getY(1), this.getZ(), f, f1, f2);
+                this.level().addParticle(ParticleTypes.NOTE, this.getX(), this.getY(1), this.getZ(), f, f1, f2);
             }
             DomesticationMod.PROXY.updateEntityStatus(this, id);
         } else {

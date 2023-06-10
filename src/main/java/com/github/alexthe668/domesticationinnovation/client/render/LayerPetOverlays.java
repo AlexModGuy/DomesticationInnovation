@@ -102,9 +102,9 @@ public class LayerPetOverlays extends RenderLayer {
         BlockPos blockpos = BlockPos.containing(fromVec);
         BlockPos blockpos1 = BlockPos.containing(to);
         int i = 0;
-        int j = from.level.getBrightness(LightLayer.BLOCK, blockpos1);
-        int k = from.level.getBrightness(LightLayer.SKY, blockpos);
-        int l = from.level.getBrightness(LightLayer.SKY, blockpos1);
+        int j = from.level().getBrightness(LightLayer.BLOCK, blockpos1);
+        int k = from.level().getBrightness(LightLayer.SKY, blockpos);
+        int l = from.level().getBrightness(LightLayer.SKY, blockpos1);
         for (int i1 = 0; i1 <= 8; ++i1) {
             float width = 0.05F - (i1 / 8F) * 0.025F;
             addVertexPairAlex(vertexconsumer, matrix4f, f, f1, f2, i, j, k, l, 0.2F, width, width, width, i1, false);
@@ -150,7 +150,7 @@ public class LayerPetOverlays extends RenderLayer {
                     matrixStackIn.translate(bob1, 1.25F - entity.getBbHeight() * 0.5F - bob2, -entity.getBbWidth() - 0.125F - bob3);
                     matrixStackIn.mulPose(Axis.XN.rotationDegrees(90));
                     matrixStackIn.scale(1.6F, 1.6F, 3F);
-                    Minecraft.getInstance().getItemRenderer().renderStatic(MAGNET, ItemDisplayContext.GROUND, packedLightIn, OverlayTexture.NO_OVERLAY, matrixStackIn, bufferIn, entity.level, entity.getId());
+                    Minecraft.getInstance().getItemRenderer().renderStatic(MAGNET, ItemDisplayContext.GROUND, packedLightIn, OverlayTexture.NO_OVERLAY, matrixStackIn, bufferIn, entity.level(), entity.getId());
                     matrixStackIn.popPose();
                     matrixStackIn.popPose();
                 }
@@ -180,7 +180,7 @@ public class LayerPetOverlays extends RenderLayer {
                     matrixStackIn.popPose();
                 }
             }
-            if (TameableUtils.hasEnchant(living, DIEnchantmentRegistry.VOID_CLOUD) && !living.isInWaterOrBubble() && !living.isOnGround() && TameableUtils.getFallDistance(living) >= 3.0F) {
+            if (TameableUtils.hasEnchant(living, DIEnchantmentRegistry.VOID_CLOUD) && !living.isInWaterOrBubble() && !living.onGround() && TameableUtils.getFallDistance(living) >= 3.0F) {
                 matrixStackIn.pushPose();
                 matrixStackIn.translate(0.4F, 1.25F + entity.getBbHeight(), 0.2F);
                 matrixStackIn.mulPose(Axis.YN.rotationDegrees(f));

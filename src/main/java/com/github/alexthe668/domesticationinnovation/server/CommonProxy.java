@@ -65,6 +65,7 @@ import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.loot.LootModifier;
 import net.minecraftforge.common.world.ForgeChunkManager;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
@@ -130,7 +131,7 @@ public class CommonProxy {
                 living.setHealth((float) Math.max(living.getHealth(), TameableUtils.getSafePetHealth(living)));
             }
             if (living.isAlive() && TameableUtils.isTamed(living)) {
-                DIWorldData data = DIWorldData.get(living.level);
+                DIWorldData data = DIWorldData.get(living.level());
                 if (data != null) {
                     data.removeMatchingLanternRequests(living.getUUID());
                 }
@@ -141,12 +142,12 @@ public class CommonProxy {
     @SubscribeEvent
     public void onEntityLeaveWorld(EntityLeaveLevelEvent event) {
         if (event.getEntity() instanceof LivingEntity living) {
-            if (!living.level.isClientSide && living.isAlive() && TameableUtils.isTamed(living) && TameableUtils.shouldUnloadToLantern(living)) {
+            if (!living.level().isClientSide && living.isAlive() && TameableUtils.isTamed(living) && TameableUtils.shouldUnloadToLantern(living)) {
                 UUID ownerUUID = TameableUtils.getOwnerUUIDOf(event.getEntity());
                 String saveName = event.getEntity().hasCustomName() ? event.getEntity().getCustomName().getString() : "";
-                DIWorldData data = DIWorldData.get(living.level);
+                DIWorldData data = DIWorldData.get(living.level());
                 if (data != null) {
-                    LanternRequest request = new LanternRequest(living.getUUID(), ForgeRegistries.ENTITY_TYPES.getKey(event.getEntity().getType()).toString(), ownerUUID, living.blockPosition(), event.getEntity().level.dayTime(), saveName);
+                    LanternRequest request = new LanternRequest(living.getUUID(), ForgeRegistries.ENTITY_TYPES.getKey(event.getEntity().getType()).toString(), ownerUUID, living.blockPosition(), event.getEntity().level().dayTime(), saveName);
                     data.addLanternRequest(request);
                 }
             }
@@ -158,17 +159,17 @@ public class CommonProxy {
     }
 
     private boolean canTickCollar(Entity entity){
-        if(entity.level.isClientSide){
+        if(entity.level().isClientSide){
             return true;
         }else{
-            CollarTickTracker tracker = COLLAR_TICK_TRACKER_MAP.get(entity.level);
+            CollarTickTracker tracker = COLLAR_TICK_TRACKER_MAP.get(entity.level());
             return tracker == null || !tracker.isEntityBlocked(entity);
         }
     }
 
     private void blockCollarTick(Entity entity){
-        if(!entity.level.isClientSide){
-            CollarTickTracker tracker = COLLAR_TICK_TRACKER_MAP.get(entity.level);
+        if(!entity.level().isClientSide){
+            CollarTickTracker tracker = COLLAR_TICK_TRACKER_MAP.get(entity.level());
             if(tracker == null){
                 tracker.addBlockedEntityTick(entity.getUUID(), 5);
             }
@@ -188,7 +189,7 @@ public class CommonProxy {
                 ServerLevel endpointWorld = triple.b;
                 UUID ownerUUID = triple.c;
                 entity.unRide();
-                entity.level = endpointWorld;
+                entity.setLevel(endpointWorld);
                 Entity player = endpointWorld.getPlayerByUUID(ownerUUID);
                 if (player != null) {
                     Entity teleportedEntity = entity.getType().create(endpointWorld);
@@ -239,7 +240,7 @@ public class CommonProxy {
                     float yRot = event.getProjectile().yRotO;
                     Vec3 vec3 = event.getProjectile().position().subtract(hit.position()).normalize().scale(hit.getBbWidth() + 0.5F);
                     Vec3 vec32 = hit.position().add(vec3);
-                    hit.level.addParticle(DIParticleRegistry.DEFLECTION_SHIELD.get(), vec32.x, vec32.y, vec32.z, xRot, yRot, 0.0F);
+                    hit.level().addParticle(DIParticleRegistry.DEFLECTION_SHIELD.get(), vec32.x, vec32.y, vec32.z, xRot, yRot, 0.0F);
                     event.getProjectile().setDeltaMovement(event.getProjectile().getDeltaMovement().scale(-0.2D));
                     event.getProjectile().setYRot(yRot + 180);
                     event.getProjectile().setXRot(xRot + 180);
@@ -254,8 +255,8 @@ public class CommonProxy {
             if (new Random().nextFloat() < 0.1F * event.getEntity().getItem().getCount()) {
                 event.getEntity().getItem().shrink(1);
                 event.setExtraLife(10);
-                ItemEntity rotten = new ItemEntity(event.getEntity().level, event.getEntity().getX(), event.getEntity().getY(), event.getEntity().getZ(), new ItemStack(DIItemRegistry.ROTTEN_APPLE.get()));
-                event.getEntity().getLevel().addFreshEntity(rotten);
+                ItemEntity rotten = new ItemEntity(event.getEntity().level(), event.getEntity().getX(), event.getEntity().getY(), event.getEntity().getZ(), new ItemStack(DIItemRegistry.ROTTEN_APPLE.get()));
+                event.getEntity().level().addFreshEntity(rotten);
             }
         }
     }
@@ -278,7 +279,7 @@ public class CommonProxy {
             }
             if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.MAGNETIC) && event.getEntity() instanceof Mob mob) {
                 Entity sucking = TameableUtils.getPetAttackTarget(mob);
-                if (!mob.level.isClientSide) {
+                if (!mob.level().isClientSide) {
                     if (mob.getTarget() == null || !mob.getTarget().isAlive() || mob.distanceTo(mob.getTarget()) < 0.5F + mob.getBbWidth() || mob.getRootVehicle() instanceof GiantBubbleEntity) {
                         if (TameableUtils.getPetAttackTargetID(mob) != -1) {
                             TameableUtils.setPetAttackTarget(mob, -1);
@@ -296,7 +297,7 @@ public class CommonProxy {
                             float f1 = 0.5F * (mob.getRandom().nextFloat() - 0.5F);
                             float f2 = 0.5F * (mob.getRandom().nextFloat() - 0.5F);
                             float f3 = 0.5F * (mob.getRandom().nextFloat() - 0.5F);
-                            mob.level.addParticle(DIParticleRegistry.MAGNET.get(), vec3.x + f1, vec3.y + f2, vec3.z + f3, 0.0F, 0.0F, 0.0F);
+                            mob.level().addParticle(DIParticleRegistry.MAGNET.get(), vec3.x + f1, vec3.y + f2, vec3.z + f3, 0.0F, 0.0F, 0.0F);
                         }
                     }
                 }
@@ -306,13 +307,13 @@ public class CommonProxy {
                     }
                     mob.setDeltaMovement(mob.getDeltaMovement().multiply(0.88D, 1.0D, 0.88D));
                     Vec3 move = new Vec3(mob.getX() - sucking.getX(), mob.getY() - (double) sucking.getEyeHeight() / 2.0D - sucking.getY(), mob.getZ() - sucking.getZ());
-                    sucking.setDeltaMovement(sucking.getDeltaMovement().add(move.normalize().scale(mob.isOnGround() ? 0.15D : 0.05D)));
+                    sucking.setDeltaMovement(sucking.getDeltaMovement().add(move.normalize().scale(mob.onGround() ? 0.15D : 0.05D)));
                 }
             }
             int shadowHandsLevel = TameableUtils.getEnchantLevel(event.getEntity(), DIEnchantmentRegistry.SHADOW_HANDS);
             if (shadowHandsLevel > 0 && event.getEntity() instanceof Mob mob) {
                 DomesticationMod.PROXY.updateVisualDataForMob(event.getEntity(), TameableUtils.getShadowPunchTimes(mob));
-                if (!mob.level.isClientSide) {
+                if (!mob.level().isClientSide) {
                     Entity punching = TameableUtils.getPetAttackTarget(mob);
                     int[] punchProgress = TameableUtils.getShadowPunchTimes(mob);
                     if (punching != null && punching.isAlive() && mob.hasLineOfSight(punching) && mob.distanceTo(punching) < 16) {
@@ -387,13 +388,13 @@ public class CommonProxy {
                     }
                 }
             }
-            if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.DISK_JOCKEY) && !event.getEntity().level.isClientSide) {
+            if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.DISK_JOCKEY) && !event.getEntity().level().isClientSide) {
                 UUID uuid = TameableUtils.getPetJukeboxUUID(event.getEntity());
-                if (uuid == null || !(((ServerLevel) event.getEntity().level).getEntity(uuid) instanceof FollowingJukeboxEntity)) {
-                    FollowingJukeboxEntity follower = DIEntityRegistry.FOLLOWING_JUKEBOX.get().create(event.getEntity().level);
+                if (uuid == null || !(((ServerLevel) event.getEntity().level()).getEntity(uuid) instanceof FollowingJukeboxEntity)) {
+                    FollowingJukeboxEntity follower = DIEntityRegistry.FOLLOWING_JUKEBOX.get().create(event.getEntity().level());
                     follower.setFollowingUUID(event.getEntity().getUUID());
                     follower.copyPosition(event.getEntity());
-                    event.getEntity().level.addFreshEntity(follower);
+                    event.getEntity().level().addFreshEntity(follower);
                     TameableUtils.setPetJukeboxUUID(event.getEntity(), follower.getUUID());
                 }
             }
@@ -418,13 +419,13 @@ public class CommonProxy {
             if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.REJUVENATION)) {
                 TameableUtils.absorbExpOrbs(event.getEntity());
             }
-            if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.VOID_CLOUD) && !event.getEntity().isInWaterOrBubble() && event.getEntity().fallDistance > 3.0F && !event.getEntity().isOnGround()) {
+            if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.VOID_CLOUD) && !event.getEntity().isInWaterOrBubble() && event.getEntity().fallDistance > 3.0F && !event.getEntity().onGround()) {
                 Entity owner = TameableUtils.getOwnerOf(event.getEntity());
                 boolean shouldMoveToOwnerXZ = owner != null && Math.abs(owner.getY() - event.getEntity().getY()) < 1;
                 double targetX = shouldMoveToOwnerXZ ? owner.getX() : event.getEntity().getX();
-                double targetY = Math.max(event.getEntity().level.getMinBuildHeight() + 0.5F, owner == null ? 64F : owner.getY() < event.getEntity().getY() ? owner.getY() + 0.6F : owner.getY(1.0F) + event.getEntity().getBbHeight());
+                double targetY = Math.max(event.getEntity().level().getMinBuildHeight() + 0.5F, owner == null ? 64F : owner.getY() < event.getEntity().getY() ? owner.getY() + 0.6F : owner.getY(1.0F) + event.getEntity().getBbHeight());
                 if (owner != null && owner.getRootVehicle() == event.getEntity()) {
-                    targetY = Math.min(event.getEntity().level.getMinBuildHeight() + 0.5F, event.getEntity().getY() - 0.5F);
+                    targetY = Math.min(event.getEntity().level().getMinBuildHeight() + 0.5F, event.getEntity().getY() - 0.5F);
                 }
                 double targetZ = shouldMoveToOwnerXZ ? owner.getZ() : event.getEntity().getZ();
                 if (event.getEntity().verticalCollision) {
@@ -434,9 +435,9 @@ public class CommonProxy {
                 }
                 Vec3 move = new Vec3(targetX - event.getEntity().getX(), targetY - event.getEntity().getY(), targetZ - event.getEntity().getZ());
                 event.getEntity().setDeltaMovement(event.getEntity().getDeltaMovement().add(move.normalize().scale(0.15D)).multiply(0.5F, 0.5F, 0.5F));
-                if (event.getEntity().level instanceof ServerLevel) {
+                if (event.getEntity().level() instanceof ServerLevel) {
                     TameableUtils.setFallDistance(event.getEntity(), event.getEntity().fallDistance);
-                    ((ServerLevel) event.getEntity().level).sendParticles(ParticleTypes.REVERSE_PORTAL, event.getEntity().getRandomX(1.5F), event.getEntity().getY() - event.getEntity().getRandom().nextFloat(), event.getEntity().getRandomZ(1.5F), 0, 0, -0.2F, 0, 1.0D);
+                    ((ServerLevel) event.getEntity().level()).sendParticles(ParticleTypes.REVERSE_PORTAL, event.getEntity().getRandomX(1.5F), event.getEntity().getY() - event.getEntity().getRandom().nextFloat(), event.getEntity().getRandomZ(1.5F), 0, 0, -0.2F, 0, 1.0D);
                 }
             }
             int oreLvl = TameableUtils.getEnchantLevel(event.getEntity(), DIEnchantmentRegistry.ORE_SCENTING);
@@ -444,12 +445,12 @@ public class CommonProxy {
                 int interval = 100 + Math.max(150, 550 - oreLvl * 100);
                 TameableUtils.detectRandomOres(event.getEntity(), interval, 5 + oreLvl * 2, oreLvl * 50, oreLvl * 3);
             }
-            if (TameableUtils.isZombiePet(event.getEntity()) && !event.getEntity().level.isClientSide && event.getEntity() instanceof Mob mob) {
+            if (TameableUtils.isZombiePet(event.getEntity()) && !event.getEntity().level().isClientSide && event.getEntity() instanceof Mob mob) {
                 if (mob.getTarget() instanceof Player && ((Player) mob.getTarget()).isCreative()) {
                     mob.setTarget(null);
                 }
                 if (mob.getTarget() == null || !mob.getTarget().isAlive()) {
-                    mob.setTarget(mob.level.getNearestPlayer(ZOMBIE_TARGET, mob));
+                    mob.setTarget(mob.level().getNearestPlayer(ZOMBIE_TARGET, mob));
                 } else if (mob.distanceTo(mob.getTarget()) < mob.getBbWidth() + 0.5F) {
                     mob.doHurtTarget(mob.getTarget());
                 } else if (mob.getNavigation().isDone()) {
@@ -486,13 +487,13 @@ public class CommonProxy {
                         Vec3 avg = new Vec3(vec33.x / 2F, Math.floor(vec33.y / 2F), vec33.z / 2F);
                         Vec3 rotationFrom = avg.subtract(vec3);
                         Direction dir = Direction.getNearest(rotationFrom.x, rotationFrom.y, rotationFrom.z);
-                        PsychicWallEntity wall = DIEntityRegistry.PSYCHIC_WALL.get().create(mob.level);
+                        PsychicWallEntity wall = DIEntityRegistry.PSYCHIC_WALL.get().create(mob.level());
                         wall.setPos(avg.x, avg.y, avg.z);
                         wall.setBlockWidth(width);
                         wall.setCreatorId(mob.getUUID());
                         wall.setLifespan(psychicWallLevel * 100);
                         wall.setWallDirection(dir);
-                        mob.level.addFreshEntity(wall);
+                        mob.level().addFreshEntity(wall);
                         TameableUtils.setPsychicWallCooldown(mob, psychicWallLevel * 200 + 40);
                     }
                 }
@@ -551,7 +552,7 @@ public class CommonProxy {
                 }
             }
             for (int i = 0; i < 1 + event.getEntity().getRandom().nextInt(2); i++) {
-                event.getEntity().level.addParticle(ParticleTypes.SNOWFLAKE, event.getEntity().getRandomX(0.7F), event.getEntity().getRandomY(), event.getEntity().getRandomZ(0.7F), 0.0F, 0.0F, 0.0F);
+                event.getEntity().level().addParticle(ParticleTypes.SNOWFLAKE, event.getEntity().getRandomX(0.7F), event.getEntity().getRandomY(), event.getEntity().getRandomZ(0.7F), 0.0F, 0.0F, 0.0F);
             }
         }
     }
@@ -580,7 +581,7 @@ public class CommonProxy {
                     event.setCanceled(true);
                     flag = true;
                     for (int i = 0; i < 3 + event.getEntity().getRandom().nextInt(3); i++) {
-                        attacker.level.addParticle(ParticleTypes.FLAME, event.getEntity().getRandomX(0.8F), event.getEntity().getRandomY(), event.getEntity().getRandomZ(0.8F), 0.0F, 0.0F, 0.0F);
+                        attacker.level().addParticle(ParticleTypes.FLAME, event.getEntity().getRandomX(0.8F), event.getEntity().getRandomY(), event.getEntity().getRandomZ(0.8F), 0.0F, 0.0F, 0.0F);
                     }
                     event.getEntity().playSound(DISoundRegistry.BLAZING_PROTECTION.get(), 1, event.getEntity().getVoicePitch());
                     TameableUtils.setBlazingProtectionBars(event.getEntity(), bars - 1);
@@ -591,7 +592,7 @@ public class CommonProxy {
                 event.setCanceled(true);
                 flag = true;
             }
-            if (!flag && (event.getSource().is(DamageTypes.FALL) || event.getSource().is(DamageTypes.OUT_OF_WORLD)) && TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.VOID_CLOUD)) {
+            if (!flag && (event.getSource().is(DamageTypes.FALL) || event.getSource().is(DamageTypes.FELL_OUT_OF_WORLD)) && TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.VOID_CLOUD)) {
                 event.setCanceled(true);
                 flag = true;
             }
@@ -601,7 +602,7 @@ public class CommonProxy {
                     owner.hurt(event.getSource(), event.getAmount());
                     event.setCanceled(true);
                     flag = true;
-                    event.getEntity().hurt(DIDamageTypes.causeSiphonDamage(owner.level.registryAccess()), 0.0F);
+                    event.getEntity().hurt(DIDamageTypes.causeSiphonDamage(owner.level().registryAccess()), 0.0F);
                 }
             }
             if (!flag && TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.TOTAL_RECALL) && event.getEntity().getHealth() - event.getAmount() <= 2.0D && !TameableUtils.isZombiePet(event.getEntity())) {
@@ -611,7 +612,7 @@ public class CommonProxy {
                         mob.playAmbientSound();
                     }
                     event.getEntity().playSound(SoundEvents.ENDER_CHEST_CLOSE, 1.0F, 1.5F);
-                    RecallBallEntity recallBall = DIEntityRegistry.RECALL_BALL.get().create(event.getEntity().level);
+                    RecallBallEntity recallBall = DIEntityRegistry.RECALL_BALL.get().create(event.getEntity().level());
                     recallBall.setOwnerUUID(owner);
                     CompoundTag tag = new CompoundTag();
                     event.getEntity().addAdditionalSaveData(tag);
@@ -621,7 +622,7 @@ public class CommonProxy {
                     recallBall.setYRot(event.getEntity().getYRot());
                     recallBall.setInvulnerable(true);
                     event.getEntity().stopRiding();
-                    if (event.getEntity().level.addFreshEntity(recallBall)) {
+                    if (event.getEntity().level().addFreshEntity(recallBall)) {
                         event.getEntity().discard();
                     }
                     flag = true;
@@ -636,13 +637,13 @@ public class CommonProxy {
             int vampireLevel = TameableUtils.getEnchantLevel(attacker, DIEnchantmentRegistry.VAMPIRE);
 
             if (lightningLevel > 0) {
-                ChainLightningEntity lightning = DIEntityRegistry.CHAIN_LIGHTNING.get().create(event.getEntity().level);
+                ChainLightningEntity lightning = DIEntityRegistry.CHAIN_LIGHTNING.get().create(event.getEntity().level());
                 lightning.setCreatorEntityID(attacker.getId());
                 lightning.setFromEntityID(attacker.getId());
                 lightning.setToEntityID(event.getEntity().getId());
                 lightning.copyPosition(event.getEntity());
                 lightning.setChainsLeft(3 + lightningLevel * 3);
-                event.getEntity().level.addFreshEntity(lightning);
+                event.getEntity().level().addFreshEntity(lightning);
                 event.getEntity().playSound(DISoundRegistry.CHAIN_LIGHTNING.get(), 1F, 1F);
             }
             if (TameableUtils.hasEnchant(attacker, DIEnchantmentRegistry.FROST_FANG)) {
@@ -653,17 +654,17 @@ public class CommonProxy {
                     float f1 = 0.2F * (attacker.getRandom().nextFloat() - 1.0F);
                     float f2 = 0.2F * (attacker.getRandom().nextFloat() - 1.0F);
                     float f3 = 0.2F * (attacker.getRandom().nextFloat() - 1.0F);
-                    attacker.level.addParticle(ParticleTypes.SNOWFLAKE, vec32.x + f1, vec32.y + f2, vec32.z + f3, 0.0F, 0.0F, 0.0F);
+                    attacker.level().addParticle(ParticleTypes.SNOWFLAKE, vec32.x + f1, vec32.y + f2, vec32.z + f3, 0.0F, 0.0F, 0.0F);
                 }
                 TameableUtils.setFrozenTimeTag(event.getEntity(), 60);
             }
             if (bubblingLevel > 0) {
-                if (!(event.getEntity().getRootVehicle() instanceof GiantBubbleEntity) && (event.getEntity().isOnGround() || event.getEntity().isInWaterOrBubble() || event.getEntity().isInLava())) {
-                    GiantBubbleEntity bubble = DIEntityRegistry.GIANT_BUBBLE.get().create(event.getEntity().level);
+                if (!(event.getEntity().getRootVehicle() instanceof GiantBubbleEntity) && (event.getEntity().onGround() || event.getEntity().isInWaterOrBubble() || event.getEntity().isInLava())) {
+                    GiantBubbleEntity bubble = DIEntityRegistry.GIANT_BUBBLE.get().create(event.getEntity().level());
                     bubble.copyPosition(event.getEntity());
                     event.getEntity().startRiding(bubble, true);
                     bubble.setpopsIn(bubblingLevel * 40 + 40);
-                    event.getEntity().level.addFreshEntity(bubble);
+                    event.getEntity().level().addFreshEntity(bubble);
                     event.getEntity().playSound(DISoundRegistry.GIANT_BUBBLE_INFLATE.get(), 1F, 1F);
 
                 }
@@ -672,21 +673,21 @@ public class CommonProxy {
                 if (attacker.getHealth() < attacker.getMaxHealth()) {
                     float f = Mth.clamp(event.getAmount() * vampireLevel * 0.5F, 1F, 10F);
                     attacker.heal(f);
-                    if (event.getEntity().level instanceof ServerLevel) {
+                    if (event.getEntity().level() instanceof ServerLevel) {
                         for (int i = 0; i < 5 + event.getEntity().getRandom().nextInt(3); i++) {
                             double f1 = event.getEntity().getRandomX(0.7F);
                             double f2 = event.getEntity().getY(0.4F + event.getEntity().getRandom().nextFloat() * 0.2F);
                             double f3 = event.getEntity().getRandomZ(0.7F);
                             Vec3 motion = attacker.getEyePosition().subtract(f1, f2, f3).normalize().scale(0.2F);
-                            ((ServerLevel) event.getEntity().level).sendParticles(DIParticleRegistry.VAMPIRE.get(), f1, f2, f3, 1, motion.x, motion.y, motion.z, 0.2F);
+                            ((ServerLevel) event.getEntity().level()).sendParticles(DIParticleRegistry.VAMPIRE.get(), f1, f2, f3, 1, motion.x, motion.y, motion.z, 0.2F);
                         }
                     }
                 }
             }
-            if (!event.getEntity().level.isClientSide && TameableUtils.hasEnchant(attacker, DIEnchantmentRegistry.WARPING_BITE)) {
+            if (!event.getEntity().level().isClientSide && TameableUtils.hasEnchant(attacker, DIEnchantmentRegistry.WARPING_BITE)) {
                 for (int i = 0; i < 16; ++i) {
                     double d3 = event.getEntity().getX() + (attacker.getRandom().nextDouble() - 0.5D) * 16.0D;
-                    double d4 = Mth.clamp(event.getEntity().getY() + (double) (attacker.getRandom().nextInt(16) - 8), event.getEntity().level.getMinBuildHeight(), event.getEntity().level.getMinBuildHeight() + ((ServerLevel) event.getEntity().level).getLogicalHeight() - 1);
+                    double d4 = Mth.clamp(event.getEntity().getY() + (double) (attacker.getRandom().nextInt(16) - 8), event.getEntity().level().getMinBuildHeight(), event.getEntity().level().getMinBuildHeight() + ((ServerLevel) event.getEntity().level()).getLogicalHeight() - 1);
                     double d5 = event.getEntity().getZ() + (attacker.getRandom().nextDouble() - 0.5D) * 16.0D;
                     if (event.getEntity().randomTeleport(d3, d4, d5, true)) {
                         SoundEvent soundevent = event.getEntity() instanceof Fox ? SoundEvents.FOX_TELEPORT : SoundEvents.CHORUS_FRUIT_TELEPORT;
@@ -728,20 +729,20 @@ public class CommonProxy {
                 CompoundTag data = new CompoundTag();
                 event.getEntity().addAdditionalSaveData(data);
                 String saveName = event.getEntity().hasCustomName() ? event.getEntity().getCustomName().getString() : "";
-                RespawnRequest request = new RespawnRequest(ForgeRegistries.ENTITY_TYPES.getKey(event.getEntity().getType()).toString(), TameableUtils.getPetBedDimension(event.getEntity()), data, bedPos, event.getEntity().level.dayTime(), saveName);
-                DIWorldData worldData = DIWorldData.get(event.getEntity().level);
+                RespawnRequest request = new RespawnRequest(ForgeRegistries.ENTITY_TYPES.getKey(event.getEntity().getType()).toString(), TameableUtils.getPetBedDimension(event.getEntity()), data, bedPos, event.getEntity().level().dayTime(), saveName);
+                DIWorldData worldData = DIWorldData.get(event.getEntity().level());
                 if (worldData != null) {
                     worldData.addRespawnRequest(request);
                 }
             }
             if (!(event.getEntity() instanceof TamableAnimal)) {
                 Entity owner = TameableUtils.getOwnerOf(event.getEntity());
-                if (!event.getEntity().level.isClientSide && event.getEntity().level.getGameRules().getBoolean(GameRules.RULE_SHOWDEATHMESSAGES) && owner instanceof ServerPlayer) {
+                if (!event.getEntity().level().isClientSide && event.getEntity().level().getGameRules().getBoolean(GameRules.RULE_SHOWDEATHMESSAGES) && owner instanceof ServerPlayer) {
                     owner.sendSystemMessage(event.getEntity().getCombatTracker().getDeathMessage());
                 }
             }
-            if (event.getEntity() instanceof Mob mob && event.getEntity().level.getDifficulty() != Difficulty.PEACEFUL && TameableUtils.hasEnchant(mob, DIEnchantmentRegistry.UNDEAD_CURSE)) {
-                Mob zombieCopy = (Mob) mob.getType().create(mob.level);
+            if (event.getEntity() instanceof Mob mob && event.getEntity().level().getDifficulty() != Difficulty.PEACEFUL && TameableUtils.hasEnchant(mob, DIEnchantmentRegistry.UNDEAD_CURSE)) {
+                Mob zombieCopy = (Mob) mob.getType().create(mob.level());
                 int id = zombieCopy.getId();
                 Entity owner = TameableUtils.getOwnerOf(mob);
                 CompoundTag livingNbt = new CompoundTag();
@@ -762,8 +763,8 @@ public class CommonProxy {
                     commandableMob.setCommand(0);
                 }
                 zombieCopy.copyPosition(mob);
-                zombieCopy.setTarget(owner instanceof Player && !((Player) owner).isCreative() ? (Player) owner : mob.level.getNearestPlayer(ZOMBIE_TARGET, mob));
-                mob.level.addFreshEntity(zombieCopy);
+                zombieCopy.setTarget(owner instanceof Player && !((Player) owner).isCreative() ? (Player) owner : mob.level().getNearestPlayer(ZOMBIE_TARGET, mob));
+                mob.level().addFreshEntity(zombieCopy);
                 zombieCopy.setHealth(zombieCopy.getMaxHealth());
                 TameableUtils.setZombiePet(zombieCopy, true);
             }
@@ -844,7 +845,7 @@ public class CommonProxy {
                     event.setCancellationResult(InteractionResult.SUCCESS);
                     return;
                 }
-                if (!TameableUtils.isTamed(rabbit) && !rabbit.level.isClientSide) {
+                if (!TameableUtils.isTamed(rabbit) && !rabbit.level().isClientSide) {
                     if (!event.getEntity().isCreative()) {
                         stack.shrink(1);
                     }
@@ -854,7 +855,7 @@ public class CommonProxy {
                             double d0 = rabbit.getRandom().nextGaussian() * 0.02D;
                             double d1 = rabbit.getRandom().nextGaussian() * 0.02D;
                             double d2 = rabbit.getRandom().nextGaussian() * 0.02D;
-                            ((ServerLevel) rabbit.getLevel()).sendParticles(ParticleTypes.HEART, rabbit.getRandomX(1.0D), rabbit.getRandomY() + 0.5D, rabbit.getRandomZ(1.0D), 3, d0, d1, d2, 0.02F);
+                            ((ServerLevel) rabbit.level()).sendParticles(ParticleTypes.HEART, rabbit.getRandomX(1.0D), rabbit.getRandomY() + 0.5D, rabbit.getRandomZ(1.0D), 3, d0, d1, d2, 0.02F);
                         }
                         ((ModifedToBeTameable) rabbit).setTame(true);
                         ((ModifedToBeTameable) rabbit).setTameOwnerUUID(event.getEntity().getUUID());
@@ -864,7 +865,7 @@ public class CommonProxy {
                             double d0 = rabbit.getRandom().nextGaussian() * 0.02D;
                             double d1 = rabbit.getRandom().nextGaussian() * 0.02D;
                             double d2 = rabbit.getRandom().nextGaussian() * 0.02D;
-                            ((ServerLevel) rabbit.getLevel()).sendParticles(ParticleTypes.SMOKE, rabbit.getRandomX(1.0D), rabbit.getRandomY() + 0.5D, rabbit.getRandomZ(1.0D), 3, d0, d1, d2, 0.02F);
+                            ((ServerLevel) rabbit.level()).sendParticles(ParticleTypes.SMOKE, rabbit.getRandomX(1.0D), rabbit.getRandomY() + 0.5D, rabbit.getRandomZ(1.0D), 3, d0, d1, d2, 0.02F);
                         }
                     }
                     event.setCanceled(true);
@@ -878,7 +879,7 @@ public class CommonProxy {
         }
         if (event.getTarget() instanceof LivingEntity living && TameableUtils.isPetOf(event.getEntity(), entity) && !living.getType().is(DITagRegistry.REFUSES_COLLAR_TAGS)) {
             if (event.getItemStack().is(DIItemRegistry.COLLAR_TAG.get()) && DomesticationMod.CONFIG.collarTag.get()) {
-                if (!event.getEntity().level.isClientSide && living.isAlive()) {
+                if (!event.getEntity().level().isClientSide && living.isAlive()) {
                     Map<Enchantment, Integer> itemEnchantments = EnchantmentHelper.deserializeEnchantments(stack.getEnchantmentTags());
                     Map<ResourceLocation, Integer> entityEnchantments = TameableUtils.getEnchants(living);
                     if (stack.hasCustomHoverName() && living.hasCustomName() && stack.getHoverName().equals(living.getCustomName())) {
@@ -935,45 +936,6 @@ public class CommonProxy {
                 event.setCanceled(true);
                 event.setCancellationResult(InteractionResult.SUCCESS);
             }
-        }
-    }
-
-    @SubscribeEvent
-    public void onLootTableLoad(LootTableLoadEvent event) {
-        if (event.getName().equals(BuiltInLootTables.WOODLAND_MANSION) && DomesticationMod.CONFIG.sinisterCarrotLootChance.get() > 0) {
-            LootPoolEntryContainer.Builder item = LootItem.lootTableItem(DIItemRegistry.SINISTER_CARROT.get()).setWeight(1);
-            LootPool.Builder builder = new LootPool.Builder().name("di_bubbling_book").add(item).when(LootItemRandomChanceCondition.randomChance(DomesticationMod.CONFIG.sinisterCarrotLootChance.get().floatValue())).setRolls(UniformGenerator.between(0, 1)).setBonusRolls(UniformGenerator.between(0, 1));
-            event.getTable().addPool(builder.build());
-        }
-        if (event.getName().equals(BuiltInLootTables.BURIED_TREASURE) && DomesticationMod.CONFIG.isEnchantEnabled(DIEnchantmentRegistry.BUBBLING) && DomesticationMod.CONFIG.bubblingLootChance.get() > 0) {
-            LootPoolEntryContainer.Builder item = LootItem.lootTableItem(Items.BOOK).setWeight(5).apply((new EnchantRandomlyFunction.Builder()).withEnchantment(DIEnchantmentRegistry.BUBBLING)).setWeight(1);
-            LootPool.Builder builder = new LootPool.Builder().name("di_bubbling_book").add(item).when(LootItemRandomChanceCondition.randomChance(DomesticationMod.CONFIG.bubblingLootChance.get().floatValue())).setRolls(UniformGenerator.between(0, 1)).setBonusRolls(UniformGenerator.between(0, 1));
-            event.getTable().addPool(builder.build());
-        }
-        if (event.getName().equals(BuiltInLootTables.WOODLAND_MANSION) && DomesticationMod.CONFIG.isEnchantEnabled(DIEnchantmentRegistry.VAMPIRE) && DomesticationMod.CONFIG.vampirismLootChance.get() > 0) {
-            LootPoolEntryContainer.Builder item = LootItem.lootTableItem(Items.BOOK).setWeight(5).apply((new EnchantRandomlyFunction.Builder()).withEnchantment(DIEnchantmentRegistry.VAMPIRE)).setWeight(1);
-            LootPool.Builder builder = new LootPool.Builder().name("di_vampire_book").add(item).when(LootItemRandomChanceCondition.randomChance(DomesticationMod.CONFIG.vampirismLootChance.get().floatValue())).setRolls(UniformGenerator.between(0, 1)).setBonusRolls(UniformGenerator.between(0, 1));
-            event.getTable().addPool(builder.build());
-        }
-        if (event.getName().equals(BuiltInLootTables.END_CITY_TREASURE) && DomesticationMod.CONFIG.isEnchantEnabled(DIEnchantmentRegistry.VOID_CLOUD) && DomesticationMod.CONFIG.voidCloudLootChance.get() > 0) {
-            LootPoolEntryContainer.Builder item = LootItem.lootTableItem(Items.BOOK).setWeight(5).apply((new EnchantRandomlyFunction.Builder()).withEnchantment(DIEnchantmentRegistry.VOID_CLOUD)).setWeight(1);
-            LootPool.Builder builder = new LootPool.Builder().name("di_void_cloud_book").add(item).when(LootItemRandomChanceCondition.randomChance(DomesticationMod.CONFIG.voidCloudLootChance.get().floatValue())).setRolls(UniformGenerator.between(0, 1)).setBonusRolls(UniformGenerator.between(0, 1));
-            event.getTable().addPool(builder.build());
-        }
-        if (event.getName().equals(BuiltInLootTables.ABANDONED_MINESHAFT) && DomesticationMod.CONFIG.isEnchantEnabled(DIEnchantmentRegistry.ORE_SCENTING) && DomesticationMod.CONFIG.oreScentingLootChance.get() > 0) {
-            LootPoolEntryContainer.Builder item = LootItem.lootTableItem(Items.BOOK).setWeight(5).apply((new EnchantRandomlyFunction.Builder()).withEnchantment(DIEnchantmentRegistry.ORE_SCENTING)).setWeight(1);
-            LootPool.Builder builder = new LootPool.Builder().name("di_ore_scenting_book").add(item).when(LootItemRandomChanceCondition.randomChance(DomesticationMod.CONFIG.oreScentingLootChance.get().floatValue())).setRolls(UniformGenerator.between(0, 1)).setBonusRolls(UniformGenerator.between(0, 1));
-            event.getTable().addPool(builder.build());
-        }
-        if (event.getName().equals(BuiltInLootTables.ANCIENT_CITY) && DomesticationMod.CONFIG.isEnchantEnabled(DIEnchantmentRegistry.MUFFLED) && DomesticationMod.CONFIG.muffledLootChance.get() > 0) {
-            LootPoolEntryContainer.Builder item = LootItem.lootTableItem(Items.BOOK).setWeight(5).apply((new EnchantRandomlyFunction.Builder()).withEnchantment(DIEnchantmentRegistry.MUFFLED)).setWeight(1);
-            LootPool.Builder builder = new LootPool.Builder().name("di_muffled_book").add(item).when(LootItemRandomChanceCondition.randomChance(DomesticationMod.CONFIG.muffledLootChance.get().floatValue())).setRolls(UniformGenerator.between(0, 1)).setBonusRolls(UniformGenerator.between(0, 1));
-            event.getTable().addPool(builder.build());
-        }
-        if (event.getName().equals(BuiltInLootTables.NETHER_BRIDGE) && DomesticationMod.CONFIG.isEnchantEnabled(DIEnchantmentRegistry.BLAZING_PROTECTION) && DomesticationMod.CONFIG.blazingProtectionLootChance.get() > 0) {
-            LootPoolEntryContainer.Builder item = LootItem.lootTableItem(Items.BOOK).setWeight(5).apply((new EnchantRandomlyFunction.Builder()).withEnchantment(DIEnchantmentRegistry.BLAZING_PROTECTION)).setWeight(1);
-            LootPool.Builder builder = new LootPool.Builder().name("di_blazing_protection_book").add(item).when(LootItemRandomChanceCondition.randomChance(DomesticationMod.CONFIG.blazingProtectionLootChance.get().floatValue())).setRolls(UniformGenerator.between(0, 1)).setBonusRolls(UniformGenerator.between(0, 1));
-            event.getTable().addPool(builder.build());
         }
     }
 
@@ -1100,18 +1062,18 @@ public class CommonProxy {
     @SubscribeEvent
     public void onEntityTeleport(EntityTeleportEvent event) {
         if (event.getEntity() instanceof Player) {
-            teleportNearbyPets((Player) event.getEntity(), event.getPrev(), event.getTarget(), event.getEntity().level, event.getEntity().level);
+            teleportNearbyPets((Player) event.getEntity(), event.getPrev(), event.getTarget(), event.getEntity().level(), event.getEntity().level());
         }
     }
 
     @SubscribeEvent
     public void onEntityTravelToDimension(EntityTravelToDimensionEvent event) {
         if (!event.isCanceled()) {
-            if (event.getEntity().level instanceof ServerLevel serverLevel && event.getEntity() instanceof Player) {
+            if (event.getEntity().level() instanceof ServerLevel serverLevel && event.getEntity() instanceof Player) {
                 MinecraftServer server = serverLevel.getServer();
                 Level toLevel = server.getLevel(event.getDimension());
                 if (toLevel != null) {
-                    teleportNearbyPets((Player) event.getEntity(), event.getEntity().position(), event.getEntity().position(), event.getEntity().level, toLevel);
+                    teleportNearbyPets((Player) event.getEntity(), event.getEntity().position(), event.getEntity().position(), event.getEntity().level(), toLevel);
                 }
             }
         }

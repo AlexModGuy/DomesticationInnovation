@@ -154,7 +154,7 @@ public abstract class RabbitMixin extends Animal implements ModifedToBeTameable,
     public LivingEntity getTameOwner() {
         try {
             UUID uuid = this.getTameOwnerUUID();
-            return uuid == null ? null : this.level.getPlayerByUUID(uuid);
+            return uuid == null ? null : this.level().getPlayerByUUID(uuid);
         } catch (IllegalArgumentException illegalargumentexception) {
             return null;
         }

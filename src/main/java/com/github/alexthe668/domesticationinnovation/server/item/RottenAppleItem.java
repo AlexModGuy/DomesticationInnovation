@@ -1,7 +1,5 @@
 package com.github.alexthe668.domesticationinnovation.server.item;
 
-import com.github.alexthe668.domesticationinnovation.DomesticationMod;
-import com.github.alexthe668.domesticationinnovation.server.misc.DICreativeModeTab;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
@@ -38,9 +36,9 @@ public class RottenAppleItem extends Item {
             }
             horse.addAdditionalSaveData(horseExtras);
             for(int i = 0; i < 6 + horse.getRandom().nextInt(5); i++){
-                horse.level.addParticle(ParticleTypes.SNEEZE, horse.getRandomX(1.0F), horse.getRandomY(), horse.getRandomZ(1.0F), 0F, 0F, 0F);
+                horse.level().addParticle(ParticleTypes.SNEEZE, horse.getRandomX(1.0F), horse.getRandomY(), horse.getRandomZ(1.0F), 0F, 0F, 0F);
             }
-            ZombieHorse zombie = EntityType.ZOMBIE_HORSE.create(horse.level);
+            ZombieHorse zombie = EntityType.ZOMBIE_HORSE.create(horse.level());
             if(horse.isLeashed()){
                 zombie.setLeashedTo(horse.getLeashHolder(), true);
             }
@@ -54,7 +52,7 @@ public class RottenAppleItem extends Item {
             zombie.readAdditionalSaveData(horseExtras);
             zombie.setPersistenceRequired();
             net.minecraftforge.event.ForgeEventFactory.onLivingConvert(horse, zombie);
-            player.level.addFreshEntity(zombie);
+            player.level().addFreshEntity(zombie);
             horse.discard();
             if(!player.isCreative()){
                 stack.shrink(1);

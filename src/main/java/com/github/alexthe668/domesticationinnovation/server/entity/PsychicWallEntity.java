@@ -54,7 +54,7 @@ public class PsychicWallEntity extends Entity {
             }
             soundLoop++;
         }
-        if (!this.level.isClientSide && this.getCreatorId() != null) {
+        if (!this.level().isClientSide && this.getCreatorId() != null) {
             Entity creator = this.getCreator();
             if (creator != null) {
                 this.entityData.set(CREATOR_ID, creator.getId());
@@ -68,7 +68,7 @@ public class PsychicWallEntity extends Entity {
         float wY = Math.abs(this.getWallDirection().getStepY());
         float wZ = Math.abs(this.getWallDirection().getStepZ());
         AABB collisionAABB = this.getBoundingBox().inflate(wX * 0.25F, wY * 0.25F, wZ * 0.25F);
-        List<Entity> colliders = level.getEntities(this, collisionAABB);
+        List<Entity> colliders = level().getEntities(this, collisionAABB);
         float backISay = this.getWallDirection().getAxis() == Direction.Axis.Y ? -0.6F : -0.1F;
         for (Entity collider : colliders) {
             if (!isSameTeam(collider)) {
@@ -86,7 +86,7 @@ public class PsychicWallEntity extends Entity {
                     }
                     if (flag) {
                         deflectedEntities.put(collider.getUUID(), 15);
-                        if (level.isClientSide && collider.getBoundingBox().intersects(collisionAABB)) {
+                        if (level().isClientSide && collider.getBoundingBox().intersects(collisionAABB)) {
                             Vec3 vec3 = new Vec3(collider.getX(), collider.getY(0.5F), collider.getZ());
                             Vec3 vec31 = collisionAABB.getCenter();
                             Vec3 vec32;
@@ -98,7 +98,7 @@ public class PsychicWallEntity extends Entity {
                             } else {
                                 vec32 = entityhitresult.getLocation();
                             }
-                            level.addParticle(DIParticleRegistry.PSYCHIC_WALL.get(), vec32.x, vec32.y, vec32.z, this.getWallDirection().get3DDataValue(), 0, 0);
+                            level().addParticle(DIParticleRegistry.PSYCHIC_WALL.get(), vec32.x, vec32.y, vec32.z, this.getWallDirection().get3DDataValue(), 0, 0);
                             this.playSound(DISoundRegistry.PSYCHIC_WALL_DEFLECT.get(), 1, random.nextFloat() * 0.3F + 0.9F);
                         }
                     }
@@ -206,15 +206,15 @@ public class PsychicWallEntity extends Entity {
 
 
     public Entity getCreator() {
-        if (!level.isClientSide) {
+        if (!level().isClientSide) {
             UUID id = getCreatorId();
             if (id != null) {
-                return ((ServerLevel) level).getEntity(id);
+                return ((ServerLevel) level()).getEntity(id);
             }
             return null;
         } else {
             int id = this.entityData.get(CREATOR_ID);
-            return id < 0 ? null : level.getEntity(id);
+            return id < 0 ? null : level().getEntity(id);
         }
 
     }

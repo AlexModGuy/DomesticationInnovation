@@ -96,14 +96,14 @@ public class AmphibianFollowOwnerBehavior<T extends Animal> extends Behavior<T> 
     }
 
     private boolean canTeleportTo(T axolotl, BlockPos pos) {
-        BlockPathTypes blockpathtypes = WalkNodeEvaluator.getBlockPathTypeStatic(axolotl.level, pos.mutable());
-        if(axolotl.level.getFluidState(pos).is(Fluids.WATER)){
+        BlockPathTypes blockpathtypes = WalkNodeEvaluator.getBlockPathTypeStatic(axolotl.level(), pos.mutable());
+        if(axolotl.level().getFluidState(pos).is(Fluids.WATER)){
             return true;
         }else if (blockpathtypes != BlockPathTypes.WALKABLE) {
             return false;
         } else {
             BlockPos blockpos = pos.subtract(axolotl.blockPosition());
-            return axolotl.level.noCollision(axolotl, axolotl.getBoundingBox().move(blockpos));
+            return axolotl.level().noCollision(axolotl, axolotl.getBoundingBox().move(blockpos));
         }
     }
 }

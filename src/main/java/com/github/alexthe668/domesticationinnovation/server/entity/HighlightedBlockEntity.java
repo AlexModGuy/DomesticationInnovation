@@ -76,7 +76,7 @@ public class HighlightedBlockEntity extends Entity {
     }
 
     public BlockState getBlockState() {
-        return this.level.getBlockState(this.blockPosition());
+        return this.level().getBlockState(this.blockPosition());
     }
 
     public boolean isCurrentlyGlowing() {

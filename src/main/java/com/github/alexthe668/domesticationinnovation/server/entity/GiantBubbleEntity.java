@@ -41,16 +41,16 @@ public class GiantBubbleEntity extends Entity {
             pop();
         }else{
             this.setpopsIn(this.getPopsIn() - 1);
-            this.level.addParticle(DIParticleRegistry.SIMPLE_BUBBLE.get(), this.getRandomX(1.4F), this.getRandomY(), this.getRandomZ(1.4F), (random.nextFloat() - 0.5F) * 0.3F, -0.1F, (random.nextFloat() - 0.5F) * 0.3F);
+            this.level().addParticle(DIParticleRegistry.SIMPLE_BUBBLE.get(), this.getRandomX(1.4F), this.getRandomY(), this.getRandomZ(1.4F), (random.nextFloat() - 0.5F) * 0.3F, -0.1F, (random.nextFloat() - 0.5F) * 0.3F);
         }
     }
 
-    public void positionRider(Entity entity) {
-        entity.setPos(this.getX(), this.getBoundingBox().minY - 0.1, this.getZ());
+    public void positionRider(Entity entity, Entity.MoveFunction moveFunction) {
+        moveFunction.accept(entity, this.getX(), this.getBoundingBox().minY - 0.1, this.getZ());
     }
 
     public boolean hurt(DamageSource source, float f) {
-        if(source.is(DamageTypeTags.IS_PROJECTILE) && f > 0 || source.is(DamageTypes.OUT_OF_WORLD)){
+        if(source.is(DamageTypeTags.IS_PROJECTILE) && f > 0 || source.is(DamageTypes.FELL_OUT_OF_WORLD)){
             this.pop();
             return true;
         }
@@ -59,8 +59,8 @@ public class GiantBubbleEntity extends Entity {
 
     private void pop() {
         this.playSound(DISoundRegistry.GIANT_BUBBLE_POP.get(), 1.0F, 1.5F);
-        if(!level.isClientSide){
-            ((ServerLevel)this.level).sendParticles(DIParticleRegistry.GIANT_POP.get(), this.getX(), this.getY() + this.getBbHeight() * 0.5F, this.getZ(), 1, 0, 0, 0, 0);
+        if(!level().isClientSide){
+            ((ServerLevel)this.level()).sendParticles(DIParticleRegistry.GIANT_POP.get(), this.getX(), this.getY() + this.getBbHeight() * 0.5F, this.getZ(), 1, 0, 0, 0, 0);
         }
         this.ejectPassengers();
         this.discard();

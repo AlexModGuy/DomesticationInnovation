@@ -26,7 +26,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
@@ -42,7 +42,7 @@ public class DrumBlock extends BaseEntityBlock {
     private static Random random = new Random();
 
     public DrumBlock() {
-        super(Properties.of(Material.WOOD).sound(SoundType.WOOD).strength(1F).noOcclusion());
+        super(Properties.of().mapColor(MapColor.WOOD).sound(SoundType.WOOD).strength(1F).noOcclusion());
         this.registerDefaultState(this.stateDefinition.any().setValue(COMMAND, 0).setValue(POWERED, Boolean.valueOf(false)));
     }
 

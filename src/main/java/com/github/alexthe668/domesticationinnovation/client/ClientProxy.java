@@ -112,17 +112,17 @@ public class ClientProxy extends CommonProxy {
 
     public static void setupParticles(RegisterParticleProvidersEvent event) {
         DomesticationMod.LOGGER.debug("Registered particle factories");
-        event.register(DIParticleRegistry.DEFLECTION_SHIELD.get(), new ParticleDeflectionShield.Factory());
-        event.register(DIParticleRegistry.MAGNET.get(), ParticleMagnet.Factory::new);
-        event.register(DIParticleRegistry.ZZZ.get(), ParticleZZZ.Factory::new);
-        event.register(DIParticleRegistry.GIANT_POP.get(), ParticleGiantPop.Factory::new);
-        event.register(DIParticleRegistry.SIMPLE_BUBBLE.get(), ParticleSimpleBubble.Factory::new);
-        event.register(DIParticleRegistry.VAMPIRE.get(), ParticleVampire.Factory::new);
-        event.register(DIParticleRegistry.SNIFF.get(), ParticleSniff.Factory::new);
-        event.register(DIParticleRegistry.PSYCHIC_WALL.get(), ParticlePsychicWall.Factory::new);
-        event.register(DIParticleRegistry.INTIMIDATION.get(), new ParticleIntimidation.Factory());
-        event.register(DIParticleRegistry.BLIGHT.get(), ParticleBlight.Factory::new);
-        event.register(DIParticleRegistry.LANTERN_BUGS.get(), ParticleLanternBugs.Factory::new);
+        event.registerSpecial(DIParticleRegistry.DEFLECTION_SHIELD.get(), new ParticleDeflectionShield.Factory());
+        event.registerSpriteSet(DIParticleRegistry.MAGNET.get(), ParticleMagnet.Factory::new);
+        event.registerSpriteSet(DIParticleRegistry.ZZZ.get(), ParticleZZZ.Factory::new);
+        event.registerSpriteSet(DIParticleRegistry.GIANT_POP.get(), ParticleGiantPop.Factory::new);
+        event.registerSpriteSet(DIParticleRegistry.SIMPLE_BUBBLE.get(), ParticleSimpleBubble.Factory::new);
+        event.registerSpriteSet(DIParticleRegistry.VAMPIRE.get(), ParticleVampire.Factory::new);
+        event.registerSpriteSet(DIParticleRegistry.SNIFF.get(), ParticleSniff.Factory::new);
+        event.registerSpriteSet(DIParticleRegistry.PSYCHIC_WALL.get(), ParticlePsychicWall.Factory::new);
+        event.registerSpecial(DIParticleRegistry.INTIMIDATION.get(), new ParticleIntimidation.Factory());
+        event.registerSpriteSet(DIParticleRegistry.BLIGHT.get(), ParticleBlight.Factory::new);
+        event.registerSpriteSet(DIParticleRegistry.LANTERN_BUGS.get(), ParticleLanternBugs.Factory::new);
     }
 
     @SubscribeEvent
@@ -189,7 +189,7 @@ public class ClientProxy extends CommonProxy {
                 pose.translate(f3 + 12, (-10 * list.size()) + 16, 0);
                 pose.mulPose(Axis.XP.rotationDegrees(180.0F));
                 pose.scale(22F, 22F, 22F);
-                Minecraft.getInstance().getItemRenderer().renderStatic(new ItemStack(DIItemRegistry.COLLAR_TAG.get()), ItemDisplayContext.GROUND, lightIn, OverlayTexture.NO_OVERLAY, pose, buffer, entity.level, entity.getId());
+                Minecraft.getInstance().getItemRenderer().renderStatic(new ItemStack(DIItemRegistry.COLLAR_TAG.get()), ItemDisplayContext.GROUND, lightIn, OverlayTexture.NO_OVERLAY, pose, buffer, entity.level(), entity.getId());
                 pose.popPose();
 
                 Matrix4f matrix4f = pose.last().pose();
