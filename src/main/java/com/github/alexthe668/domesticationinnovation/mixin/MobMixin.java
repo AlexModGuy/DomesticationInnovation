@@ -10,6 +10,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.animal.WaterAnimal;
 import net.minecraft.world.entity.animal.axolotl.Axolotl;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -20,6 +22,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import javax.annotation.Nullable;
 
 @Mixin(Mob.class)
 public abstract class MobMixin extends LivingEntity {
@@ -95,6 +99,13 @@ public abstract class MobMixin extends LivingEntity {
     )
     private void di_playAmbientSound(CallbackInfo ci) {
         if(TameableUtils.isTamed(this) && TameableUtils.hasEnchant(this, DIEnchantmentRegistry.MUFFLED)){
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "setTarget", at = @At(value = "HEAD"), cancellable = true)
+    private void di_setTarget(@Nullable LivingEntity livingEntity, CallbackInfo ci) {
+        if (TameableUtils.hasEnchant(this, DIEnchantmentRegistry.PACIFIST) && (livingEntity instanceof Animal || livingEntity instanceof WaterAnimal) ) {
             ci.cancel();
         }
     }
