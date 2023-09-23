@@ -252,7 +252,7 @@ public class TameableUtils {
     private static ListTag getEnchantmentList(LivingEntity entity) {
         CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(entity);
         if (tag.contains(ENCHANTMENT_TAG)) {
-            return tag.getList(ENCHANTMENT_TAG, 10);
+            return tag.getList(ENCHANTMENT_TAG, ListTag.TAG_COMPOUND);
         }
         return null;
     }

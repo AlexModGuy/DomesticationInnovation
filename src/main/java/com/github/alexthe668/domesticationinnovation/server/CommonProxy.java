@@ -494,7 +494,9 @@ public class CommonProxy {
                     }
                 }
             }
-            if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.BLAZING_PROTECTION)) {
+
+            // FIXME Workaround :: The CollarTickTracker always allows syncs from the client side, which results in a race condition with the tag swap update
+            if (!event.getEntity().level.isClientSide() && TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.BLAZING_PROTECTION)) {
                 int bars = TameableUtils.getBlazingProtectionBars(event.getEntity());
                 if (bars < 2 * TameableUtils.getEnchantLevel(event.getEntity(), DIEnchantmentRegistry.BLAZING_PROTECTION)) {
                     int cooldown = TameableUtils.getBlazingProtectionCooldown(event.getEntity());
@@ -507,7 +509,9 @@ public class CommonProxy {
                     TameableUtils.setBlazingProtectionCooldown(event.getEntity(), cooldown);
                 }
             }
-            if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.HEALING_AURA)) {
+
+            // FIXME Workaround :: The CollarTickTracker always allows syncs from the client side, which results in a race condition with the tag swap update
+            if (!event.getEntity().level.isClientSide() && TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.HEALING_AURA)) {
                 int time = TameableUtils.getHealingAuraTime(event.getEntity());
                 if (time > 0) {
                     List<LivingEntity> hurtNearby = TameableUtils.getAuraHealables(event.getEntity());
@@ -529,6 +533,7 @@ public class CommonProxy {
                     }
                     TameableUtils.setHealingAuraImpulse(event.getEntity(), false);
                 }
+
                 TameableUtils.setHealingAuraTime(event.getEntity(), time);
             }
         }
@@ -570,14 +575,19 @@ public class CommonProxy {
                 int bars = TameableUtils.getBlazingProtectionBars(event.getEntity());
                 if (bars > 0) {
                     Entity attacker = event.getSource().getEntity();
-                    if (attacker instanceof LivingEntity && !TameableUtils.hasSameOwnerAs((LivingEntity) attacker, event.getEntity())) {
+                    if (attacker instanceof LivingEntity livingAttacker && !TameableUtils.hasSameOwnerAs(livingAttacker, event.getEntity())) {
                         attacker.setSecondsOnFire(5 + event.getEntity().getRandom().nextInt(3));
-                        ((LivingEntity) attacker).knockback(0.4, event.getEntity().getX() - attacker.getX(), event.getEntity().getZ() - attacker.getZ());
+                        livingAttacker.knockback(0.4, event.getEntity().getX() - attacker.getX(), event.getEntity().getZ() - attacker.getZ());
                     }
                     event.setCanceled(true);
                     flag = true;
                     for (int i = 0; i < 3 + event.getEntity().getRandom().nextInt(3); i++) {
-                        attacker.level.addParticle(ParticleTypes.FLAME, event.getEntity().getRandomX(0.8F), event.getEntity().getRandomY(), event.getEntity().getRandomZ(0.8F), 0.0F, 0.0F, 0.0F);
+                        Level level = attacker != null ? attacker.level : event.getEntity() != null ? event.getEntity().level : null;
+                        if (level != null) {
+                            level.addParticle(ParticleTypes.FLAME, event.getEntity().getRandomX(0.8F), event.getEntity().getRandomY(), event.getEntity().getRandomZ(0.8F), 0.0F, 0.0F, 0.0F);
+                        } else {
+                            DomesticationMod.LOGGER.warn("Both attacker and the target were null within the LivingAttackEvent, DamageSource: [{}]", event.getSource());
+                        }
                     }
                     event.getEntity().playSound(DISoundRegistry.BLAZING_PROTECTION.get(), 1, event.getEntity().getVoicePitch());
                     TameableUtils.setBlazingProtectionBars(event.getEntity(), bars - 1);
@@ -878,7 +888,7 @@ public class CommonProxy {
                 if (!event.getEntity().level.isClientSide && living.isAlive()) {
                     Map<Enchantment, Integer> itemEnchantments = EnchantmentHelper.deserializeEnchantments(stack.getEnchantmentTags());
                     Map<ResourceLocation, Integer> entityEnchantments = TameableUtils.getEnchants(living);
-                    if (stack.hasCustomHoverName() && living.hasCustomName() && stack.getHoverName().equals(living.getCustomName())) {
+                    if (stack.hasCustomHoverName() && living.hasCustomName() && stack.getHoverName().equals(living.getCustomName())) { // If the enchantments didn't change don't bother doing anything
                         boolean hasSameEnchants = itemEnchantments.isEmpty();
                         if (entityEnchantments != null) {
                             hasSameEnchants = true;
@@ -906,11 +916,11 @@ public class CommonProxy {
                         ItemStack collarFrom = new ItemStack(DIItemRegistry.COLLAR_TAG.get());
                         if (entityEnchantments != null) {
                             collarFrom.getOrCreateTag();
-                            if (!collarFrom.getTag().contains("Enchantments", 9)) {
+                            if (!collarFrom.getTag().contains("Enchantments", ListTag.TAG_LIST)) {
                                 collarFrom.getTag().put("Enchantments", new ListTag());
                             }
 
-                            ListTag listtag = collarFrom.getTag().getList("Enchantments", 10);
+                            ListTag listtag = collarFrom.getTag().getList("Enchantments", ListTag.TAG_COMPOUND);
                             for (Map.Entry<ResourceLocation, Integer> entry : entityEnchantments.entrySet()) {
                                 listtag.add(EnchantmentHelper.storeEnchantment(entry.getKey(), entry.getValue()));
                             }
