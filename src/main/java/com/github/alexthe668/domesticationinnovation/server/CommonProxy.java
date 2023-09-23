@@ -154,6 +154,7 @@ public class CommonProxy {
         }
     }
 
+    // TODO :: Make it possible to also check for client-side
     private boolean canTickCollar(Entity entity){
         if(entity.level.isClientSide){
             return true;
@@ -888,7 +889,9 @@ public class CommonProxy {
                 if (!event.getEntity().level.isClientSide && living.isAlive()) {
                     Map<Enchantment, Integer> itemEnchantments = EnchantmentHelper.deserializeEnchantments(stack.getEnchantmentTags());
                     Map<ResourceLocation, Integer> entityEnchantments = TameableUtils.getEnchants(living);
-                    if (stack.hasCustomHoverName() && living.hasCustomName() && stack.getHoverName().equals(living.getCustomName())) { // If the enchantments didn't change don't bother doing anything
+
+                    // If the enchantments didn't change don't bother doing anything
+                    if (stack.hasCustomHoverName() && living.hasCustomName() && stack.getHoverName().equals(living.getCustomName())) {
                         boolean hasSameEnchants = itemEnchantments.isEmpty();
                         if (entityEnchantments != null) {
                             hasSameEnchants = true;
@@ -912,6 +915,8 @@ public class CommonProxy {
                         stack.shrink(1);
                     }
                     blockCollarTick(living);
+
+                    // Drop a collar with the current enchantments
                     if (TameableUtils.hasCollar(living)) {
                         ItemStack collarFrom = new ItemStack(DIItemRegistry.COLLAR_TAG.get());
                         if (entityEnchantments != null) {
@@ -930,6 +935,8 @@ public class CommonProxy {
                         living.spawnAtLocation(collarFrom);
                     }
                     living.playSound(DISoundRegistry.COLLAR_TAG.get(), 1, 1);
+
+                    // Update the enchantments of the pet
                     if (itemEnchantments.isEmpty()) {
                         TameableUtils.clearEnchants(living);
                     } else {
