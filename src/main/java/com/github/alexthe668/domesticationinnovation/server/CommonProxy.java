@@ -618,7 +618,7 @@ public class CommonProxy {
                     event.getEntity().addAdditionalSaveData(tag);
                     recallBall.setContainedData(tag);
                     recallBall.setContainedEntityType(ForgeRegistries.ENTITY_TYPES.getKey(event.getEntity().getType()).toString());
-                    recallBall.copyPosition(event.getEntity());
+                    recallBall.setPos(event.getEntity().getX(), Math.max(event.getEntity().getY(), event.getEntity().level().getMinBuildHeight() + 1), event.getEntity().getZ());
                     recallBall.setYRot(event.getEntity().getYRot());
                     recallBall.setInvulnerable(true);
                     event.getEntity().stopRiding();
