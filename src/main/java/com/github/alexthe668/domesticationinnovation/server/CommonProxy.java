@@ -388,7 +388,7 @@ public class CommonProxy {
                     }
                 }
             }
-            if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.DISK_JOCKEY) && !event.getEntity().level().isClientSide) {
+            if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.DISK_JOCKEY) && !event.getEntity().level().isClientSide && event.getEntity().tickCount % 10 == 0) {
                 UUID uuid = TameableUtils.getPetJukeboxUUID(event.getEntity());
                 if (uuid == null || !(((ServerLevel) event.getEntity().level()).getEntity(uuid) instanceof FollowingJukeboxEntity)) {
                     FollowingJukeboxEntity follower = DIEntityRegistry.FOLLOWING_JUKEBOX.get().create(event.getEntity().level());
