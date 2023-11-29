@@ -265,7 +265,7 @@ public class CommonProxy {
     public void onLivingUpdate(LivingEvent.LivingTickEvent event) {
         int frozenTime = TameableUtils.getFrozenTime(event.getEntity());
         if (TameableUtils.couldBeTamed(event.getEntity()) && canTickCollar(event.getEntity())) {
-            if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.IMMUNITY_FRAME)) {
+            if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.IMMUNITY_FRAME) && !event.getEntity().level().isClientSide) {
                 int i = TameableUtils.getImmuneTime(event.getEntity());
                 if (i > 0) {
                     TameableUtils.setImmuneTime(event.getEntity(), i - 1);
@@ -441,7 +441,7 @@ public class CommonProxy {
                 }
             }
             int oreLvl = TameableUtils.getEnchantLevel(event.getEntity(), DIEnchantmentRegistry.ORE_SCENTING);
-            if (oreLvl > 0) {
+            if (oreLvl > 0 && !event.getEntity().level().isClientSide) {
                 int interval = 100 + Math.max(150, 550 - oreLvl * 100);
                 TameableUtils.detectRandomOres(event.getEntity(), interval, 5 + oreLvl * 2, oreLvl * 50, oreLvl * 3);
             }
@@ -458,7 +458,7 @@ public class CommonProxy {
                 }
             }
             int psychicWallLevel = TameableUtils.getEnchantLevel(event.getEntity(), DIEnchantmentRegistry.PSYCHIC_WALL);
-            if (psychicWallLevel > 0 && event.getEntity() instanceof Mob mob) {
+            if (psychicWallLevel > 0 && event.getEntity() instanceof Mob mob && !event.getEntity().level().isClientSide) {
                 int cooldown = TameableUtils.getPsychicWallCooldown(mob);
                 if (cooldown > 0) {
                     TameableUtils.setPsychicWallCooldown(mob, cooldown - 1);
@@ -498,7 +498,7 @@ public class CommonProxy {
                     }
                 }
             }
-            if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.BLAZING_PROTECTION)) {
+            if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.BLAZING_PROTECTION) && !event.getEntity().level().isClientSide) {
                 int bars = TameableUtils.getBlazingProtectionBars(event.getEntity());
                 if (bars < 2 * TameableUtils.getEnchantLevel(event.getEntity(), DIEnchantmentRegistry.BLAZING_PROTECTION)) {
                     int cooldown = TameableUtils.getBlazingProtectionCooldown(event.getEntity());

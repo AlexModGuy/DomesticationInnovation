@@ -14,8 +14,8 @@ public class DITagRegistry {
     public static final TagKey<EntityType<?>> PETSTORE_CAGE_1 = registerEntity("petstore_cage_1");
     public static final TagKey<EntityType<?>> PETSTORE_CAGE_2 = registerEntity("petstore_cage_2");
     public static final TagKey<EntityType<?>> PETSTORE_CAGE_3 = registerEntity("petstore_cage_3");
-
     public static final TagKey<EntityType<?>> REFUSES_COLLAR_TAGS = registerEntity("refuses_collar_tags");
+    public static final TagKey<EntityType<?>> REFUSES_PET_BEDS = registerEntity("refuses_pet_beds");
     public static final TagKey<Item> TAME_FROGS_WITH = registerItem("tame_frogs_with");
 
     private static TagKey<EntityType<?>> registerEntity(String name) {
