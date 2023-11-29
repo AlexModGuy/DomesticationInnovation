@@ -511,7 +511,7 @@ public class CommonProxy {
                     TameableUtils.setBlazingProtectionCooldown(event.getEntity(), cooldown);
                 }
             }
-            if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.HEALING_AURA)) {
+            if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.HEALING_AURA) && !event.getEntity().level().isClientSide) {
                 int time = TameableUtils.getHealingAuraTime(event.getEntity());
                 if (time > 0) {
                     List<LivingEntity> hurtNearby = TameableUtils.getAuraHealables(event.getEntity());
@@ -522,11 +522,11 @@ public class CommonProxy {
                     }
                     time--;
                     if (time == 0) {
-                        time = -600 - event.getEntity().getRandom().nextInt(600);
+                        time = -10 - event.getEntity().getRandom().nextInt(10);
                     }
                 } else if (time < 0) {
                     time++;
-                } else if ((event.getEntity().tickCount + event.getEntity().getId()) % 200 == 0 || TameableUtils.getHealingAuraImpulse(event.getEntity())) {
+                } else if ((event.getEntity().tickCount + event.getEntity().getId()) % 20 == 0 || TameableUtils.getHealingAuraImpulse(event.getEntity())) {
                     List<LivingEntity> hurtNearby = TameableUtils.getAuraHealables(event.getEntity());
                     if (!hurtNearby.isEmpty()) {
                         time = 200;

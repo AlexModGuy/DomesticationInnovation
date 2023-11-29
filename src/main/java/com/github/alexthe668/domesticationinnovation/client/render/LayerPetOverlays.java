@@ -278,8 +278,8 @@ public class LayerPetOverlays extends RenderLayer {
             if (TameableUtils.hasEnchant(living, DIEnchantmentRegistry.HEALING_AURA)) {
                 int t = TameableUtils.getHealingAuraTime(living);
                 if (t > 0) {
-                    float time = t > 20 ? 200 - Math.max(180, t - partialTicks) : t - partialTicks;
-                    float pulse = 0.9F + (float) (Math.sin(ageInTicks * 0.056F) * 0.1F + 0.1F);
+                    float time = t > 20 ? 200 - Math.max(180, t + partialTicks) : t - partialTicks;
+                    float pulse = 0.9F + (float) (Math.sin(realAge * 0.08F) * 0.1F + 0.1F);
                     float healscale = (Math.min(time, 20) / 20F) * 2.2F * pulse;
                     matrixStackIn.pushPose();
                     matrixStackIn.translate(0, 1.8F - entity.getBbHeight() * 0.5F, 0);
