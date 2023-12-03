@@ -9,15 +9,11 @@ import com.github.alexthe668.domesticationinnovation.server.entity.DIActivityReg
 import com.github.alexthe668.domesticationinnovation.server.entity.DIEntityRegistry;
 import com.github.alexthe668.domesticationinnovation.server.entity.DIVillagerRegistry;
 import com.github.alexthe668.domesticationinnovation.server.item.DIItemRegistry;
-import com.github.alexthe668.domesticationinnovation.server.misc.DICreativeModeTab;
 import com.github.alexthe668.domesticationinnovation.server.misc.DIPOIRegistry;
 import com.github.alexthe668.domesticationinnovation.server.misc.DIParticleRegistry;
 import com.github.alexthe668.domesticationinnovation.server.misc.DISoundRegistry;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.server.ServerAboutToStartEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -64,7 +60,7 @@ public class DomesticationMod {
     }
 
     private void setupClient(FMLClientSetupEvent event) {
-        PROXY.clientInit();
+        event.enqueueWork(() -> PROXY.clientInit());
     }
 
     private void setup(final FMLCommonSetupEvent event) {

@@ -3,6 +3,7 @@ package com.github.alexthe668.domesticationinnovation.server.block;
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
 import com.github.alexthe668.domesticationinnovation.server.entity.TameableUtils;
 import com.github.alexthe668.domesticationinnovation.server.misc.DIParticleRegistry;
+import com.github.alexthe668.domesticationinnovation.server.misc.DITagRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -45,9 +46,8 @@ public class PetBedBlock extends BaseEntityBlock {
         this.registerDefaultState(this.stateDefinition.any().setValue(WATERLOGGED, Boolean.valueOf(false)).setValue(FACING, Direction.NORTH));
     }
 
-
     public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
-        if(TameableUtils.isTamed(entity) && !level.isClientSide && DomesticationMod.CONFIG.petBedRespawns.get()){
+        if(!level.isClientSide() && DomesticationMod.CONFIG.petBedRespawns.get() && !entity.getType().is(DITagRegistry.REFUSES_PET_BEDS) && TameableUtils.isTamed(entity)){
            if((entity.tickCount + entity.getId()) % 10 == 0 && random.nextInt(6) == 0){
                TameableUtils.setPetBedPos((LivingEntity) entity, pos);
                TameableUtils.setPetBedDimension((LivingEntity) entity, level.dimension().toString());

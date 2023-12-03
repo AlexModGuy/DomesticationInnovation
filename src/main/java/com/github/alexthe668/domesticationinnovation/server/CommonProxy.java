@@ -154,7 +154,6 @@ public class CommonProxy {
         }
     }
 
-    // TODO :: Make it possible to also check for client-side
     private boolean canTickCollar(Entity entity){
         if(entity.level.isClientSide){
             return true;
@@ -262,7 +261,7 @@ public class CommonProxy {
     public void onLivingUpdate(LivingEvent.LivingTickEvent event) {
         int frozenTime = TameableUtils.getFrozenTime(event.getEntity());
         if (TameableUtils.couldBeTamed(event.getEntity()) && canTickCollar(event.getEntity())) {
-            if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.IMMUNITY_FRAME)) {
+            if (!event.getEntity().level.isClientSide() && TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.IMMUNITY_FRAME)) {
                 int i = TameableUtils.getImmuneTime(event.getEntity());
                 if (i > 0) {
                     TameableUtils.setImmuneTime(event.getEntity(), i - 1);
@@ -385,7 +384,7 @@ public class CommonProxy {
                     }
                 }
             }
-            if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.DISK_JOCKEY) && !event.getEntity().level.isClientSide) {
+            if (!event.getEntity().level.isClientSide() && event.getEntity().tickCount % 10 == 0 && TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.DISK_JOCKEY)) {
                 UUID uuid = TameableUtils.getPetJukeboxUUID(event.getEntity());
                 if (uuid == null || !(((ServerLevel) event.getEntity().level).getEntity(uuid) instanceof FollowingJukeboxEntity)) {
                     FollowingJukeboxEntity follower = DIEntityRegistry.FOLLOWING_JUKEBOX.get().create(event.getEntity().level);
@@ -437,10 +436,12 @@ public class CommonProxy {
                     ((ServerLevel) event.getEntity().level).sendParticles(ParticleTypes.REVERSE_PORTAL, event.getEntity().getRandomX(1.5F), event.getEntity().getY() - event.getEntity().getRandom().nextFloat(), event.getEntity().getRandomZ(1.5F), 0, 0, -0.2F, 0, 1.0D);
                 }
             }
-            int oreLvl = TameableUtils.getEnchantLevel(event.getEntity(), DIEnchantmentRegistry.ORE_SCENTING);
-            if (oreLvl > 0) {
-                int interval = 100 + Math.max(150, 550 - oreLvl * 100);
-                TameableUtils.detectRandomOres(event.getEntity(), interval, 5 + oreLvl * 2, oreLvl * 50, oreLvl * 3);
+            if (!event.getEntity().level.isClientSide()) {
+                int oreLvl = TameableUtils.getEnchantLevel(event.getEntity(), DIEnchantmentRegistry.ORE_SCENTING);
+                if (oreLvl > 0) {
+                    int interval = 100 + Math.max(150, 550 - oreLvl * 100);
+                    TameableUtils.detectRandomOres(event.getEntity(), interval, 5 + oreLvl * 2, oreLvl * 50, oreLvl * 3);
+                }
             }
             if (TameableUtils.isZombiePet(event.getEntity()) && !event.getEntity().level.isClientSide && event.getEntity() instanceof Mob mob) {
                 if (mob.getTarget() instanceof Player && ((Player) mob.getTarget()).isCreative()) {
@@ -454,49 +455,50 @@ public class CommonProxy {
                     mob.getNavigation().moveTo(mob.getTarget(), 1.0D);
                 }
             }
-            int psychicWallLevel = TameableUtils.getEnchantLevel(event.getEntity(), DIEnchantmentRegistry.PSYCHIC_WALL);
-            if (psychicWallLevel > 0 && event.getEntity() instanceof Mob mob) {
-                int cooldown = TameableUtils.getPsychicWallCooldown(mob);
-                if (cooldown > 0) {
-                    TameableUtils.setPsychicWallCooldown(mob, cooldown - 1);
-                } else {
-                    Entity blocking = null;
-                    Entity blockingFrom = null;
-                    if (mob.getTarget() != null) {
-                        blocking = mob.getTarget();
-                        blockingFrom = mob;
-                    } else if (TameableUtils.getOwnerOf(mob) instanceof LivingEntity owner) {
-                        if (owner.getLastHurtByMob() != null && owner.getLastHurtByMob().isAlive() && !TameableUtils.hasSameOwnerAs(mob, owner.getLastHurtByMob())) {
-                            blocking = owner.getLastHurtByMob();
-                            blockingFrom = owner;
+            if (!event.getEntity().level.isClientSide()) {
+                int psychicWallLevel = TameableUtils.getEnchantLevel(event.getEntity(), DIEnchantmentRegistry.PSYCHIC_WALL);
+                if (psychicWallLevel > 0 && event.getEntity() instanceof Mob mob) {
+                    int cooldown = TameableUtils.getPsychicWallCooldown(mob);
+                    if (cooldown > 0) {
+                        TameableUtils.setPsychicWallCooldown(mob, cooldown - 1);
+                    } else {
+                        Entity blocking = null;
+                        Entity blockingFrom = null;
+                        if (mob.getTarget() != null) {
+                            blocking = mob.getTarget();
+                            blockingFrom = mob;
+                        } else if (TameableUtils.getOwnerOf(mob) instanceof LivingEntity owner) {
+                            if (owner.getLastHurtByMob() != null && owner.getLastHurtByMob().isAlive() && !TameableUtils.hasSameOwnerAs(mob, owner.getLastHurtByMob())) {
+                                blocking = owner.getLastHurtByMob();
+                                blockingFrom = owner;
+                            }
+                            if (owner.getLastHurtMob() != null && owner.getLastHurtMob().isAlive() && !TameableUtils.hasSameOwnerAs(mob, owner.getLastHurtMob())) {
+                                blocking = owner.getLastHurtMob();
+                                blockingFrom = owner;
+                            }
                         }
-                        if (owner.getLastHurtMob() != null && owner.getLastHurtMob().isAlive() && !TameableUtils.hasSameOwnerAs(mob, owner.getLastHurtMob())) {
-                            blocking = owner.getLastHurtMob();
-                            blockingFrom = owner;
+                        if (blocking != null) {
+                            int width = psychicWallLevel + 1;
+                            float yAdditional = blocking.getBbHeight() * 0.5F + width * 0.5F;
+                            Vec3 vec3 = blockingFrom.position().add(0, yAdditional, 0);
+                            Vec3 vec32 = blocking.position().add(0, yAdditional, 0);
+                            Vec3 vec33 = vec3.add(vec32);
+                            Vec3 avg = new Vec3(vec33.x / 2F, Math.floor(vec33.y / 2F), vec33.z / 2F);
+                            Vec3 rotationFrom = avg.subtract(vec3);
+                            Direction dir = Direction.getNearest(rotationFrom.x, rotationFrom.y, rotationFrom.z);
+                            PsychicWallEntity wall = DIEntityRegistry.PSYCHIC_WALL.get().create(mob.level);
+                            wall.setPos(avg.x, avg.y, avg.z);
+                            wall.setBlockWidth(width);
+                            wall.setCreatorId(mob.getUUID());
+                            wall.setLifespan(psychicWallLevel * 100);
+                            wall.setWallDirection(dir);
+                            mob.level.addFreshEntity(wall);
+                            TameableUtils.setPsychicWallCooldown(mob, psychicWallLevel * 200 + 40);
                         }
-                    }
-                    if (blocking != null) {
-                        int width = psychicWallLevel + 1;
-                        float yAdditional = blocking.getBbHeight() * 0.5F + width * 0.5F;
-                        Vec3 vec3 = blockingFrom.position().add(0, yAdditional, 0);
-                        Vec3 vec32 = blocking.position().add(0, yAdditional, 0);
-                        Vec3 vec33 = vec3.add(vec32);
-                        Vec3 avg = new Vec3(vec33.x / 2F, Math.floor(vec33.y / 2F), vec33.z / 2F);
-                        Vec3 rotationFrom = avg.subtract(vec3);
-                        Direction dir = Direction.getNearest(rotationFrom.x, rotationFrom.y, rotationFrom.z);
-                        PsychicWallEntity wall = DIEntityRegistry.PSYCHIC_WALL.get().create(mob.level);
-                        wall.setPos(avg.x, avg.y, avg.z);
-                        wall.setBlockWidth(width);
-                        wall.setCreatorId(mob.getUUID());
-                        wall.setLifespan(psychicWallLevel * 100);
-                        wall.setWallDirection(dir);
-                        mob.level.addFreshEntity(wall);
-                        TameableUtils.setPsychicWallCooldown(mob, psychicWallLevel * 200 + 40);
                     }
                 }
             }
 
-            // FIXME Workaround :: The CollarTickTracker always allows syncs from the client side, which results in a race condition with the tag swap update
             if (!event.getEntity().level.isClientSide() && TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.BLAZING_PROTECTION)) {
                 int bars = TameableUtils.getBlazingProtectionBars(event.getEntity());
                 if (bars < 2 * TameableUtils.getEnchantLevel(event.getEntity(), DIEnchantmentRegistry.BLAZING_PROTECTION)) {
@@ -511,7 +513,6 @@ public class CommonProxy {
                 }
             }
 
-            // FIXME Workaround :: The CollarTickTracker always allows syncs from the client side, which results in a race condition with the tag swap update
             if (!event.getEntity().level.isClientSide() && TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.HEALING_AURA)) {
                 int time = TameableUtils.getHealingAuraTime(event.getEntity());
                 if (time > 0) {
@@ -625,7 +626,7 @@ public class CommonProxy {
                     event.getEntity().addAdditionalSaveData(tag);
                     recallBall.setContainedData(tag);
                     recallBall.setContainedEntityType(Registry.ENTITY_TYPE.getKey(event.getEntity().getType()).toString());
-                    recallBall.copyPosition(event.getEntity());
+                    recallBall.setPos(event.getEntity().getX(), Math.max(event.getEntity().getY(), event.getEntity().level.getMinBuildHeight() + 1), event.getEntity().getZ());
                     recallBall.setYRot(event.getEntity().getYRot());
                     recallBall.setInvulnerable(true);
                     event.getEntity().stopRiding();
