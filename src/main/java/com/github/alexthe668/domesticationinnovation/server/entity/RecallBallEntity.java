@@ -10,9 +10,12 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.players.OldUsersConverter;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -97,6 +100,9 @@ public class RecallBallEntity extends Entity {
         }
         if(random.nextFloat() < 0.4F){
             this.level().addParticle(ParticleTypes.PORTAL, this.getRandomX(0.5D), this.getRandomY() - 0.25D, this.getRandomZ(0.5D), (this.random.nextDouble() - 0.5D) * 2.0D, -this.random.nextDouble(), (this.random.nextDouble() - 0.5D) * 2.0D);
+        }
+        if(this.getY() < level().getMinBuildHeight()){
+            this.setPos(this.getX(), level().getMinBuildHeight() + 1.2F, this.getZ());
         }
         if(this.entityData.get(OPENED) && openProgress >= 1F && !this.isFinished()){
             if(!level().isClientSide){
@@ -188,6 +194,10 @@ public class RecallBallEntity extends Entity {
 
     public void setContainedData(CompoundTag containedData) {
         this.entityData.set(CONTAINED_ENTITY_DATA, containedData);
+    }
+
+    public boolean isInvulnerableTo(DamageSource damageSource) {
+        return damageSource.isCreativePlayer();
     }
 
     public float getOpenProgress(float f){
