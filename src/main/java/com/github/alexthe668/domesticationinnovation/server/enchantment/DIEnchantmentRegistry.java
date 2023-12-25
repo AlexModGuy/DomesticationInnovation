@@ -49,7 +49,8 @@ public class DIEnchantmentRegistry {
     public static final PetEnchantment BLAZING_PROTECTION = new PetEnchantmentLootOnly("blazing_protection", Enchantment.Rarity.VERY_RARE, 3, 8);
     public static final PetEnchantment HEALING_AURA = new PetEnchantment("healing_aura", Enchantment.Rarity.RARE, 2, 12);
 
-    public static final PetEnchantment REJUVENATION = new PetEnchantment("rejuvenation", Enchantment.Rarity.UNCOMMON, 1, 6);
+    public static final PetEnchantment REJUVENATION = new PetEnchantment("rejuvenation", Enchantment.Rarity.COMMON, 1, 1);
+    public static final PetEnchantment PACIFIST = new PetEnchantment("pacifist", Enchantment.Rarity.UNCOMMON, 1, 4);
     public static final PetEnchantment UNDEAD_CURSE = new PetEnchantmentCurse("undead_curse", Enchantment.Rarity.VERY_RARE);
     public static final PetEnchantment INFAMY_CURSE = new PetEnchantmentCurse("infamy_curse", Enchantment.Rarity.VERY_RARE);
     public static final PetEnchantment BLIGHT_CURSE = new PetEnchantmentCurse("blight_curse", Enchantment.Rarity.VERY_RARE);
